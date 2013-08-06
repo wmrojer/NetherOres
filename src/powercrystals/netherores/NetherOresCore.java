@@ -12,6 +12,7 @@ import powercrystals.netherores.net.ConnectionHandler;
 import powercrystals.netherores.net.INetherOresProxy;
 import powercrystals.netherores.net.ServerPacketHandler;
 import powercrystals.netherores.ores.BlockNetherOres;
+import powercrystals.netherores.ores.BlockNetherOverrideOre;
 import powercrystals.netherores.ores.ItemBlockNetherOre;
 import powercrystals.netherores.ores.Ores;
 import powercrystals.netherores.world.BlockHellfish;
@@ -54,7 +55,7 @@ public class NetherOresCore extends BaseMod
 	
 	public static final String mobTexureFolder = "/textures/mob/powercrystals/netherores/";
 
-	public static Block[] blockNetherOres = new Block[(int)((Ores.values().length + 15) / 16)];
+	public static Block[] blockNetherOres = new Block[(Ores.values().length + 15) / 16];
 	public static Block blockHellfish;
 	
 	private static Property[] netherOreBlockIds = new Property[blockNetherOres.length];
@@ -72,6 +73,7 @@ public class NetherOresCore extends BaseMod
 	public static Property enableInductionSmelterRecipes;
 	public static Property forceOreSpawn;
 	public static Property worldGenAllDimensions;
+	public static Property enableHellQuartz;
 	
 	@SidedProxy(clientSide = "powercrystals.netherores.net.ClientProxy", serverSide="powercrystals.netherores.net.ServerProxy")
 	public static INetherOresProxy proxy;
@@ -98,6 +100,13 @@ public class NetherOresCore extends BaseMod
 		blockHellfish = new BlockHellfish(hellfishBlockId.getInt());
 		GameRegistry.registerBlock(blockHellfish, "netherOresBlockHellfish");
 		GameRegistry.registerWorldGenerator(new NetherOresWorldGenHandler());
+		if (enableHellQuartz.getBoolean(true))
+		{
+			int id = Block.oreNetherQuartz.blockID;
+			Block.blocksList[id] = null;
+			Block quartz = new BlockNetherOverrideOre(id).setHardness(3.0F).setResistance(5.0F).setStepSound(Block.soundStoneFootstep).setUnlocalizedName("netherquartz");
+			Block.oreNetherQuartz = quartz;
+		}
 		
 		for(Ores o : Ores.values())
 		{
@@ -221,6 +230,8 @@ public class NetherOresCore extends BaseMod
 		enableHellfish.comment = "If true, Hellfish will spawn in the Nether. Note that setting this false will not kill active Hellfish mobs.";
 		worldGenAllDimensions = c.get(Configuration.CATEGORY_GENERAL, "AllDimensionWorldGen", false);
 		worldGenAllDimensions.comment = "If true, Nether Ores oregen will run in all dimensions instead of just the Nether. It will still require netherrack to place ores.";
+		enableHellQuartz = c.get(Configuration.CATEGORY_GENERAL, "OverrideNetherQuartz", true);
+		enableHellQuartz.comment = "If true, Nether Quartz ore will be a NetherOre and will follow the same rules as all other NetherOres.";
 
 		for(Ores o : Ores.values())
 		{

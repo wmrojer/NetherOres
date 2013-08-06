@@ -55,7 +55,7 @@ public enum Ores
 	private Ores(String oreSuffix, int groupsPerChunk, int blocksPerGroup, int smeltCount, int maceCount)
 	{
 		int meta = this.ordinal();
-		_blockIndex = (int)(meta / 16);
+		_blockIndex = meta / 16;
 		_metadata = meta % 16;
 		_oreName = "ore" + oreSuffix;
 		_dustName = "dust" + oreSuffix;

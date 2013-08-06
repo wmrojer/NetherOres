@@ -26,7 +26,7 @@ public class BlockHellfish extends BlockNetherrack
 	@Override
 	public void registerIcons(IconRegister ir)
 	{
-		_icon = ir.registerIcon("powercrystals/netherores/" + getUnlocalizedName());
+		_icon = ir.registerIcon("hellrock");
 	}
 	
 	@Override
@@ -61,12 +61,12 @@ public class BlockHellfish extends BlockNetherrack
 		super.onBlockDestroyedByExplosion(world, x, y, z, explosion);
 	}
 	
-	private void spawnHellfish(World world, int x, int y, int z)
+	public static void spawnHellfish(World world, int x, int y, int z)
 	{
 		if(!world.isRemote && NetherOresCore.enableHellfish.getBoolean(true))
 		{
 			EntityHellfish hellfish = new EntityHellfish(world);
-			hellfish.setLocationAndAngles((double)x + 0.5D, (double)y, (double)z + 0.5D, 0.0F, 0.0F);
+			hellfish.setLocationAndAngles(x + 0.5D, y, z + 0.5D, 0.0F, 0.0F);
 			world.spawnEntityInWorld(hellfish);
 			hellfish.spawnExplosionParticle();
 		}

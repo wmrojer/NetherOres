@@ -12,6 +12,7 @@ import net.minecraft.world.World;
 public class EntityArmedOre extends Entity
 {
 	private int _fuse;
+	private int _target;
 	
 	public EntityArmedOre(World world)
 	{
@@ -21,8 +22,10 @@ public class EntityArmedOre extends Entity
 		setSize(0.0F, 0.0F);
 		yOffset = height / 2.0F;
 	}
+
+	public EntityArmedOre(World world, double x, double y, double z) { this(world, x, y, z, null); }
 	
-	public EntityArmedOre(World world, double x, double y, double z)
+	public EntityArmedOre(World world, double x, double y, double z, Block block)
 	{
 		this(world);
 		setPosition(x, y, z);
@@ -33,6 +36,7 @@ public class EntityArmedOre extends Entity
 		prevPosX = x;
 		prevPosY = y;
 		prevPosZ = z;
+		_target = block != null ? block.blockID : -1;
 	}
 
 	@Override
@@ -71,10 +75,7 @@ public class EntityArmedOre extends Entity
 	private void explode()
 	{
 		int blockId = worldObj.getBlockId(MathHelper.floor_double(posX), MathHelper.floor_double(posY), MathHelper.floor_double(posZ));
-		boolean found = false;
-		for (Block b : NetherOresCore.blockNetherOres)
-			if ((found = b.blockID == blockId))
-				break;
+		boolean found = blockId == _target;
 		if (found)
 		{
 			worldObj.newExplosion(null, this.posX, this.posY, this.posZ, NetherOresCore.explosionPower.getInt(), true, true);

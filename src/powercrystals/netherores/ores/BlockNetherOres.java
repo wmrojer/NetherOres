@@ -83,7 +83,7 @@ public class BlockNetherOres extends Block
 	{
 		if(player == null || !EnchantmentHelper.getSilkTouchModifier(player))
 		{
-			checkExplosionChances(world, x, y, z);				
+			checkExplosionChances(this, world, x, y, z);				
 		}
 		
 		return super.removeBlockByPlayer(world, player, x, y, z);
@@ -94,11 +94,11 @@ public class BlockNetherOres extends Block
 	{
 		if(NetherOresCore.enableExplosionChainReactions.getBoolean(true))
 		{
-			checkExplosionChances(world, x, y, z);
+			checkExplosionChances(this, world, x, y, z);
 		}
 	}
 	
-	private void checkExplosionChances(World world, int x, int y, int z)
+	public static void checkExplosionChances(Block block, World world, int x, int y, int z)
 	{
 		if(!world.isRemote && NetherOresCore.enableExplosions.getBoolean(true))
 		{
@@ -117,9 +117,9 @@ public class BlockNetherOres extends Block
 							continue;
 						}
 						
-						if(world.getBlockId(tx, ty, tz) == blockID && world.rand.nextInt(1000) < NetherOresCore.explosionProbability.getInt())
+						if(world.getBlockId(tx, ty, tz) == block.blockID && world.rand.nextInt(1000) < NetherOresCore.explosionProbability.getInt())
 						{
-							EntityArmedOre eao = new EntityArmedOre(world, tx + 0.5, ty + 0.5, tz + 0.5);
+							EntityArmedOre eao = new EntityArmedOre(world, tx + 0.5, ty + 0.5, tz + 0.5, block);
 							world.spawnEntityInWorld(eao);
 							
 							world.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "random.fuse", 1.0F, 1.0F);
@@ -130,7 +130,7 @@ public class BlockNetherOres extends Block
 		}
 	}
 	
-	private void angerPigmen(EntityPlayer player, World world, int x, int y, int z)
+	public static void angerPigmen(EntityPlayer player, World world, int x, int y, int z)
 	{
 		List<?> list = world.getEntitiesWithinAABB(EntityPigZombie.class,
 				AxisAlignedBB.getBoundingBox(x - _aggroRange, y - _aggroRange, z - _aggroRange, x + _aggroRange + 1, y + _aggroRange + 1, z + _aggroRange + 1));
