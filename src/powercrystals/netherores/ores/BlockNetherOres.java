@@ -46,7 +46,7 @@ public class BlockNetherOres extends Block
 		Ores[] ores = Ores.values();
 		for(int i = 0, e = Math.min(_blockIndex * 16 + 15, ores.length - 1) % 16; i <= e; i++)
 		{
-			_netherOresIcons[i] = ir.registerIcon("powercrystals/netherores/" + getUnlocalizedName() + "_" + i);
+			_netherOresIcons[i] = ir.registerIcon("netherores:" + getUnlocalizedName() + "_" + i);
 		}
 	}
 	

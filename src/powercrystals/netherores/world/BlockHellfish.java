@@ -1,5 +1,8 @@
 package powercrystals.netherores.world;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 import java.util.Random;
 
 import powercrystals.netherores.NetherOresCore;
@@ -13,6 +16,7 @@ import net.minecraft.world.World;
 
 public class BlockHellfish extends BlockNetherrack
 {
+	@SideOnly(Side.CLIENT)
 	private Icon _icon;
 	
 	public BlockHellfish(int blockId)
@@ -24,12 +28,15 @@ public class BlockHellfish extends BlockNetherrack
 	}
 	
 	@Override
+	@SideOnly(Side.CLIENT)
 	public void registerIcons(IconRegister ir)
 	{
-		_icon = ir.registerIcon("hellrock");
+		Block.netherrack.registerIcons(ir);
+		_icon = Block.netherrack.getIcon(0, 0);
 	}
 	
 	@Override
+	@SideOnly(Side.CLIENT)
 	public Icon getIcon(int side, int meta)
 	{
 		return _icon;

@@ -51,7 +51,7 @@ public class NetherOresCore extends BaseMod
 	public static final String version = "1.6.4R2.2.0B1";
 	public static final String modName = "Nether Ores";
 	
-	public static final String mobTexureFolder = "/textures/mob/powercrystals/netherores/";
+	public static final String mobTexureFolder = "netherores:mob/";
 
 	public static Block[] blockNetherOres = new Block[(Ores.values().length + 15) / 16];
 	public static Block blockHellfish;
@@ -102,7 +102,7 @@ public class NetherOresCore extends BaseMod
 		{
 			int id = Block.oreNetherQuartz.blockID;
 			Block.blocksList[id] = null;
-			Block quartz = new BlockNetherOverrideOre(id).setHardness(3.0F).setResistance(5.0F).setStepSound(Block.soundStoneFootstep).setUnlocalizedName("netherquartz");
+			Block quartz = new BlockNetherOverrideOre(id).setHardness(3.0F).setResistance(5.0F).setStepSound(Block.soundStoneFootstep).setUnlocalizedName("netherquartz").setTextureName("quartz_ore");
 			Block.oreNetherQuartz = quartz;
 		}
 		
