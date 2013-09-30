@@ -157,7 +157,7 @@ public enum Ores
 			ItemStack maceTo = maceStack.copy();
 			maceTo.stackSize = _maceCount;
 
-			 Recipes.macerator.addRecipe(new RecipeInputItemStack(new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata)), null, maceTo.copy());
+			Recipes.macerator.addRecipe(new RecipeInputItemStack(new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata)), null, maceTo.copy());
 		}
 		
 		/*if(NetherOresCore.enablePulverizerRecipes.getBoolean(true) && Loader.isModLoaded("ThermalExpansion"))
