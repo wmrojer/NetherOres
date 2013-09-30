@@ -109,7 +109,7 @@
 	</target>
 
 	<available property="forge-exists" file="${download.dir}/minecraftforge-src-${forge.version}.zip" />
-	<available property="already-compiled" file="${classes.dir}/powercrystals" />
+	<available property="already-compiled" file="${classes.dir}/powercrystals/netherores" />
 	<condition property="should-download-ant-contrib">
 		<or>
 			<available file="${download.dir}/ant-contrib/ant-contrib-1.0b3.jar"/>
@@ -127,11 +127,11 @@
 	<target name="build" depends="extract-dependencies" unless="already-compiled">
 		<!-- Recompile -->
 		<depend srcdir="${mcpsrc.dir}" destdir="${mcp.dir}/bin/minecraft">
-			<include name="powercrystals/core/**/*.java"/>
+			<include name="powercrystals/netherores/**/*.java"/>
 		</depend>
 		<javac srcdir="${mcpsrc.dir}" destdir="${mcp.dir}/bin/minecraft" target="1.6" source="1.6"
 			classpathref="mcp.classpath" debug="true" debuglevel="lines,source" includeAntRuntime="false">
-			<include name="powercrystals/core/**/*.java"/>
+			<include name="powercrystals/netherores/**/*.java"/>
 		</javac>
 		<!--<exec dir="${mcp.dir}" executable="${windows.python}"
 			osfamily="windows" failonerror="true">
