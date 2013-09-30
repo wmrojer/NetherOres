@@ -28,9 +28,7 @@ import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.OreDictionary.OreRegisterEvent;
 import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.Init;
-import cpw.mods.fml.common.Mod.PostInit;
-import cpw.mods.fml.common.Mod.PreInit;
+import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
@@ -50,7 +48,7 @@ connectionHandler = ConnectionHandler.class)
 public class NetherOresCore extends BaseMod
 {
 	public static final String modId = "NetherOres";
-	public static final String version = "1.5.1R2.1.5";
+	public static final String version = "1.6.4R2.2.0B1";
 	public static final String modName = "Nether Ores";
 	
 	public static final String mobTexureFolder = "/textures/mob/powercrystals/netherores/";
@@ -78,7 +76,7 @@ public class NetherOresCore extends BaseMod
 	@SidedProxy(clientSide = "powercrystals.netherores.net.ClientProxy", serverSide="powercrystals.netherores.net.ServerProxy")
 	public static INetherOresProxy proxy;
 
-	@PreInit
+	@EventHandler
 	public void preInit(FMLPreInitializationEvent evt)
 	{
 		setConfigFolderBase(evt.getModConfigurationDirectory());
@@ -89,7 +87,7 @@ public class NetherOresCore extends BaseMod
 		loadLang();
 	}
 
-	@Init
+	@EventHandler
 	public void load(FMLInitializationEvent evt)
 	{
 		for (int i = 0, e = blockNetherOres.length; i < e; ++i)
@@ -121,7 +119,7 @@ public class NetherOresCore extends BaseMod
 		TickRegistry.registerScheduledTickHandler(new UpdateManager(this), Side.CLIENT);
 	}
 	
-	@PostInit
+	@EventHandler
 	public void postInit(FMLPostInitializationEvent e)
 	{
 		if(enableStandardFurnaceRecipes.getBoolean(true) || enableInductionSmelterRecipes.getBoolean(true))

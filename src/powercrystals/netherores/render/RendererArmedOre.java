@@ -2,6 +2,7 @@ package powercrystals.netherores.render;
 
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.ResourceLocation;
 
 import powercrystals.netherores.entity.EntityArmedOre;
 
@@ -24,5 +25,10 @@ public class RendererArmedOre extends Render
 	public void doRender(Entity entity, double x, double y, double z, float par8, float par9)
 	{
 		renderArmedOre((EntityArmedOre)entity, x, y, z, par8, par9);
+	}
+
+	@Override
+	protected ResourceLocation getEntityTexture(Entity entity) {
+		return null;
 	}
 }

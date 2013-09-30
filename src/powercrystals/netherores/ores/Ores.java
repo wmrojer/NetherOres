@@ -1,11 +1,9 @@
 package powercrystals.netherores.ores;
 
 import cpw.mods.fml.common.Loader;
+import ic2.api.recipe.RecipeInputItemStack;
 import ic2.api.recipe.Recipes;
 import powercrystals.netherores.NetherOresCore;
-import thermalexpansion.api.crafting.CraftingManagers;
-import thermalexpansion.api.item.ItemRegistry;
-import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraftforge.common.Configuration;
@@ -138,7 +136,7 @@ public enum Ores
 			FurnaceRecipes.smelting().addSmelting(NetherOresCore.getOreBlock(_blockIndex).blockID, _metadata, smeltTo, 1F);
 		}
 		
-		if(NetherOresCore.enableInductionSmelterRecipes.getBoolean(true) && Loader.isModLoaded("ThermalExpansion"))
+		/*if(NetherOresCore.enableInductionSmelterRecipes.getBoolean(true) && Loader.isModLoaded("ThermalExpansion"))
 		{
 			ItemStack smeltToReg = smeltStack.copy();
 			ItemStack smeltToRich = smeltStack.copy();
@@ -148,7 +146,7 @@ public enum Ores
 		   
 			CraftingManagers.smelterManager.addRecipe(320, new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata), new ItemStack(Block.sand), smeltToReg, ItemRegistry.getItem("slagRich", 1), 10, false);
 			CraftingManagers.smelterManager.addRecipe(400, new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata), ItemRegistry.getItem("slagRich", 1), smeltToRich, ItemRegistry.getItem("slag", 1), 80, false);
-		}
+		}//*/
 	}
 	
 	public void registerMacerator(ItemStack maceStack)
@@ -159,10 +157,10 @@ public enum Ores
 			ItemStack maceTo = maceStack.copy();
 			maceTo.stackSize = _maceCount;
 
-			 Recipes.macerator.addRecipe(new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata), maceTo.copy());
+			 Recipes.macerator.addRecipe(new RecipeInputItemStack(new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata)), null, maceTo.copy());
 		}
 		
-		if(NetherOresCore.enablePulverizerRecipes.getBoolean(true) && Loader.isModLoaded("ThermalExpansion"))
+		/*if(NetherOresCore.enablePulverizerRecipes.getBoolean(true) && Loader.isModLoaded("ThermalExpansion"))
 		{
 			ItemStack pulvPriTo = maceStack.copy();
 			ItemStack pulvSecTo = new ItemStack(Block.netherrack);
@@ -171,7 +169,7 @@ public enum Ores
 			pulvSecTo.stackSize = 1;
 		   
 			CraftingManagers.pulverizerManager.addRecipe(400, new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata), pulvPriTo, pulvSecTo, 15, false);
-		}
+		}//*/
 	}
 	
 	public void loadConfig(Configuration c)

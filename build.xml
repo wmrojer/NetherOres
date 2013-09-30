@@ -7,8 +7,8 @@
 	<property name="build.dir" value="build" />
 	<property name="classes.dir" value="${build.dir}/packaging" />
 	<property name="src.dir" value="src" />
-	<property name="forge.buildnum" value="691" />
-	<property name="forge.version" value="1.5.2-7.8.0.${forge.buildnum}" />
+	<property name="forge.buildnum" value="884" />
+	<property name="forge.version" value="1.6.4-9.11.0.${forge.buildnum}" />
 	<property name="forge.url" value="http://files.minecraftforge.net/minecraftforge/minecraftforge-src-${forge.version}.zip" />
 	<property name="forge.dir" value="${build.dir}/forge" />
 	<property name="mcp.dir" value="${forge.dir}/mcp" />
@@ -31,40 +31,53 @@
 
 	<property name="verclass.dir" value="${mcpsrc.dir}/powercrystals/netherores" />
 	<property name="verclass.name" value="NetherOresCore.java"/>
-	
-		<condition property="have-apis">
+
+	<condition property="have-apis">
 		<and>
-			<available file="${download.dir}/PowerCrystalsCore-master.zip"/>
-			<available file="${download.dir}/BuildCraft-master.zip"/>
-			<available file="${download.dir}/thermalexpansion.zip"/>
-			<available file="${download.dir}/industrialcraft-2-api.zip"/>
+			<available file="${mcpsrc.dir}/powercrystals/core" type="dir"/>
+			<available file="${mcpsrc.dir}/buildcraft" type="dir"/>
+			<available file="${mcpsrc.dir}/ic2" type="dir"/>
+			<!--<available file="${mcpsrc.dir}/thermalexpansion" type="dir"/>-->
 		</and>
 	</condition>
+	
+    <path id="mcp.classpath">
+        <pathelement location="${mcp.dir}/bin/minecraft"/>
+        <fileset dir="${mcp.dir}/jars/libraries/">
+          <include name="**/*.jar"/>
+          <exclude name="**/*-sources.jar"/>
+        </fileset>
+        <pathelement location="${mcp.dir}/jars/bin/jinput.jar"/>
+        <pathelement location="${mcp.dir}/jars/bin/lwjgl.jar"/>
+        <pathelement location="${mcp.dir}/jars/bin/lwjgl_util.jar"/>
+    </path>
 
 	<target name="get-dependencies" depends="get-version" unless="${have-apis}">
+		<!--
 		<echo message="Downloading Thermal Expansion API... " />
 		<get src="https://dl.dropboxusercontent.com/u/57416963/Minecraft/Mods/ThermalExpansion/api/ThermalExpansion-API-2.3.0.zip" dest="${download.dir}/thermalexpansion.zip" />
+		-->
 		
 		<echo message="Downloading IC2... " />
-		<get src="http://www.powercrystalsmods.com/build/ic2-api.zip" dest="${download.dir}/industrialcraft-2-api.zip" />
+		<get src="http://ic2api.player.to:8080/job/IC2_experimental/234/artifact/packages/industrialcraft-2-api_2.0.234-experimental.zip" dest="${download.dir}/industrialcraft-2-api.zip" />
 		
 		<echo message="Downloading BuildCraft API..." />
-		<get src="https://github.com/BuildCraft/BuildCraft/archive/master.zip" dest="${download.dir}/BuildCraft-master.zip"/>
+		<get src="https://github.com/BuildCraft/BuildCraft/archive/3e13bbb166568624cc918f8a9f916fa2062f6c37.zip" dest="${download.dir}/Buildcraft-master.zip"/>
 	</target>
 
-	<target name="extract-dependencies" depends="setup-forge,get-dependencies">
+	<target name="extract-dependencies" depends="setup-forge,get-dependencies" unless="${have-apis}">
 		<copy todir="${mcpsrc.dir}/powercrystals/core">
-			<fileset dir="${download.dir}/PowerCrystalsCore-master/src/powercrystals/core" />
+			<fileset dir="${download.dir}/PowerCrystalsCore-1.6.4/src/powercrystals/core" />
 		</copy>
 		
 		<echo message="Extracting BuildCraft API..." />
 		<unzip src="${download.dir}/BuildCraft-master.zip" dest="${download.dir}"/>
 		<mkdir dir="${mcpsrc.dir}/buildcraft/" />
-		<move file="${download.dir}/BuildCraft-master/common/buildcraft/api" todir="${mcpsrc.dir}/buildcraft/"/>
+		<move file="${download.dir}/Buildcraft-3e13bbb166568624cc918f8a9f916fa2062f6c37/common/buildcraft/api" todir="${mcpsrc.dir}/buildcraft/"/>
 		
-		<echo message="Extracting Thermal Expansion API... " />
+		<!--<echo message="Extracting Thermal Expansion API... " />
 		<unzip src="${download.dir}/thermalexpansion.zip" dest="${download.dir}" />
-		<move file="${download.dir}/thermalexpansion" todir="${mcpsrc.dir}" />
+		<move file="${download.dir}/thermalexpansion" todir="${mcpsrc.dir}" />-->
 		
 		<echo message="Extracting IC2 API... " />
 		<unzip src="${download.dir}/industrialcraft-2-api.zip" dest="${download.dir}" />
@@ -113,13 +126,21 @@
 
 	<target name="build" depends="extract-dependencies" unless="already-compiled">
 		<!-- Recompile -->
-		<exec dir="${mcp.dir}" executable="cmd" osfamily="windows" failonerror="true">
-			<arg line="/c recompile.bat"/>
+		<depend srcdir="${mcpsrc.dir}" destdir="${mcp.dir}/bin/minecraft">
+			<include name="powercrystals/core/**/*.java"/>
+		</depend>
+		<javac srcdir="${mcpsrc.dir}" destdir="${mcp.dir}/bin/minecraft" target="1.6" source="1.6"
+			classpathref="mcp.classpath" debug="true" debuglevel="lines,source" includeAntRuntime="false">
+			<include name="powercrystals/core/**/*.java"/>
+		</javac>
+		<!--<exec dir="${mcp.dir}" executable="${windows.python}"
+			osfamily="windows" failonerror="true">
+			<arg line="runtime/recompile.py" />
 		</exec>
 
-		<exec dir="${mcp.dir}" executable="sh" osfamily="unix" failonerror="true">
+		<exec dir="${mcp.dir}" executable="sh" osfamily="unix">
 			<arg value="recompile.sh" />
-		</exec>
+		</exec>-->
 
 		<!-- Reobf -->
 		<exec dir="${mcp.dir}" executable="cmd" osfamily="windows">
@@ -181,7 +202,7 @@
 
 		<chmod file="${forge.dir}/install.sh" perm="+x"/>
 
-		<copy file="${download.dir}/PowerCrystalsCore-master/pcc_at.cfg" todir="${forge.dir}/accesstransformers/"/>
+		<copy file="${download.dir}/PowerCrystalsCore-1.6.4/pcc_at.cfg" todir="${forge.dir}/accesstransformers/"/>
 
 		<!-- Install forge -->
 		<delete dir="${mcp.dir}" failonerror="no"/>
@@ -219,15 +240,12 @@
 			</classpath>
 		</taskdef>
 		<echo message="Downloading forge... " />
-		<getMethod url="http://files.minecraftforge.net/minecraftforge-src-${forge.version}.zip"
-							 responseDataFile="${download.dir}/minecraftforge-src-${forge.version}.zip">
-			<header name="User-Agent" value="Ant-${ant.version}/${ant.java.version}"/>
-		</getMethod>
+		<get src="${forge.url}" dest="${download.dir}/minecraftforge-src-${forge.version}.zip" />
 	</target>
 	
 	<target name="download-core" unless="forge-exists">
 		<echo message="Downloading PowerCrystalsCore... " />
-		<get src="https://github.com/powercrystals/PowerCrystalsCore/archive/master.zip" dest="${download.dir}/PowerCrystalsCore-master.zip"/>
+		<get src="https://github.com/skyboy/PowerCrystalsCore/archive/1.6.4.zip" dest="${download.dir}/PowerCrystalsCore-master.zip"/>
 		
 		<echo message="Extracting PowerCrystalsCore... " />
 		<unzip src="${download.dir}/PowerCrystalsCore-master.zip" dest="${download.dir}"/>

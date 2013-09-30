@@ -2,6 +2,7 @@ package powercrystals.netherores.entity;
 
 import powercrystals.netherores.NetherOresCore;
 import net.minecraft.block.Block;
+import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.monster.EntitySilverfish;
 import net.minecraft.util.Facing;
 import net.minecraft.util.MathHelper;
@@ -12,8 +13,13 @@ public class EntityHellfish extends EntitySilverfish
 	public EntityHellfish(World world)
 	{
 		super(world);
-		this.texture = NetherOresCore.mobTexureFolder + "hellfish.png";
-		this.moveSpeed = 0.9F;
+	}
+	
+	@Override
+	protected void applyEntityAttributes()
+	{
+		super.applyEntityAttributes();
+		this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setAttribute(0.9D);
 		this.isImmuneToFire = true;
 	}
 	
