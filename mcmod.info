@@ -1,24 +1,22 @@
 [
-{
-  "modid": "NetherOres",
-  "name": "Nether Ores",
-  "description": "Introduces mineable yet dangerous ores to the Nether",
-  "version": "2.0.4",
-  "mcversion": "1.6.4",
-  "url": "http://www.minecraftforum.net/topic/1629898-",
-  "updateUrl": "",
-  "authors": [
-    "PowerCrystals",
-	"TehKrush",
-	"AtomicStryker",
-	"skyboy026"
-  ],
-  "credits": "",
-  "logoFile": "",
-  "screenshots": [
-  ],
-  "parent":"",
-  "dependencies": [
-  ]
-}
+    {
+        "name": "Nether Ores", 
+        "parent": "", 
+        "url": "http://www.minecraftforum.net/topic/1629898-", 
+        "logoFile": "", 
+        "updateUrl": "", 
+        "credits": "", 
+        "version": "2.2.0B1", 
+        "modid": "NetherOres", 
+        "authors": [
+            "PowerCrystals", 
+            "TehKrush", 
+            "AtomicStryker", 
+            "skyboy026"
+        ], 
+        "mcversion": "1.6.4", 
+        "screenshots": [], 
+        "dependencies": [], 
+        "description": "Introduces mineable yet dangerous ores to the Nether"
+    }
 ]

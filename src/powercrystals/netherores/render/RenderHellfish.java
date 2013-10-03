@@ -3,15 +3,15 @@ package powercrystals.netherores.render;
 import powercrystals.netherores.NetherOresCore;
 
 import net.minecraft.client.renderer.entity.RenderSilverfish;
-import net.minecraft.entity.monster.EntitySilverfish;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 
 public class RenderHellfish extends RenderSilverfish
 {
-    private static final ResourceLocation silverfishTextures = new ResourceLocation(NetherOresCore.mobTexureFolder + "hellfish.png");
+    private static final ResourceLocation silverfishTextures = new ResourceLocation(NetherOresCore.mobTextureFolder + "hellfish.png");
 
     @Override
-	protected ResourceLocation getSilverfishTextures(EntitySilverfish par1EntitySilverfish)
+	protected ResourceLocation getEntityTexture(Entity par1Entity)
     {
         return silverfishTextures;
     }

@@ -1,45 +1,23 @@
 package powercrystals.netherores.world;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-
 import java.util.Random;
 
 import powercrystals.netherores.NetherOresCore;
 import powercrystals.netherores.entity.EntityHellfish;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockNetherrack;
-import net.minecraft.client.renderer.texture.IconRegister;
-import net.minecraft.util.Icon;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 
 public class BlockHellfish extends BlockNetherrack
 {
-	@SideOnly(Side.CLIENT)
-	private Icon _icon;
-	
 	public BlockHellfish(int blockId)
 	{
 		super(blockId);
 		setHardness(0.4F);
 		setStepSound(soundStoneFootstep);
 		setUnlocalizedName("netherores.hellfish");
-	}
-	
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void registerIcons(IconRegister ir)
-	{
-		Block.netherrack.registerIcons(ir);
-		_icon = Block.netherrack.getIcon(0, 0);
-	}
-	
-	@Override
-	@SideOnly(Side.CLIENT)
-	public Icon getIcon(int side, int meta)
-	{
-		return _icon;
+		setTextureName("netherrack");
 	}
 	
 	@Override
