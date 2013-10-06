@@ -83,7 +83,8 @@ public class NetherOresCore extends BaseMod
 		
 		loadConfig(getCommonConfig());
 		
-		extractLang(new String[] { "en_US", "es_AR", "es_ES", "es_MX", "es_UY", "es_VE", "de_DE", "ru_RU" });
+		extractLang(new String[] {  "en_US", "es_AR", "es_ES", "es_MX", "es_UY", "es_VE", "de_DE",
+									"ru_RU", "sv_SE" });
 		loadLang();
 	}
 
