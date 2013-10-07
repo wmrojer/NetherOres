@@ -7,8 +7,8 @@
 	<property name="build.dir" value="build" />
 	<property name="classes.dir" value="${build.dir}/packaging" />
 	<property name="src.dir" value="src" />
-	<property name="forge.buildnum" value="884" />
-	<property name="forge.version" value="1.6.4-9.11.0.${forge.buildnum}" />
+	<property name="forge.buildnum" value="871" />
+	<property name="forge.version" value="1.6.2-9.10.1.${forge.buildnum}" />
 	<property name="forge.url" value="http://files.minecraftforge.net/minecraftforge/minecraftforge-src-${forge.version}.zip" />
 	<property name="forge.dir" value="${build.dir}/forge" />
 	<property name="mcp.dir" value="${forge.dir}/mcp" />
@@ -68,7 +68,7 @@
 
 	<target name="extract-dependencies" depends="setup-forge,get-dependencies" unless="${have-apis}">
 		<copy todir="${mcpsrc.dir}/powercrystals/core">
-			<fileset dir="${download.dir}/PowerCrystalsCore-1.6.4/src/powercrystals/core" />
+			<fileset dir="${download.dir}/PowerCrystalsCore-1.6.2/src/powercrystals/core" />
 		</copy>
 		
 		<echo message="Extracting BuildCraft API..." />
@@ -122,7 +122,7 @@
 	<available property="already-compiled" file="${classes.dir}/powercrystals/netherores" />
 	<condition property="should-download-ant-contrib">
 		<or>
-			<available file="${download.dir}/ant-contrib/ant-contrib-1.0b3.jar"/>
+			<available file="${download.dir}/ant-contrib/lib"/>
 			<available file="${download.dir}/minecraftforge-src-${forge.version}.zip"/>
 		</or>
 	</condition>
@@ -205,7 +205,7 @@
 
 		<chmod file="${forge.dir}/install.sh" perm="+x"/>
 
-		<copy file="${download.dir}/PowerCrystalsCore-1.6.4/pcc_at.cfg" todir="${forge.dir}/accesstransformers/"/>
+		<copy file="${download.dir}/PowerCrystalsCore-1.6.2/pcc_at.cfg" todir="${forge.dir}/accesstransformers/"/>
 
 		<!-- Install forge -->
 		<delete dir="${mcp.dir}" failonerror="no"/>
@@ -248,7 +248,7 @@
 	
 	<target name="download-core" unless="forge-exists">
 		<echo message="Downloading PowerCrystalsCore... " />
-		<get src="https://github.com/skyboy/PowerCrystalsCore/archive/1.6.4.zip" dest="${download.dir}/PowerCrystalsCore-master.zip"/>
+		<get src="https://github.com/skyboy/PowerCrystalsCore/archive/1.6.2.zip" dest="${download.dir}/PowerCrystalsCore-master.zip"/>
 		
 		<echo message="Extracting PowerCrystalsCore... " />
 		<unzip src="${download.dir}/PowerCrystalsCore-master.zip" dest="${download.dir}"/>
