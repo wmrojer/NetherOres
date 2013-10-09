@@ -1,11 +1,15 @@
 package powercrystals.netherores.ores;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+
 import cpw.mods.fml.common.Loader;
-import ic2.api.recipe.RecipeInputItemStack;
+import ic2.api.recipe.IMachineRecipeManager;
 import ic2.api.recipe.Recipes;
 import powercrystals.netherores.NetherOresCore;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.oredict.OreDictionary;
@@ -157,7 +161,29 @@ public enum Ores
 			ItemStack maceTo = maceStack.copy();
 			maceTo.stackSize = _maceCount;
 
-			Recipes.macerator.addRecipe(new RecipeInputItemStack(new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata)), null, maceTo.copy());
+			
+			Method m;
+			try
+			{
+				m = IMachineRecipeManager.class.getDeclaredMethod("addRecipe", ItemStack.class, ItemStack.class);
+				m.invoke(Recipes.macerator, new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata), maceTo.copy());
+			}
+			catch (Throwable _)
+			{
+				try
+				{
+					Class<?> clazz = Class.forName("RecipeInputItemStack");
+					Constructor<?> c = clazz.getDeclaredConstructor(ItemStack.class);
+					m = IMachineRecipeManager.class.getDeclaredMethod("addRecipe", clazz, NBTTagCompound.class, ItemStack.class);
+					Object o = c.newInstance(new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata));
+					m.invoke(Recipes.macerator, o, null, maceTo.copy());
+				}
+				catch (Throwable e)
+				{
+					e.printStackTrace();
+					_registeredMacerator = false;
+				}
+			}
 		}
 		
 		/*if(NetherOresCore.enablePulverizerRecipes.getBoolean(true) && Loader.isModLoaded("ThermalExpansion"))

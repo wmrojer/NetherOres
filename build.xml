@@ -60,7 +60,7 @@
 		-->
 		
 		<echo message="Downloading IC2... " />
-		<get src="http://ic2api.player.to:8080/job/IC2_experimental/234/artifact/packages/industrialcraft-2-api_2.0.234-experimental.zip" dest="${download.dir}/industrialcraft-2-api.zip" />
+		<get src="http://ic2api.player.to:8080/job/IC2_experimental/253/artifact/packages/industrialcraft-2-api_2.0.253-experimental.zip" dest="${download.dir}/industrialcraft-2-api.zip" />
 		
 		<echo message="Downloading BuildCraft API..." />
 		<get src="https://github.com/BuildCraft/BuildCraft/archive/3e13bbb166568624cc918f8a9f916fa2062f6c37.zip" dest="${download.dir}/Buildcraft-master.zip"/>
