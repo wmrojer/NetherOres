@@ -9,7 +9,6 @@ import ic2.api.recipe.Recipes;
 import powercrystals.netherores.NetherOresCore;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.oredict.OreDictionary;
@@ -162,21 +161,26 @@ public enum Ores
 			maceTo.stackSize = _maceCount;
 
 			
-			Method m;
+			Method m = null;
 			try
 			{
-				m = IMachineRecipeManager.class.getDeclaredMethod("addRecipe", ItemStack.class, ItemStack.class);
+
+				for (Method t : IMachineRecipeManager.class.getDeclaredMethods())
+					if (t.getName().equals("addRecipe"))
+					{
+						m = t;
+						break;
+					}
 				m.invoke(Recipes.macerator, new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata), maceTo.copy());
 			}
 			catch (Throwable _)
 			{
 				try
 				{
-					Class<?> clazz = Class.forName("RecipeInputItemStack");
+					Class<?> clazz = Class.forName("ic2.api.recipe.RecipeInputItemStack");
 					Constructor<?> c = clazz.getDeclaredConstructor(ItemStack.class);
-					m = IMachineRecipeManager.class.getDeclaredMethod("addRecipe", clazz, NBTTagCompound.class, ItemStack.class);
 					Object o = c.newInstance(new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata));
-					m.invoke(Recipes.macerator, o, null, maceTo.copy());
+					m.invoke(Recipes.macerator, o, null, new ItemStack[] {maceTo.copy()});
 				}
 				catch (Throwable e)
 				{
