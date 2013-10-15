@@ -64,6 +64,9 @@
 		
 		<echo message="Downloading BuildCraft API..." />
 		<get src="https://github.com/BuildCraft/BuildCraft/archive/3e13bbb166568624cc918f8a9f916fa2062f6c37.zip" dest="${download.dir}/Buildcraft-master.zip"/>
+		
+		<echo message="Downloading AppEng API..." />
+		<get src="http://ae-mod.info/releases/appeng-rv13-c-mc162.jar" dest="${download.dir}/appeng.zip"/>
 	</target>
 
 	<target name="extract-dependencies" depends="setup-forge,get-dependencies" unless="${have-apis}">
@@ -83,6 +86,12 @@
 		<echo message="Extracting IC2 API... " />
 		<unzip src="${download.dir}/industrialcraft-2-api.zip" dest="${download.dir}" />
 		<move file="${download.dir}/ic2" todir="${mcpsrc.dir}" />
+		
+		<echo message="Extracting AppEng API... " />
+		<unzip src="${download.dir}/appeng.zip" dest="${download.dir}" />
+		<delete file="${download.dir}/appeng" />
+		<unzip src="${download.dir}/appeng_api.zip" dest="${download.dir}" />
+		<move file="${download.dir}/appeng" todir="${mcpsrc.dir}" />
 	</target>
 
 
@@ -165,6 +174,7 @@
 		<delete dir="${mcp.dir}/reobf/minecraft/buildcraft"/>
 		<delete dir="${mcp.dir}/reobf/minecraft/ic2"/>
 		<delete dir="${mcp.dir}/reobf/minecraft/powercrystals/core"/>
+		<delete dir="${mcp.dir}/reobf/minecraft/appeng"/>
 		
 		<copy todir="${classes.dir}">
 			<fileset dir="${mcp.dir}/reobf/minecraft"/>

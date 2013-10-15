@@ -1,5 +1,9 @@
 package powercrystals.netherores.ores;
 
+import appeng.api.IAppEngGrinderRecipe;
+import java.util.List;
+import appeng.api.IGrinderRecipeManager;
+import appeng.api.Util;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
@@ -200,6 +204,33 @@ public enum Ores
 		   
 			CraftingManagers.pulverizerManager.addRecipe(400, new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata), pulvPriTo, pulvSecTo, 15, false);
 		}//*/
+
+		if(NetherOresCore.enableGrinderRecipes.getBoolean(true) && Loader.isModLoaded("AppliedEnergistics"))
+		{
+			ItemStack maceTo = maceStack.copy();
+			maceTo.stackSize = _maceCount;
+
+			IGrinderRecipeManager grinder = Util.getGrinderRecipeManage();
+			boolean added = false;
+
+			for(ItemStack ore : OreDictionary.getOres(_oreName))
+			{
+				IAppEngGrinderRecipe recipe = grinder.getRecipeForInput(ore);
+
+				if(recipe != null)
+				{
+					grinder.addRecipe(new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata), maceTo, recipe.getEnergyCost());
+					added = true;
+					break;
+				}
+			}
+
+			// if there's no overworld recipe to get the energy cost from, default to 8 turns
+			if(!added)
+			{
+				grinder.addRecipe(new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata), maceTo, 8);
+			}
+		}
 	}
 	
 	public void loadConfig(Configuration c)
