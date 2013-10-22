@@ -1,7 +1,6 @@
 package powercrystals.netherores.ores;
 
 import appeng.api.IAppEngGrinderRecipe;
-import java.util.List;
 import appeng.api.IGrinderRecipeManager;
 import appeng.api.Util;
 import java.lang.reflect.Constructor;
@@ -175,7 +174,9 @@ public enum Ores
 						m = t;
 						break;
 					}
-				m.invoke(Recipes.macerator, new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata), maceTo.copy());
+				m.invoke(Recipes.macerator,
+						new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata),
+						maceTo.copy());
 			}
 			catch (Throwable _)
 			{
@@ -183,7 +184,8 @@ public enum Ores
 				{
 					Class<?> clazz = Class.forName("ic2.api.recipe.RecipeInputItemStack");
 					Constructor<?> c = clazz.getDeclaredConstructor(ItemStack.class);
-					Object o = c.newInstance(new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata));
+					Object o = c.newInstance(new ItemStack(NetherOresCore.getOreBlock(_blockIndex),
+															1, _metadata));
 					m.invoke(Recipes.macerator, o, null, new ItemStack[] {maceTo.copy()});
 				}
 				catch (Throwable e)
@@ -194,7 +196,8 @@ public enum Ores
 			}
 		}
 		
-		/*if(NetherOresCore.enablePulverizerRecipes.getBoolean(true) && Loader.isModLoaded("ThermalExpansion"))
+		/*if(NetherOresCore.enablePulverizerRecipes.getBoolean(true) &&
+		   Loader.isModLoaded("ThermalExpansion"))
 		{
 			ItemStack pulvPriTo = maceStack.copy();
 			ItemStack pulvSecTo = new ItemStack(Block.netherrack);
@@ -202,16 +205,18 @@ public enum Ores
 			pulvPriTo.stackSize = _maceCount;
 			pulvSecTo.stackSize = 1;
 		   
-			CraftingManagers.pulverizerManager.addRecipe(400, new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata), pulvPriTo, pulvSecTo, 15, false);
+			CraftingManagers.pulverizerManager.addRecipe(400,
+			 new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata),
+			  pulvPriTo, pulvSecTo, 15, false);
 		}//*/
 
-		if(NetherOresCore.enableGrinderRecipes.getBoolean(true) && Loader.isModLoaded("AppliedEnergistics"))
+		appeng: if(NetherOresCore.enableGrinderRecipes.getBoolean(true) && 
+				Loader.isModLoaded("AppliedEnergistics"))
 		{
 			ItemStack maceTo = maceStack.copy();
 			maceTo.stackSize = _maceCount;
 
 			IGrinderRecipeManager grinder = Util.getGrinderRecipeManage();
-			boolean added = false;
 
 			for(ItemStack ore : OreDictionary.getOres(_oreName))
 			{
@@ -219,17 +224,14 @@ public enum Ores
 
 				if(recipe != null)
 				{
-					grinder.addRecipe(new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata), maceTo, recipe.getEnergyCost());
-					added = true;
-					break;
+					grinder.addRecipe(new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1,
+							_metadata), maceTo, recipe.getEnergyCost() * 2);
+					break appeng;
 				}
 			}
-
-			// if there's no overworld recipe to get the energy cost from, default to 8 turns
-			if(!added)
-			{
-				grinder.addRecipe(new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata), maceTo, 8);
-			}
+			// if there's no overworld recipe to get the energy cost from, default to 16 turns
+			grinder.addRecipe(new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata),
+					maceTo, 16);
 		}
 	}
 	

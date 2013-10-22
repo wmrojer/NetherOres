@@ -38,6 +38,7 @@
 			<available file="${mcpsrc.dir}/powercrystals/core" type="dir"/>
 			<available file="${mcpsrc.dir}/buildcraft" type="dir"/>
 			<available file="${mcpsrc.dir}/ic2" type="dir"/>
+			<available file="${mcpsrc.dir}/appeng" type="dir"/>
 			<!--<available file="${mcpsrc.dir}/thermalexpansion" type="dir"/>-->
 		</and>
 	</condition>
