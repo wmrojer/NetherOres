@@ -1,7 +1,6 @@
 package powercrystals.netherores;
 
 import java.io.File;
-import java.lang.reflect.Method;
 
 import powercrystals.core.mod.BaseMod;
 import powercrystals.core.updater.UpdateManager;
