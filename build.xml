@@ -64,7 +64,7 @@
 		<get src="http://ic2api.player.to:8080/job/IC2_experimental/253/artifact/packages/industrialcraft-2-api_2.0.253-experimental.zip" dest="${download.dir}/industrialcraft-2-api.zip" />
 		
 		<echo message="Downloading BuildCraft API..." />
-		<get src="https://github.com/BuildCraft/BuildCraft/archive/3e13bbb166568624cc918f8a9f916fa2062f6c37.zip" dest="${download.dir}/Buildcraft-master.zip"/>
+		<get src="https://github.com/BuildCraft/BuildCraft/archive/3e13bbb166568624cc918f8a9f916fa2062f6c37.zip" dest="${download.dir}/BuildCraft-master.zip"/>
 		
 		<echo message="Downloading AppEng API..." />
 		<get src="http://ae-mod.info/releases/appeng-rv13-c-mc162.jar" dest="${download.dir}/appeng.zip"/>
@@ -78,7 +78,7 @@
 		<echo message="Extracting BuildCraft API..." />
 		<unzip src="${download.dir}/BuildCraft-master.zip" dest="${download.dir}"/>
 		<mkdir dir="${mcpsrc.dir}/buildcraft/" />
-		<move file="${download.dir}/Buildcraft-3e13bbb166568624cc918f8a9f916fa2062f6c37/common/buildcraft/api" todir="${mcpsrc.dir}/buildcraft/"/>
+		<move file="${download.dir}/BuildCraft-3e13bbb166568624cc918f8a9f916fa2062f6c37/common/buildcraft/api" todir="${mcpsrc.dir}/buildcraft/"/>
 		
 		<!--<echo message="Extracting Thermal Expansion API... " />
 		<unzip src="${download.dir}/thermalexpansion.zip" dest="${download.dir}" />
