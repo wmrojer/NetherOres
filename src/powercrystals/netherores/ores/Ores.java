@@ -32,7 +32,7 @@ public enum Ores
 	uranium("Uranium", 3, 2, 2, 4),
 	nikolite("Nikolite", 8, 4, 2, 24),
 	ruby("Ruby", 6, 3, 2, 4),
-	greensapphire("GreenSapphire", 6, 3, 2, 4),
+	peridot("Peridot", 6, 3, 2, 4),
 	sapphire("Sapphire", 6, 3, 2, 4),
 	
 	platinum("Platinum", 3, 3, 2, 4),
