@@ -71,6 +71,7 @@ public class NetherOresCore extends BaseMod
 	public static Property enableGrinderRecipes;
 	public static Property forceOreSpawn;
 	public static Property worldGenAllDimensions;
+	public static Property enableWorldGen;
 	public static Property enableHellQuartz;
 	
 	@SidedProxy(clientSide = "powercrystals.netherores.net.ClientProxy", serverSide="powercrystals.netherores.net.ServerProxy")
@@ -213,6 +214,8 @@ public class NetherOresCore extends BaseMod
 		enableHellfish.comment = "If true, Hellfish will spawn in the Nether. Note that setting this false will not kill active Hellfish mobs.";
 		worldGenAllDimensions = c.get(Configuration.CATEGORY_GENERAL, "AllDimensionWorldGen", false);
 		worldGenAllDimensions.comment = "If true, Nether Ores oregen will run in all dimensions instead of just the Nether. It will still require netherrack to place ores.";
+		enableWorldGen = c.get(Configuration.CATEGORY_GENERAL, "EnableOreWorldGen", true);
+		enableWorldGen.comment = "If true, Nether Ores oregen will run and places ores in the world where appropriate. Only disable this if you intend to use the ores with a custom ore generator.";
 		enableHellQuartz = c.get(Configuration.CATEGORY_GENERAL, "OverrideNetherQuartz", true);
 		enableHellQuartz.comment = "If true, Nether Quartz ore will be a NetherOre and will follow the same rules as all other NetherOres.";
 

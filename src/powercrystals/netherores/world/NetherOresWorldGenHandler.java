@@ -22,16 +22,19 @@ public class NetherOresWorldGenHandler implements IWorldGenerator
 
 	private void generateNether(World world, Random random, int chunkX, int chunkZ)
 	{
-		for(Ores o : Ores.values())
+		if (NetherOresCore.enableWorldGen.getBoolean(true))
 		{
-			if((o.isRegisteredSmelting() || o.isRegisteredMacerator() || NetherOresCore.forceOreSpawn.getBoolean(false)) && !o.getDisabled())
+			for(Ores o : Ores.values())
 			{
-				for(int i = 0; i < o.getGroupsPerChunk(); i++)
+				if((o.isRegisteredSmelting() || o.isRegisteredMacerator() || NetherOresCore.forceOreSpawn.getBoolean(false)) && !o.getDisabled())
 				{
-					int x = chunkX + random.nextInt(16); 
-					int y = o.getMinY() + random.nextInt(o.getMaxY() - o.getMinY());
-					int z = chunkZ + random.nextInt(16);
-					new WorldGenNetherOres(NetherOresCore.getOreBlock(o.getBlockIndex()).blockID, o.getMetadata(), o.getBlocksPerGroup()).generate(world, random, x, y, z);
+					for(int i = 0; i < o.getGroupsPerChunk(); i++)
+					{
+						int x = chunkX + random.nextInt(16);
+						int y = o.getMinY() + random.nextInt(o.getMaxY() - o.getMinY());
+						int z = chunkZ + random.nextInt(16);
+						new WorldGenNetherOres(NetherOresCore.getOreBlock(o.getBlockIndex()).blockID, o.getMetadata(), o.getBlocksPerGroup()).generate(world, random, x, y, z);
+					}
 				}
 			}
 		}
