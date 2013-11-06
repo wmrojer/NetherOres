@@ -61,7 +61,8 @@ public class WorldGenNetherOres extends WorldGenerator
 					for(int blockZ = zStart; blockZ <= zStop; blockZ++)
 					{
 						double d14 = ((blockZ + 0.5D) - d8) / (d10 / 2D);
-						if(d12 * d12 + d13 * d13 + d14 * d14 < 1.0D && world.getBlockId(blockX, blockY, blockZ) == Block.netherrack.blockID)
+						Block block = Block.blocksList[world.getBlockId(blockX, blockY, blockZ)];
+						if (block != null && d12 * d12 + d13 * d13 + d14 * d14 < 1.0D && block.isGenMineableReplaceable(world, blockX, blockY, blockZ, Block.netherrack.blockID))
 						{
 							world.setBlock(blockX, blockY, blockZ, _minableBlockId, _minableBlockMeta, 2);
 						}
