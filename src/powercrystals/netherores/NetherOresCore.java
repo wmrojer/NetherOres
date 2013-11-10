@@ -150,6 +150,11 @@ public class NetherOresCore extends BaseMod
 			}
 		}
 		
+		for(Ores o : Ores.values())
+		{
+			o.postLoad();
+		}
+		
 		MinecraftForge.EVENT_BUS.register(this);
 	}
 	
