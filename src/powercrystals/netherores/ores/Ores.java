@@ -63,8 +63,6 @@ public enum Ores
 	private boolean _oreGenDisable = false;
 	private int _smeltCount;
 	private int _maceCount;
-	private boolean _isUseful = false;
-
 	private Ores(String oreSuffix, int groupsPerChunk, int blocksPerGroup, int smeltCount, int maceCount)
 	{
 		int meta = this.ordinal();
@@ -138,17 +136,12 @@ public enum Ores
 	{
 		MinecraftForge.setBlockHarvestLevel(NetherOresCore.getOreBlock(_blockIndex),
 				_metadata, "pickaxe", 2);
+		ItemStack oreStack = new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata);
+		OreDictionary.registerOre(_netherOreName, oreStack);
 	}
 
 	public void postLoad()
 	{
-		if (_oreGenDisable)
-			return;
-		if (_isUseful | NetherOresCore.forceOreSpawn.getBoolean(false))
-		{
-			ItemStack oreStack = new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata);
-			OreDictionary.registerOre(_netherOreName, oreStack);
-		}
 	}
 
 	public void registerSmelting(ItemStack smeltStack)
@@ -156,7 +149,6 @@ public enum Ores
 		_registeredSmelting = true;
 		if(NetherOresCore.enableStandardFurnaceRecipes.getBoolean(true))
 		{
-			_isUseful = true;
 			ItemStack smeltTo = smeltStack.copy();
 			smeltTo.stackSize = _smeltCount;
 			FurnaceRecipes.smelting().
@@ -166,7 +158,6 @@ public enum Ores
 		if(NetherOresCore.enableInductionSmelterRecipes.getBoolean(true) &&
 				Loader.isModLoaded("ThermalExpansion"))
 		{
-			_isUseful = true;
 			ItemStack input = new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata);
 			ItemStack regSec = new ItemStack(Block.sand);
 			ItemStack slagRich = GameRegistry.findItemStack("ThermalExpansion", "slagRich", 1);
@@ -210,7 +201,6 @@ public enum Ores
 		_registeredMacerator = true;
 		if(NetherOresCore.enableMaceratorRecipes.getBoolean(true) && Loader.isModLoaded("IC2"))
 		{
-			_isUseful = true;
 			ItemStack maceTo = maceStack.copy();
 			maceTo.stackSize = _maceCount;
 
@@ -249,7 +239,6 @@ public enum Ores
 		if(NetherOresCore.enablePulverizerRecipes.getBoolean(true) &&
 				Loader.isModLoaded("ThermalExpansion"))
 		{
-			_isUseful = true;
 			ItemStack input = new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata);
 			ItemStack pulvPriTo = maceStack.copy();
 			ItemStack pulvSecTo = new ItemStack(Block.netherrack);
@@ -272,7 +261,6 @@ public enum Ores
 		appeng: if(NetherOresCore.enableGrinderRecipes.getBoolean(true) && 
 				Loader.isModLoaded("AppliedEnergistics"))
 		{
-			_isUseful = true;
 			ItemStack maceTo = maceStack.copy();
 			maceTo.stackSize = _maceCount;
 
