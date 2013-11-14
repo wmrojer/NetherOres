@@ -1,6 +1,29 @@
 package powercrystals.netherores;
 
+import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.Mod.EventHandler;
+import cpw.mods.fml.common.SidedProxy;
+import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLInterModComms;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.network.NetworkMod;
+import cpw.mods.fml.common.network.NetworkMod.SidedPacketHandler;
+import cpw.mods.fml.common.registry.EntityRegistry;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.common.registry.TickRegistry;
+import cpw.mods.fml.relauncher.Side;
+
 import java.io.File;
+
+import net.minecraft.block.Block;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.common.Configuration;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.Property;
+import net.minecraftforge.event.ForgeSubscribe;
+import net.minecraftforge.oredict.OreDictionary;
+import net.minecraftforge.oredict.OreDictionary.OreRegisterEvent;
 
 import powercrystals.core.mod.BaseMod;
 import powercrystals.core.updater.UpdateManager;
@@ -17,29 +40,8 @@ import powercrystals.netherores.ores.Ores;
 import powercrystals.netherores.world.BlockHellfish;
 import powercrystals.netherores.world.NetherOresWorldGenHandler;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.Configuration;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.Property;
-import net.minecraftforge.event.ForgeSubscribe;
-import net.minecraftforge.oredict.OreDictionary;
-import net.minecraftforge.oredict.OreDictionary.OreRegisterEvent;
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.EventHandler;
-import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.network.NetworkMod;
-import cpw.mods.fml.common.network.NetworkMod.SidedPacketHandler;
-import cpw.mods.fml.common.registry.EntityRegistry;
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.common.registry.TickRegistry;
-import cpw.mods.fml.relauncher.Side;
-
-@Mod(modid = NetherOresCore.modId, name = NetherOresCore.modName, version = NetherOresCore.version, dependencies = "required-after:PowerCrystalsCore;after:IC2;after:ThermalExpansion")
+@Mod(modid = NetherOresCore.modId, name = NetherOresCore.modName, version = NetherOresCore.version,
+dependencies = "required-after:PowerCrystalsCore;before:ThermalExpansion")
 @NetworkMod(clientSideRequired = true, serverSideRequired = false,
 clientPacketHandlerSpec = @SidedPacketHandler(channels = { NetherOresCore.modId }, packetHandler = ClientPacketHandler.class),
 serverPacketHandlerSpec = @SidedPacketHandler(channels = { NetherOresCore.modId }, packetHandler = ServerPacketHandler.class),
@@ -122,7 +124,7 @@ public class NetherOresCore extends BaseMod
 	}
 	
 	@EventHandler
-	public void postInit(FMLPostInitializationEvent e)
+	public void postInit(FMLInterModComms.IMCEvent e)
 	{
 		if(enableStandardFurnaceRecipes.getBoolean(true) || enableInductionSmelterRecipes.getBoolean(true))
 		{
@@ -148,11 +150,6 @@ public class NetherOresCore extends BaseMod
 			{
 				registerOreDictionaryEntry(oreName, OreDictionary.getOres(oreName).get(0));
 			}
-		}
-		
-		for(Ores o : Ores.values())
-		{
-			o.postLoad();
 		}
 		
 		MinecraftForge.EVENT_BUS.register(this);

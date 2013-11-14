@@ -136,12 +136,11 @@ public enum Ores
 	{
 		MinecraftForge.setBlockHarvestLevel(NetherOresCore.getOreBlock(_blockIndex),
 				_metadata, "pickaxe", 2);
-		ItemStack oreStack = new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata);
-		OreDictionary.registerOre(_netherOreName, oreStack);
-	}
-
-	public void postLoad()
-	{
+		if (!_oreGenDisable)
+		{
+			ItemStack oreStack = new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata);
+			OreDictionary.registerOre(_netherOreName, oreStack);
+		}
 	}
 
 	public void registerSmelting(ItemStack smeltStack)
@@ -169,7 +168,7 @@ public enum Ores
 			smeltToRich.stackSize += 2;
 
 			NBTTagCompound toSend = new NBTTagCompound();
-			toSend.setInteger("energy", 320);
+			toSend.setInteger("energy", 3200);
 			toSend.setCompoundTag("primaryInput", new NBTTagCompound());
 			toSend.setCompoundTag("secondaryInput", new NBTTagCompound());
 			toSend.setCompoundTag("primaryOutput", new NBTTagCompound());
@@ -179,10 +178,10 @@ public enum Ores
 			smeltToReg.writeToNBT(toSend.getCompoundTag("primaryOutput"));
 			slagRich.writeToNBT(toSend.getCompoundTag("secondaryOutput"));
 			toSend.setInteger("secondaryChance", 10);
-			sendComm("SmelterRecipe", toSend);
+			FMLInterModComms.sendMessage("ThermalExpansion", "SmelterRecipe", toSend);
 
 			toSend = new NBTTagCompound();
-			toSend.setInteger("energy", 400);
+			toSend.setInteger("energy", 4000);
 			toSend.setCompoundTag("primaryInput", new NBTTagCompound());
 			toSend.setCompoundTag("secondaryInput", new NBTTagCompound());
 			toSend.setCompoundTag("primaryOutput", new NBTTagCompound());
@@ -192,7 +191,7 @@ public enum Ores
 			smeltToReg.writeToNBT(toSend.getCompoundTag("primaryOutput"));
 			slag.writeToNBT(toSend.getCompoundTag("secondaryOutput"));
 			toSend.setInteger("secondaryChance", 80);
-			sendComm("SmelterRecipe", toSend);
+			FMLInterModComms.sendMessage("ThermalExpansion", "SmelterRecipe", toSend);
 		}
 	}
 
@@ -247,7 +246,7 @@ public enum Ores
 			pulvSecTo.stackSize = 1;
 
 			NBTTagCompound toSend = new NBTTagCompound();
-			toSend.setInteger("energy", 320);
+			toSend.setInteger("energy", 3200);
 			toSend.setCompoundTag("input", new NBTTagCompound());
 			toSend.setCompoundTag("primaryOutput", new NBTTagCompound());
 			toSend.setCompoundTag("secondaryOutput", new NBTTagCompound());
@@ -255,7 +254,7 @@ public enum Ores
 			pulvPriTo.writeToNBT(toSend.getCompoundTag("primaryOutput"));
 			pulvSecTo.writeToNBT(toSend.getCompoundTag("secondaryOutput"));
 			toSend.setInteger("secondaryChance", 15);
-			sendComm("PulverizerRecipe", toSend);
+			FMLInterModComms.sendMessage("ThermalExpansion", "PulverizerRecipe", toSend);
 		}
 
 		appeng: if(NetherOresCore.enableGrinderRecipes.getBoolean(true) && 
@@ -281,11 +280,6 @@ public enum Ores
 			grinder.addRecipe(new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata),
 					maceTo, 16);
 		}
-	}
-
-	private static void sendComm(String type, NBTTagCompound msg)
-	{
-		FMLInterModComms.sendMessage("ThermalExpansion", type, msg);
 	}
 
 	public void loadConfig(Configuration c)
