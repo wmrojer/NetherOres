@@ -74,24 +74,28 @@ public class EntityArmedOre extends Entity
 
 	private void explode()
 	{
-		int blockId = worldObj.getBlockId(MathHelper.floor_double(posX), MathHelper.floor_double(posY), MathHelper.floor_double(posZ));
+		int blockId = worldObj.getBlockId(MathHelper.floor_double(posX),
+				MathHelper.floor_double(posY), MathHelper.floor_double(posZ));
 		boolean found = blockId == _target;
 		if (found)
 		{
-			worldObj.newExplosion(null, this.posX, this.posY, this.posZ, NetherOresCore.explosionPower.getInt(), true, true);
+			worldObj.newExplosion(null, this.posX, this.posY, this.posZ,
+					NetherOresCore.explosionPower.getInt(), true, true);
 		}
 	}
 
 	@Override
-	protected void writeEntityToNBT(NBTTagCompound par1NBTTagCompound)
+	protected void writeEntityToNBT(NBTTagCompound tag)
 	{
-		par1NBTTagCompound.setByte("Fuse", (byte)_fuse);
+		tag.setByte("Fuse", (byte)_fuse);
+		tag.setInteger("Target", _target);
 	}
 
 	@Override
-	protected void readEntityFromNBT(NBTTagCompound par1NBTTagCompound)
+	protected void readEntityFromNBT(NBTTagCompound tag)
 	{
-		_fuse = par1NBTTagCompound.getByte("Fuse");
+		_fuse = tag.getByte("Fuse");
+		_target = tag.hasKey("Target") ? tag.getInteger("Target") : -1;
 	}
 
 	@SideOnly(Side.CLIENT)
