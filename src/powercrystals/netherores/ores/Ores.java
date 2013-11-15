@@ -74,7 +74,7 @@ public enum Ores
 		_oreGenGroupsPerChunk = groupsPerChunk;
 		_oreGenBlocksPerGroup = blocksPerGroup;
 		_smeltCount = smeltCount;
-		_maceCount = maceCount; 
+		_maceCount = maceCount;
 	}
 
 	public int getBlockIndex()
