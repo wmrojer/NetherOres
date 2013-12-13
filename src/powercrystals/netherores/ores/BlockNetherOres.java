@@ -3,20 +3,19 @@ package powercrystals.netherores.ores;
 import java.util.List;
 import java.util.Random;
 
-import powercrystals.netherores.NetherOresCore;
-import powercrystals.netherores.entity.EntityArmedOre;
-import powercrystals.netherores.gui.NOCreativeTab;
-
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityPigZombie;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Icon;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
+
+import powercrystals.netherores.NetherOresCore;
+import powercrystals.netherores.entity.EntityArmedOre;
+import powercrystals.netherores.gui.NOCreativeTab;
 
 public class BlockNetherOres extends Block
 {	
@@ -68,25 +67,34 @@ public class BlockNetherOres extends Block
 		return 1;
 	}
 	
-	@Override
-	public void harvestBlock(World world, EntityPlayer entityplayer, int x, int y, int z, int fortune)
-	{
-		super.harvestBlock(world, entityplayer, x, y, z, fortune);
-		if(NetherOresCore.enableAngryPigmen.getBoolean(true))
+	private ThreadLocal<Boolean> explode = new ThreadLocal<Boolean>() {
+		@Override
+		protected Boolean initialValue()
 		{
-			angerPigmen(entityplayer, world, x, y, z);
+			return true;
 		}
-	}
+	}, willAnger = new ThreadLocal<Boolean>();
 	
 	@Override
 	public boolean removeBlockByPlayer(World world, EntityPlayer player, int x, int y, int z)
 	{
-		if(player == null || !EnchantmentHelper.getSilkTouchModifier(player))
-		{
-			checkExplosionChances(this, world, x, y, z);				
-		}
-		
-		return super.removeBlockByPlayer(world, player, x, y, z);
+		explode.set(player == null || !EnchantmentHelper.getSilkTouchModifier(player));
+		willAnger.set(true);
+		boolean r = super.removeBlockByPlayer(world, player, x, y, z);
+		angerPigmen(player, world, x, y, z);
+		willAnger.set(false);
+		explode.set(true);
+		return r;
+	}
+	
+	@Override
+	public void breakBlock(World world, int x, int y, int z, int id, int meta)
+	{
+		if (explode.get())
+			checkExplosionChances(this, world, x, y, z);
+		Boolean ex = willAnger.get();
+		if (ex == null || !ex)
+			angerPigmen(world, x, y, z);
 	}
 	
 	@Override
@@ -108,14 +116,12 @@ public class BlockNetherOres extends Block
 				{
 					for(int zOffset = -1; zOffset <= 1; zOffset++)
 					{
+						if ((xOffset | yOffset | zOffset) == 0)
+							continue;
+						
 						int tx = x + xOffset;
 						int ty = y + yOffset;
 						int tz = z + zOffset;
-						
-						if(tx == x && ty == y && tz == z)
-						{
-							continue;
-						}
 						
 						if(world.getBlockId(tx, ty, tz) == block.blockID && world.rand.nextInt(1000) < NetherOresCore.explosionProbability.getInt())
 						{
@@ -132,16 +138,17 @@ public class BlockNetherOres extends Block
 	
 	public static void angerPigmen(EntityPlayer player, World world, int x, int y, int z)
 	{
-		List<?> list = world.getEntitiesWithinAABB(EntityPigZombie.class,
-				AxisAlignedBB.getBoundingBox(x - _aggroRange, y - _aggroRange, z - _aggroRange, x + _aggroRange + 1, y + _aggroRange + 1, z + _aggroRange + 1));
-		for(int j = 0; j < list.size(); j++)
+		if(NetherOresCore.enableAngryPigmen.getBoolean(true))
 		{
-			Entity entity1 = (Entity)list.get(j);
-			if(entity1 instanceof EntityPigZombie)
-			{
-				EntityPigZombie entitypigzombie = (EntityPigZombie)entity1;
-				entitypigzombie.becomeAngryAt(player);
-			}
+			List<EntityPigZombie> list = world.getEntitiesWithinAABB(EntityPigZombie.class,
+					AxisAlignedBB.getBoundingBox(x - _aggroRange, y - _aggroRange, z - _aggroRange, x + _aggroRange + 1, y + _aggroRange + 1, z + _aggroRange + 1));
+			for(int j = 0; j < list.size(); j++)
+				list.get(j).becomeAngryAt(player);
 		}
+	}
+	
+	public static void angerPigmen(World world, int x, int y, int z)
+	{
+		angerPigmen(null, world, x, y, z);
 	}
 }

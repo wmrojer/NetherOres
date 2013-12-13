@@ -15,25 +15,34 @@ public class BlockNetherOverrideOre extends BlockOre
 		super(par1);
 	}
 	
-	@Override
-	public void harvestBlock(World world, EntityPlayer entityplayer, int x, int y, int z, int fortune)
-	{
-		super.harvestBlock(world, entityplayer, x, y, z, fortune);
-		if(NetherOresCore.enableAngryPigmen.getBoolean(true))
+	private ThreadLocal<Boolean> explode = new ThreadLocal<Boolean>() {
+		@Override
+		protected Boolean initialValue()
 		{
-			BlockNetherOres.angerPigmen(entityplayer, world, x, y, z);
+			return true;
 		}
-	}
+	}, willAnger = new ThreadLocal<Boolean>();
 	
 	@Override
 	public boolean removeBlockByPlayer(World world, EntityPlayer player, int x, int y, int z)
 	{
-		if(player == null || !EnchantmentHelper.getSilkTouchModifier(player))
-		{
-			BlockNetherOres.checkExplosionChances(this, world, x, y, z);				
-		}
-		
-		return super.removeBlockByPlayer(world, player, x, y, z);
+		explode.set(player == null || !EnchantmentHelper.getSilkTouchModifier(player));
+		willAnger.set(true);
+		boolean r = super.removeBlockByPlayer(world, player, x, y, z);
+		BlockNetherOres.angerPigmen(player, world, x, y, z);
+		willAnger.set(false);
+		explode.set(true);
+		return r;
+	}
+	
+	@Override
+	public void breakBlock(World world, int x, int y, int z, int id, int meta)
+	{
+		if (explode.get())
+			BlockNetherOres.checkExplosionChances(this, world, x, y, z);
+		Boolean ex = willAnger.get();
+		if (ex == null || !ex)
+			BlockNetherOres.angerPigmen(world, x, y, z);
 	}
 	
 	@Override
