@@ -49,7 +49,7 @@ connectionHandler = ConnectionHandler.class)
 public class NetherOresCore extends BaseMod
 {
 	public static final String modId = "NetherOres";
-	public static final String version = "1.6.2R2.2.1";
+	public static final String version = "1.6.2R2.2.2B1";
 	public static final String modName = "Nether Ores";
 	
 	public static final String mobTextureFolder = "netherores:textures/mob/";
@@ -136,7 +136,9 @@ public class NetherOresCore extends BaseMod
 			Ores.redstone.registerSmelting(new ItemStack(Block.oreRedstone));
 			Ores.emerald.registerSmelting(new ItemStack(Block.oreEmerald));
 		}
-		if(enableMaceratorRecipes.getBoolean(true) || enablePulverizerRecipes.getBoolean(true) || enableGrinderRecipes.getBoolean(true))
+		if (enableMaceratorRecipes.getBoolean(true) ||
+				enablePulverizerRecipes.getBoolean(true) ||
+				enableGrinderRecipes.getBoolean(true))
 		{
 			Ores.diamond.registerMacerator(new ItemStack(Item.diamond));
 			Ores.coal.registerMacerator(new ItemStack(Item.coal));
