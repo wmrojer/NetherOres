@@ -17,7 +17,7 @@ public class EntityArmedOre extends Entity
 	public EntityArmedOre(World world)
 	{
 		super(world);
-		_fuse = 0;
+		_fuse = 80;
 		preventEntitySpawning = true;
 		setSize(0.0F, 0.0F);
 		yOffset = height / 2.0F;
@@ -37,6 +37,7 @@ public class EntityArmedOre extends Entity
 		prevPosY = y;
 		prevPosZ = z;
 		_target = block != null ? block.blockID : -1;
+		setAir(_target);
 	}
 
 	@Override
@@ -63,12 +64,18 @@ public class EntityArmedOre extends Entity
 
 			if(!worldObj.isRemote)
 			{
+				setInvisible(true);
 				explode();
 			}
 		}
-		else
+		else if (worldObj.isRemote)
 		{
-			worldObj.spawnParticle("smoke", this.posX, this.posY + 0.5D, this.posZ, 0.0D, 0.0D, 0.0D);
+			if (isInvisible())
+				setDead();
+			int blockId = worldObj.getBlockId(MathHelper.floor_double(posX),
+					MathHelper.floor_double(posY), MathHelper.floor_double(posZ));
+			if (blockId == getAir())
+				worldObj.spawnParticle("smoke", this.posX, this.posY + 0.5D, this.posZ, 0.0D, 0.0D, 0.0D);
 		}
 	}
 
@@ -76,8 +83,7 @@ public class EntityArmedOre extends Entity
 	{
 		int blockId = worldObj.getBlockId(MathHelper.floor_double(posX),
 				MathHelper.floor_double(posY), MathHelper.floor_double(posZ));
-		boolean found = blockId == _target;
-		if (found)
+		if (blockId == _target)
 		{
 			worldObj.newExplosion(null, this.posX, this.posY, this.posZ,
 					NetherOresCore.explosionPower.getInt(), true, true);
@@ -96,6 +102,7 @@ public class EntityArmedOre extends Entity
 	{
 		_fuse = tag.getByte("Fuse");
 		_target = tag.hasKey("Target") ? tag.getInteger("Target") : -1;
+		setAir(_target);
 	}
 
 	@SideOnly(Side.CLIENT)
