@@ -26,28 +26,29 @@ import powercrystals.netherores.NetherOresCore;
 
 public enum Ores
 {
-	coal("Coal", 8, 16, 2, 4),
-	diamond("Diamond", 4, 3, 2, 4),
-	gold("Gold", 8, 6, 2, 4),
-	iron("Iron", 8, 8, 2, 4),
-	lapis("Lapis", 6, 6, 2, 24),
-	redstone("Redstone", 6, 8, 2, 24),
-	copper("Copper", 8, 8, 2, 4),
-	tin("Tin", 8, 8, 2, 4),
-	emerald("Emerald", 3, 2, 2, 4),
-	silver("Silver", 6, 4, 2, 4),
-	lead("Lead", 6, 6, 2, 4),
-	uranium("Uranium", 3, 2, 2, 4),
-	nikolite("Nikolite", 8, 4, 2, 24),
-	ruby("Ruby", 6, 3, 2, 4),
-	peridot("Peridot", 6, 3, 2, 4),
-	sapphire("Sapphire", 6, 3, 2, 4),
+	coal(    "Coal",     8, 16, 2,  4),
+	diamond( "Diamond",  4,  3, 2,  4),
+	gold(    "Gold",     8,  6, 2,  4),
+	iron(    "Iron",     8,  8, 2,  4),
+	lapis(   "Lapis",    6,  6, 2, 24),
+	redstone("Redstone", 6,  8, 2, 24),
+	copper(  "Copper",   8,  8, 2,  4),
+	tin(     "Tin",      8,  8, 2,  4),
+	emerald( "Emerald",  3,  2, 2,  4),
+	silver(  "Silver",   6,  4, 2,  4),
+	lead(    "Lead",     6,  6, 2,  4),
+	uranium( "Uranium",  3,  2, 2,  4),
+	nikolite("Nikolite", 8,  4, 2, 24),
+	ruby(    "Ruby",     6,  3, 2,  4),
+	peridot( "Peridot",  6,  3, 2,  4),
+	sapphire("Sapphire", 6,  3, 2,  4),
 
-	platinum("Platinum", 3, 3, 2, 4),
-	nickel("Nickel", 4, 6, 2, 4),
-	pigiron("Steel", 3, 4, 2, 4),
-	iridium("Iridium", 1, 2, 2, 4),
-	osmium("Osmium", 8, 7, 2, 4);
+	platinum("Platinum", 3,  3, 2,  4),
+	nickel(  "Nickel",   4,  6, 2,  4),
+	pigiron( "Steel",    3,  4, 2,  4),
+	iridium( "Iridium",  1,  2, 2,  4),
+	osmium(  "Osmium",   8,  7, 2,  4),
+	sulfur(  "Sulfur",   8, 12, 2, 24);
 
 	private int _blockIndex;
 	private int _metadata;
