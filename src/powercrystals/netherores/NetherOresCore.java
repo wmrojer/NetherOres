@@ -75,6 +75,7 @@ public class NetherOresCore extends BaseMod
 	public static Property worldGenAllDimensions;
 	public static Property enableWorldGen;
 	public static Property enableHellQuartz;
+	public static Property silkyStopsPigmen;
 	
 	@SidedProxy(clientSide = "powercrystals.netherores.net.ClientProxy", serverSide="powercrystals.netherores.net.ServerProxy")
 	public static INetherOresProxy proxy;
@@ -115,7 +116,7 @@ public class NetherOresCore extends BaseMod
 			o.load();
 		}
 		
-		EntityRegistry.registerModEntity(EntityArmedOre.class, "netherOresArmedOre", 0, this, 160, 5, true);
+		EntityRegistry.registerModEntity(EntityArmedOre.class, "netherOresArmedOre", 0, this, 80, 5, false);
 		EntityRegistry.registerModEntity(EntityHellfish.class, "netherOresHellfish", 1, this, 160, 5, true);
 		
 		proxy.load();
@@ -222,6 +223,8 @@ public class NetherOresCore extends BaseMod
 		enableWorldGen.comment = "If true, Nether Ores oregen will run and places ores in the world where appropriate. Only disable this if you intend to use the ores with a custom ore generator.";
 		enableHellQuartz = c.get(Configuration.CATEGORY_GENERAL, "OverrideNetherQuartz", true);
 		enableHellQuartz.comment = "If true, Nether Quartz ore will be a NetherOre and will follow the same rules as all other NetherOres.";
+		silkyStopsPigmen = c.get(Configuration.CATEGORY_GENERAL, "SilkyAngryPigmenEnable", true);
+		silkyStopsPigmen.comment = "If true, when NetherOres are mined with Silk Touch, nearby pigmen become angry to the player.";
 
 		for(Ores o : Ores.values())
 		{

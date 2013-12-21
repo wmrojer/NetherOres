@@ -26,10 +26,12 @@ public class BlockNetherOverrideOre extends BlockOre
 	@Override
 	public boolean removeBlockByPlayer(World world, EntityPlayer player, int x, int y, int z)
 	{
-		explode.set(player == null || !EnchantmentHelper.getSilkTouchModifier(player));
+		boolean silky = player == null || !EnchantmentHelper.getSilkTouchModifier(player); 
+		explode.set(silky);
 		willAnger.set(true);
 		boolean r = super.removeBlockByPlayer(world, player, x, y, z);
-		BlockNetherOres.angerPigmen(player, world, x, y, z);
+		if (silky || NetherOresCore.silkyStopsPigmen.getBoolean(true))
+			BlockNetherOres.angerPigmen(player, world, x, y, z);
 		willAnger.set(false);
 		explode.set(true);
 		return r;
