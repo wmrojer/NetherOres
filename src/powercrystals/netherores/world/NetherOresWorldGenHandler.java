@@ -46,7 +46,7 @@ public class NetherOresWorldGenHandler implements IWorldGenerator
 		if(NetherOresCore.enableHellfish.getBoolean(true))
 		{
 			int hellfishVein = NetherOresCore.hellFishPerGroup.getInt();
-			for(int i = NetherOresCore.hellFishPerChunk.getInt(); i < 9; i++)
+			for(int i = NetherOresCore.hellFishPerChunk.getInt(); i --> 0; )
 			{
 				int x = chunkX + random.nextInt(16); 
 				int y = random.nextInt(128);
