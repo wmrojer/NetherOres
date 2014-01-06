@@ -26,29 +26,31 @@ import powercrystals.netherores.NetherOresCore;
 
 public enum Ores
 {
-	coal(    "Coal",     8, 16, 2,  4),
-	diamond( "Diamond",  4,  3, 2,  4),
-	gold(    "Gold",     8,  6, 2,  4),
-	iron(    "Iron",     8,  8, 2,  4),
-	lapis(   "Lapis",    6,  6, 2, 24),
-	redstone("Redstone", 6,  8, 2, 24),
-	copper(  "Copper",   8,  8, 2,  4),
-	tin(     "Tin",      8,  8, 2,  4),
-	emerald( "Emerald",  3,  2, 2,  4),
-	silver(  "Silver",   6,  4, 2,  4),
-	lead(    "Lead",     6,  6, 2,  4),
-	uranium( "Uranium",  3,  2, 2,  4),
-	nikolite("Nikolite", 8,  4, 2, 24),
-	ruby(    "Ruby",     6,  3, 2,  4),
-	peridot( "Peridot",  6,  3, 2,  4),
-	sapphire("Sapphire", 6,  3, 2,  4),
+	/*       Name,   Chunk, Group, Smelt, Mace*/
+	coal(    "Coal",     8,    16,     2,    4),
+	diamond( "Diamond",  4,     3,     2,    4),
+	gold(    "Gold",     8,     6,     2,    4),
+	iron(    "Iron",     8,     8,     2,    4),
+	lapis(   "Lapis",    6,     6,     2,   24),
+	redstone("Redstone", 6,     8,     2,   24),
+	copper(  "Copper",   8,     8,     2,    4),
+	tin(     "Tin",      8,     8,     2,    4),
+	emerald( "Emerald",  3,     2,     2,    4),
+	silver(  "Silver",   6,     4,     2,    4),
+	lead(    "Lead",     6,     6,     2,    4),
+	uranium( "Uranium",  3,     2,     2,    4),
+	nikolite("Nikolite", 8,     4,     2,   24),
+	ruby(    "Ruby",     6,     3,     2,    4),
+	peridot( "Peridot",  6,     3,     2,    4),
+	sapphire("Sapphire", 6,     3,     2,    4),
 
-	platinum("Platinum", 3,  3, 2,  4),
-	nickel(  "Nickel",   4,  6, 2,  4),
-	pigiron( "Steel",    3,  4, 2,  4),
-	iridium( "Iridium",  1,  2, 2,  4),
-	osmium(  "Osmium",   8,  7, 2,  4),
-	sulfur(  "Sulfur",   8, 12, 2, 24);
+	platinum("Platinum", 1,     3,     2,    4),
+	nickel(  "Nickel",   4,     6,     2,    4),
+	pigiron( "Steel",    3,     4,     2,    4),
+	iridium( "Iridium",  1,     2,     2,    4),
+	osmium(  "Osmium",   8,     7,     2,    4),
+	sulfur(  "Sulfur",  12,    12,     2,   24),
+	titanium("Titanium", 3,     2,     2,    4);
 
 	private int _blockIndex;
 	private int _metadata;
@@ -62,6 +64,7 @@ public enum Ores
 	private int _oreGenGroupsPerChunk = 6;
 	private int _oreGenBlocksPerGroup = 14;
 	private boolean _oreGenDisable = false;
+	private boolean _oreGenForced = false;
 	private int _smeltCount;
 	private int _maceCount;
 	private Ores(String oreSuffix, int groupsPerChunk, int blocksPerGroup, int smeltCount, int maceCount)
@@ -133,11 +136,16 @@ public enum Ores
 		return _oreGenDisable;
 	}
 
+	public boolean getForced()
+	{
+		return _oreGenForced;
+	}
+
 	public void load()
 	{
 		MinecraftForge.setBlockHarvestLevel(NetherOresCore.getOreBlock(_blockIndex),
 				_metadata, "pickaxe", 2);
-		if (!_oreGenDisable)
+		if (_oreGenForced | !_oreGenDisable)
 		{
 			ItemStack oreStack = new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata);
 			OreDictionary.registerOre(_netherOreName, oreStack);
@@ -292,6 +300,7 @@ public enum Ores
 		_oreGenBlocksPerGroup = c.get("WorldGen", _oreName + "BlocksPerGroup", _oreGenBlocksPerGroup).
 				getInt();
 		_oreGenDisable = c.get("WorldGen", _oreName + "Disable", false).getBoolean(false);
+		_oreGenForced = c.get("WorldGen", _oreName + "Force", false).getBoolean(false);
 
 		if(_oreGenMinY >= _oreGenMaxY)
 		{

@@ -26,9 +26,13 @@ public class NetherOresWorldGenHandler implements IWorldGenerator
 		{
 			for(Ores o : Ores.values())
 			{
-				if((o.isRegisteredSmelting() || o.isRegisteredMacerator() || NetherOresCore.forceOreSpawn.getBoolean(false)) && !o.getDisabled())
+				if(o.getForced() || 
+						((o.isRegisteredSmelting() ||
+								o.isRegisteredMacerator() ||
+								NetherOresCore.forceOreSpawn.getBoolean(false)) &&
+						!o.getDisabled()))
 				{
-					for(int i = 0; i < o.getGroupsPerChunk(); i++)
+					for(int i = o.getGroupsPerChunk(); i --> 0; )
 					{
 						int x = chunkX + random.nextInt(16);
 						int y = o.getMinY() + random.nextInt(o.getMaxY() - o.getMinY());
@@ -41,12 +45,13 @@ public class NetherOresWorldGenHandler implements IWorldGenerator
 		
 		if(NetherOresCore.enableHellfish.getBoolean(true))
 		{
-			for(int i = 0; i < 9; i++)
+			int hellfishVein = NetherOresCore.hellFishPerGroup.getInt();
+			for(int i = NetherOresCore.hellFishPerChunk.getInt(); i < 9; i++)
 			{
 				int x = chunkX + random.nextInt(16); 
 				int y = random.nextInt(128);
 				int z = chunkZ + random.nextInt(16);
-				new WorldGenNetherOres(NetherOresCore.blockHellfish.blockID, 0, 12).generate(world, random, x, y, z);
+				new WorldGenNetherOres(NetherOresCore.blockHellfish.blockID, 0, hellfishVein).generate(world, random, x, y, z);
 			}
 		}
 	}
