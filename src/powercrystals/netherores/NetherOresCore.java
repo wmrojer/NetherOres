@@ -227,10 +227,10 @@ public class NetherOresCore extends BaseMod
 		enableHellQuartz.comment = "If true, Nether Quartz ore will be a NetherOre and will follow the same rules as all other NetherOres.";
 		silkyStopsPigmen = c.get(Configuration.CATEGORY_GENERAL, "SilkyAngryPigmenEnable", false);
 		silkyStopsPigmen.comment = "If true, when NetherOres are mined with Silk Touch, nearby pigmen become angry to the player.";
-		silkyStopsPigmen = c.get(Configuration.CATEGORY_GENERAL, "HellFishPerChunk", 9);
-		silkyStopsPigmen.comment = "The maximum number of hellfish veins per chunk.";
-		silkyStopsPigmen = c.get(Configuration.CATEGORY_GENERAL, "HellFishPerGroup", 12);
-		silkyStopsPigmen.comment = "The maximum number of hellfish blocks per vein.";
+		hellFishPerChunk = c.get(Configuration.CATEGORY_GENERAL, "HellFishPerChunk", 9);
+		hellFishPerChunk.comment = "The maximum number of hellfish veins per chunk.";
+		hellFishPerGroup = c.get(Configuration.CATEGORY_GENERAL, "HellFishPerGroup", 12);
+		hellFishPerGroup.comment = "The maximum number of hellfish blocks per vein.";
 
 		for(Ores o : Ores.values())
 		{
