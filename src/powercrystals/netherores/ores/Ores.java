@@ -50,7 +50,13 @@ public enum Ores
 	iridium( "Iridium",  1,     2,     2,    4),
 	osmium(  "Osmium",   8,     7,     2,    4),
 	sulfur(  "Sulfur",  12,    12,     2,   24),
-	titanium("Titanium", 3,     2,     2,    4);
+	titanium("Titanium", 3,     2,     2,    4),
+	mythril( "Mythril",  6,     6,     2,    4),
+	adamantium("Adamantium", 5, 4,     2,    4),
+	cobalt(  "Cobalt",   6,     4,     2,    4),
+	tungsten("Tungsten", 8,     8,     2,    4),
+	aluminium("Aluminium", 5,   4,     2,    4),
+	tennantite("Tennantite", 8, 8,     2,    4);
 
 	private int _blockIndex;
 	private int _metadata;
@@ -139,6 +145,16 @@ public enum Ores
 	public boolean getForced()
 	{
 		return _oreGenForced;
+	}
+
+	public int getSmeltCount()
+	{
+		return _smeltCount;
+	}
+
+	public int getMaceCount()
+	{
+		return _maceCount;
 	}
 
 	public void load()
@@ -301,6 +317,8 @@ public enum Ores
 				getInt();
 		_oreGenDisable = c.get("WorldGen", _oreName + "Disable", false).getBoolean(false);
 		_oreGenForced = c.get("WorldGen", _oreName + "Force", false).getBoolean(false);
+		_smeltCount = c.get("Smelting", _oreName + "SmeltCount", _smeltCount).getInt();
+		_maceCount = c.get("Smelting", _oreName + "MaceCount", _maceCount).getInt();
 
 		if(_oreGenMinY >= _oreGenMaxY)
 		{
