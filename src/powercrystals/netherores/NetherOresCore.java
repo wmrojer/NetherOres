@@ -78,6 +78,8 @@ public class NetherOresCore extends BaseMod
 	public static Property silkyStopsPigmen;
 	public static Property hellFishPerChunk;
 	public static Property hellFishPerGroup;
+	public static Property hellFishMinY;
+	public static Property hellFishMaxY;
 	
 	@SidedProxy(clientSide = "powercrystals.netherores.net.ClientProxy", serverSide="powercrystals.netherores.net.ServerProxy")
 	public static INetherOresProxy proxy;
@@ -227,10 +229,13 @@ public class NetherOresCore extends BaseMod
 		enableHellQuartz.comment = "If true, Nether Quartz ore will be a NetherOre and will follow the same rules as all other NetherOres.";
 		silkyStopsPigmen = c.get(Configuration.CATEGORY_GENERAL, "SilkyAngryPigmenEnable", false);
 		silkyStopsPigmen.comment = "If true, when NetherOres are mined with Silk Touch, nearby pigmen become angry to the player.";
-		hellFishPerChunk = c.get(Configuration.CATEGORY_GENERAL, "HellFishPerChunk", 9);
+		
+		hellFishPerChunk = c.get("WorldGen", "HellFish.GroupsPerChunk", 9);
 		hellFishPerChunk.comment = "The maximum number of hellfish veins per chunk.";
-		hellFishPerGroup = c.get(Configuration.CATEGORY_GENERAL, "HellFishPerGroup", 12);
+		hellFishPerGroup = c.get("WorldGen", "HellFish.BlocksPerGroup", 12);
 		hellFishPerGroup.comment = "The maximum number of hellfish blocks per vein.";
+		hellFishMinY = c.get("WorldGen", "HellFish.MinY", 1);
+		hellFishMaxY = c.get("WorldGen", "HellFish.MaxY", 127);
 
 		for(Ores o : Ores.values())
 		{
