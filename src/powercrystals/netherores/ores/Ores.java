@@ -20,43 +20,44 @@ import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.Property;
 import net.minecraftforge.oredict.OreDictionary;
 
 import powercrystals.netherores.NetherOresCore;
 
 public enum Ores
 {
-	/*       Name,   Chunk, Group, Smelt, Mace*/
-	coal(    "Coal",     8,    16,     2,    4),
-	diamond( "Diamond",  4,     3,     2,    4),
-	gold(    "Gold",     8,     6,     2,    4),
-	iron(    "Iron",     8,     8,     2,    4),
-	lapis(   "Lapis",    6,     6,     2,   24),
-	redstone("Redstone", 6,     8,     2,   24),
-	copper(  "Copper",   8,     8,     2,    4),
-	tin(     "Tin",      8,     8,     2,    4),
-	emerald( "Emerald",  3,     2,     2,    4),
-	silver(  "Silver",   6,     4,     2,    4),
-	lead(    "Lead",     6,     6,     2,    4),
-	uranium( "Uranium",  3,     2,     2,    4),
-	nikolite("Nikolite", 8,     4,     2,   24),
-	ruby(    "Ruby",     6,     3,     2,    4),
-	peridot( "Peridot",  6,     3,     2,    4),
-	sapphire("Sapphire", 6,     3,     2,    4),
+	/*         Name,     Chunk, Group, Smelt, Mace*/
+	coal(      "Coal",       8,    16,     2,    4),
+	diamond(   "Diamond",    4,     3,     2,    4),
+	gold(      "Gold",       8,     6,     2,    4),
+	iron(      "Iron",       8,     8,     2,    4),
+	lapis(     "Lapis",      6,     6,     2,   24),
+	redstone(  "Redstone",   6,     8,     2,   24),
+	copper(    "Copper",     8,     8,     2,    4),
+	tin(       "Tin",        8,     8,     2,    4),
+	emerald(   "Emerald",    3,     2,     2,    4),
+	silver(    "Silver",     6,     4,     2,    4),
+	lead(      "Lead",       6,     6,     2,    4),
+	uranium(   "Uranium",    3,     2,     2,    4),
+	nikolite(  "Nikolite",   8,     4,     2,   24),
+	ruby(      "Ruby",       6,     3,     2,    4),
+	peridot(   "Peridot",    6,     3,     2,    4),
+	sapphire(  "Sapphire",   6,     3,     2,    4),
 
-	platinum("Platinum", 1,     3,     2,    4),
-	nickel(  "Nickel",   4,     6,     2,    4),
-	pigiron( "Steel",    3,     4,     2,    4),
-	iridium( "Iridium",  1,     2,     2,    4),
-	osmium(  "Osmium",   8,     7,     2,    4),
-	sulfur(  "Sulfur",  12,    12,     2,   24),
-	titanium("Titanium", 3,     2,     2,    4),
-	mythril( "Mythril",  6,     6,     2,    4),
-	adamantium("Adamantium", 5, 4,     2,    4),
-	cobalt(  "Cobalt",   6,     4,     2,    4),
-	tungsten("Tungsten", 8,     8,     2,    4),
-	aluminium("Aluminium", 5,   4,     2,    4),
-	tennantite("Tennantite", 8, 8,     2,    4);
+	platinum(  "Platinum",   1,     3,     2,    4),
+	nickel(    "Nickel",     4,     6,     2,    4),
+	pigiron(   "Steel",      3,     4,     2,    4),
+	iridium(   "Iridium",    1,     2,     2,    4),
+	osmium(    "Osmium",     8,     7,     2,    4),
+	sulfur(    "Sulfur",    12,    12,     2,   24),
+	titanium(  "Titanium",   3,     2,     2,    4),
+	mythril(   "Mythril",    6,     6,     2,    4),
+	adamantium("Adamantium", 5,     4,     2,    4),
+	cobalt(    "Cobalt",     6,     4,     2,    4),
+	tungsten(  "Tungsten",   8,     8,     2,    4),
+	aluminium( "Aluminium",  5,     4,     2,    4),
+	tennantite("Tennantite", 8,     8,     2,    4);
 
 	private int _blockIndex;
 	private int _metadata;
@@ -73,7 +74,15 @@ public enum Ores
 	private boolean _oreGenForced = false;
 	private int _smeltCount;
 	private int _maceCount;
+	private int _miningLevel;
+	
 	private Ores(String oreSuffix, int groupsPerChunk, int blocksPerGroup, int smeltCount, int maceCount)
+	{
+		this(oreSuffix, groupsPerChunk, blocksPerGroup, smeltCount, maceCount, 2);
+	}
+	
+	private Ores(String oreSuffix, int groupsPerChunk, int blocksPerGroup,
+			int smeltCount, int maceCount, int miningLevel)
 	{
 		int meta = this.ordinal();
 		_blockIndex = meta / 16;
@@ -85,6 +94,7 @@ public enum Ores
 		_oreGenBlocksPerGroup = blocksPerGroup;
 		_smeltCount = smeltCount;
 		_maceCount = maceCount;
+		_miningLevel = miningLevel;
 	}
 
 	public int getBlockIndex()
@@ -160,7 +170,7 @@ public enum Ores
 	public void load()
 	{
 		MinecraftForge.setBlockHarvestLevel(NetherOresCore.getOreBlock(_blockIndex),
-				_metadata, "pickaxe", 2);
+				_metadata, "pickaxe", _miningLevel);
 		if (_oreGenForced | !_oreGenDisable)
 		{
 			ItemStack oreStack = new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata);
@@ -309,20 +319,64 @@ public enum Ores
 
 	public void loadConfig(Configuration c)
 	{
-		_oreGenMaxY = c.get("WorldGen", _oreName + "MaxY", _oreGenMaxY).getInt();
-		_oreGenMinY = c.get("WorldGen", _oreName + "MinY", _oreGenMinY).getInt();
-		_oreGenGroupsPerChunk = c.get("WorldGen", _oreName + "GroupsPerChunk", _oreGenGroupsPerChunk).
+		_oreGenMaxY = loadLegacy(c, "WorldGen", _oreName + ".MaxY", _oreName + "MaxY", _oreGenMaxY).getInt();
+		_oreGenMinY = loadLegacy(c, "WorldGen", _oreName + ".MinY", _oreName + "MinY",_oreGenMinY).getInt();
+		_oreGenGroupsPerChunk = loadLegacy(c, "WorldGen", _oreName + ".GroupsPerChunk", _oreName + "GroupsPerChunk", _oreGenGroupsPerChunk).
 				getInt();
-		_oreGenBlocksPerGroup = c.get("WorldGen", _oreName + "BlocksPerGroup", _oreGenBlocksPerGroup).
+		_oreGenBlocksPerGroup = loadLegacy(c, "WorldGen", _oreName + ".BlocksPerGroup", _oreName + "BlocksPerGroup", _oreGenBlocksPerGroup).
 				getInt();
-		_oreGenDisable = c.get("WorldGen", _oreName + "Disable", false).getBoolean(false);
-		_oreGenForced = c.get("WorldGen", _oreName + "Force", false).getBoolean(false);
-		_smeltCount = c.get("Smelting", _oreName + "SmeltCount", _smeltCount).getInt();
-		_maceCount = c.get("Smelting", _oreName + "MaceCount", _maceCount).getInt();
+		_oreGenDisable = loadLegacy(c, "WorldGen", _oreName + ".Disable", _oreName + "Disable", false).getBoolean(false);
+		_oreGenForced = loadLegacy(c, "WorldGen", _oreName + ".Force", _oreName + "Force", false).getBoolean(false);
+		_miningLevel = c.get("WorldGen", _oreName + ".MiningLevel", _miningLevel).getInt();
+		_smeltCount = c.get("Smelting", _oreName + ".SmeltCount", _smeltCount).getInt();
+		_maceCount = c.get("Smelting", _oreName + ".MaceCount", _maceCount).getInt();
 
 		if(_oreGenMinY >= _oreGenMaxY)
 		{
 			_oreGenMinY = _oreGenMaxY - 1;
 		}
+	}
+	
+	// TODO: remove legacy loading in 1.7
+	private static Property loadLegacy(Configuration config, String category, String name,
+						String oldName, int def)
+	{
+		Property r = null;
+		String old = null;
+		
+		if (config.hasKey(category, oldName))
+		{
+				r = config.get(category, oldName, def);
+				old = r.getString();
+				deleteEntry(config, category, oldName);
+		}
+		
+		r = config.get(category, name, def);
+		if (old != null)
+			r.set(old);
+		return r;
+	}
+	private static Property loadLegacy(Configuration config, String category, String name,
+						String oldName, boolean def)
+	{
+		Property r = null;
+		String old = null;
+		
+		if (config.hasKey(category, oldName))
+		{
+				r = config.get(category, oldName, def);
+				old = r.getString();
+				deleteEntry(config, category, oldName);
+		}
+		
+		r = config.get(category, name, def);
+		if (old != null)
+			r.set(old);
+		return r;
+	}
+	
+	private static void deleteEntry(Configuration config, String category, String name)
+	{
+		config.getCategory(category).remove(name);
 	}
 }
