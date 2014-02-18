@@ -54,9 +54,9 @@ public enum Ores
 	titanium(  "Titanium",   3,     2,     2,    4),
 	mythril(   "Mythril",    6,     6,     2,    4),
 	adamantium("Adamantium", 5,     4,     2,    4),
-	cobalt(    "Cobalt",     6,     4,     2,    4),
+	rutile(    "Rutile",     3,     4,     2,    4),
 	tungsten(  "Tungsten",   8,     8,     2,    4),
-	aluminium( "Aluminium",  5,     4,     2,    4),
+	amber(     "Amber",      5,     6,     2,    4),
 	tennantite("Tennantite", 8,     8,     2,    4);
 
 	private int _blockIndex;
