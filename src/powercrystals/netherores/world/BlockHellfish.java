@@ -6,7 +6,6 @@ import powercrystals.netherores.NetherOresCore;
 import powercrystals.netherores.entity.EntityHellfish;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockNetherrack;
-import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 
 public class BlockHellfish extends BlockNetherrack
@@ -31,19 +30,18 @@ public class BlockHellfish extends BlockNetherrack
 	{
 		return NetherOresCore.enableHellfish.getBoolean(true) ? 0 : 1;
 	}
-
+	
 	@Override
-	public void onBlockDestroyedByPlayer(World world, int x, int y, int z, int fortune)
+	public void breakBlock(World world, int x, int y, int z, int id, int meta)
 	{
 		spawnHellfish(world, x, y, z);
-		super.onBlockDestroyedByPlayer(world, x, y, z, fortune);
+		super.breakBlock(world, x, y, z, id, meta);
 	}
 	
 	@Override
-	public void onBlockDestroyedByExplosion(World world, int x, int y, int z, Explosion explosion)
+	public boolean isGenMineableReplaceable(World world, int x, int y, int z, int target)
 	{
-		spawnHellfish(world, x, y, z);
-		super.onBlockDestroyedByExplosion(world, x, y, z, explosion);
+		return blockID == target | target == Block.netherrack.blockID;
 	}
 	
 	public static void spawnHellfish(World world, int x, int y, int z)
