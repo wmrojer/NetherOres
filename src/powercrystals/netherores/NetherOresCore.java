@@ -151,12 +151,18 @@ public class NetherOresCore extends BaseMod
 			Ores.lapis.registerMacerator(new ItemStack(Item.dyePowder, 1, 4));
 		}
 		
-		for(String oreName : OreDictionary.getOreNames())
+		for(Ores ore : Ores.values())
 		{
-			if(OreDictionary.getOres(oreName).size() > 0)
-			{
-				registerOreDictionaryEntry(oreName, OreDictionary.getOres(oreName).get(0));
-			}
+			String oreName;
+			oreName = ore.getOreName();   // Ore
+			if (OreDictionary.getOres(oreName).size() > 0)
+				registerOreDictSmelt(ore, oreName, OreDictionary.getOres(oreName).get(0));
+			oreName = ore.getDustName(); // Dust
+			if (OreDictionary.getOres(oreName).size() > 0)
+				registerOreDictDust(ore, oreName, OreDictionary.getOres(oreName).get(0));
+			oreName = ore.getGemName(); // Gem
+			if (OreDictionary.getOres(oreName).size() > 0)
+				registerOreDictGem(ore, oreName, OreDictionary.getOres(oreName).get(0));
 		}
 		
 		MinecraftForge.EVENT_BUS.register(this);
@@ -167,21 +173,6 @@ public class NetherOresCore extends BaseMod
 		if (index >= 0 && index < blockNetherOres.length)
 			return blockNetherOres[index];
 		return null;
-	}
-	
-	private void registerOreDictionaryEntry(String oreName, ItemStack stack)
-	{
-		for(Ores ore : Ores.values())
-		{
-			if(!ore.isRegisteredSmelting() && ore.getOreName().equals(oreName))
-			{
-				ore.registerSmelting(stack);
-			}
-			if(!ore.isRegisteredMacerator() && ore.getDustName().equals(oreName))
-			{
-				ore.registerMacerator(stack);
-			}
-		}
 	}
 
 	private void loadConfig(File f)
@@ -249,6 +240,34 @@ public class NetherOresCore extends BaseMod
 	public void registerOreEvent(OreRegisterEvent event)
 	{
 		registerOreDictionaryEntry(event.Name, event.Ore);
+	}
+	
+	private void registerOreDictionaryEntry(String oreName, ItemStack stack)
+	{
+		for(Ores ore : Ores.values())
+		{
+			registerOreDictSmelt(ore, oreName, stack);
+			registerOreDictDust(ore, oreName, stack);
+			registerOreDictGem(ore, oreName, stack);
+		}
+	}
+	
+	private void registerOreDictSmelt(Ores ore, String oreName, ItemStack stack)
+	{
+		if (!ore.isRegisteredSmelting() && ore.getOreName().equals(oreName))
+			ore.registerSmelting(stack);
+	}
+	
+	private void registerOreDictDust(Ores ore, String oreName, ItemStack stack)
+	{
+		if (!ore.isRegisteredMacerator() && ore.getDustName().equals(oreName))
+			ore.registerMacerator(stack);
+	}
+	
+	private void registerOreDictGem(Ores ore, String oreName, ItemStack stack)
+	{
+		if (!ore.isRegisteredMacerator() && ore.getGemName().equals(oreName))
+			ore.registerMacerator(stack);
 	}
 
 	@Override

@@ -62,8 +62,9 @@ public enum Ores
 	private int _blockIndex;
 	private int _metadata;
 	private String _oreName;
-	private String _netherOreName;
+	private String _gemName;
 	private String _dustName;
+	private String _netherOreName;
 	private boolean _registeredSmelting;
 	private boolean _registeredMacerator;
 	private int _oreGenMinY = 1;
@@ -88,6 +89,7 @@ public enum Ores
 		_blockIndex = meta / 16;
 		_metadata = meta % 16;
 		_oreName = "ore" + oreSuffix;
+		_gemName = "gem" + oreSuffix;
 		_dustName = "dust" + oreSuffix;
 		_netherOreName = "oreNether" + oreSuffix;
 		_oreGenGroupsPerChunk = groupsPerChunk;
@@ -115,6 +117,11 @@ public enum Ores
 	public String getDustName()
 	{
 		return _dustName;
+	}
+
+	public String getGemName()
+	{
+		return _gemName;
 	}
 
 	public boolean isRegisteredSmelting()
