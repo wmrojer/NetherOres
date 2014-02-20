@@ -265,7 +265,6 @@ public enum Ores
 				catch (Throwable e)
 				{
 					e.printStackTrace();
-					_registeredMacerator = false;
 				}
 			}
 		}
