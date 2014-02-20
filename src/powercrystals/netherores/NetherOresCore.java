@@ -173,11 +173,11 @@ public class NetherOresCore extends BaseMod
 	{
 		for(Ores ore : Ores.values())
 		{
-			if(!ore.isRegisteredSmelting() && ore.getOreName().trim().toLowerCase().equals(oreName.trim().toLowerCase()))
+			if(!ore.isRegisteredSmelting() && ore.getOreName().equals(oreName))
 			{
 				ore.registerSmelting(stack);
 			}
-			if(!ore.isRegisteredMacerator() && ore.getDustName().trim().toLowerCase().equals(oreName.trim().toLowerCase()))
+			if(!ore.isRegisteredMacerator() && ore.getDustName().equals(oreName))
 			{
 				ore.registerMacerator(stack);
 			}
