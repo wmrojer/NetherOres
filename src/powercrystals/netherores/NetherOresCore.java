@@ -180,7 +180,7 @@ public class NetherOresCore extends BaseMod
 		Configuration c = new Configuration(f);
 		c.load();
 		
-		Property base = c.getBlock(Configuration.CATEGORY_BLOCK, "BaseID", 1440);
+		Property base = c.get(Configuration.CATEGORY_BLOCK, "BaseID", 1440);
 		base.comment = "This is the base ID blocks will assign from. Delete the other IDs here to auto-align to this value.";
 		int baseID = base.getInt(1440),
 				curID = baseID;
