@@ -180,13 +180,16 @@ public class NetherOresCore extends BaseMod
 		Configuration c = new Configuration(f);
 		c.load();
 		
-		int baseID = 1440, curID = baseID;
+		Property base = c.getBlock(Configuration.CATEGORY_BLOCK, "BaseID", 1440);
+		base.comment = "This is the base ID blocks will assign from. Delete the other IDs here to auto-align to this value.";
+		int baseID = base.getInt(1440),
+				curID = baseID;
 		
 		netherOreBlockIds[0] = c.getBlock(Configuration.CATEGORY_BLOCK, "ID.NetherOreBlock", curID++);
 		hellfishBlockId = c.getBlock(Configuration.CATEGORY_BLOCK, "ID.HellfishBlock", curID++);
 		for (int i = 1; i < netherOreBlockIds.length; ++i)
 			netherOreBlockIds[i] = c.getBlock(Configuration.CATEGORY_BLOCK, "ID.NetherOreBlock"+i, curID++);
-		// add new blocks using baseID-- or 1450ish
+		// add new blocks using baseID--
 		
 		explosionPower = c.get(Configuration.CATEGORY_GENERAL, "ExplosionPower", 2);
 		explosionPower.comment = "How powerful an explosion will be. Creepers are 3, TNT is 4, electrified creepers are 6. This affects both the ability of the explosion to punch through blocks as well as the blast radius.";
