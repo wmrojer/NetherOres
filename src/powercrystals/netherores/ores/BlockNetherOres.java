@@ -6,6 +6,7 @@ import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.monster.EntityGhast;
 import net.minecraft.entity.monster.EntityPigZombie;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
@@ -100,12 +101,17 @@ public class BlockNetherOres extends Block
 	}
 	
 	@Override
-	public void onBlockDestroyedByExplosion(World world, int x, int y, int z, Explosion explosion)
+	public void onBlockExploded(World world, int x, int y, int z, Explosion explosion)
 	{
-		if(NetherOresCore.enableExplosionChainReactions.getBoolean(true))
-		{
+		explode.set(false);
+		willAnger.set(NetherOresCore.enableGhastAngersPigmen.getBoolean(true) ||
+				explosion == null || !(explosion.getExplosivePlacedBy() instanceof EntityGhast));
+		world.setBlockToAir(x, y, z);
+		willAnger.set(true);
+		explode.set(true);
+		if (NetherOresCore.enableExplosionChainReactions.getBoolean(true))
 			checkExplosionChances(this, world, x, y, z);
-		}
+		onBlockDestroyedByExplosion(world, x, y, z, explosion);
 	}
 	
 	public static void checkExplosionChances(Block block, World world, int x, int y, int z)
