@@ -1,3 +1,5 @@
+entity.NetherOres.netherOresHellfish.name = Hellfish
+
 tile.netherores.hellfish.name = Netherrack
 tile.netherores.ore.coal.name = Nether Coal Ore
 tile.netherores.ore.diamond.name = Nether Diamond Ore
