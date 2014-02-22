@@ -104,6 +104,6 @@ public class EntityHellfish extends EntitySilverfish
 	@Override
 	public float getBlockPathWeight(int par1, int par2, int par3)
 	{
-		return this.worldObj.getBlockId(par1, par2 - 1, par3) == Block.netherrack.blockID ? 10.0F : super.getBlockPathWeight(par1, par2, par3);
+		return this.worldObj.getBlockId(par1, par2 - 1, par3) == Block.netherrack.blockID ? 10.0F : (-this.worldObj.getLightBrightness(par1, par2, par3));
 	}
 }
