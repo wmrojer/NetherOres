@@ -20,6 +20,12 @@ public class BlockHellfish extends BlockNetherrack
 	}
 	
 	@Override
+	public boolean canSilkHarvest()
+	{
+		return false;
+	}
+	
+	@Override
 	public int idDropped(int meta, Random rand, int fortune)
 	{
 		return Block.netherrack.blockID;
