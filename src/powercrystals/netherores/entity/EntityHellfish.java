@@ -29,7 +29,9 @@ public class EntityHellfish extends EntitySilverfish
 	@Override
 	protected void updateEntityActionState()
 	{
+		int cooldown = allySummonCooldown;
 		super.updateEntityActionState();
+		allySummonCooldown = cooldown;
 
 		if(!this.worldObj.isRemote)
 		{
