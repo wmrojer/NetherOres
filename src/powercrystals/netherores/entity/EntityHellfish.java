@@ -15,15 +15,24 @@ public class EntityHellfish extends EntitySilverfish
 	public EntityHellfish(World world)
 	{
 		super(world);
+		rand.setSeed(world.getSeed() ^ this.entityId);
+		this.isImmuneToFire = true;
+		this.stepHeight = 1.0F;
+		this.hurtTime = 15;
 	}
 
 	@Override
 	protected void applyEntityAttributes()
 	{
 		super.applyEntityAttributes();
-		this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setAttribute(0.9D);
-		this.getEntityAttribute(SharedMonsterAttributes.attackDamage).setAttribute(1.5D);
-		this.isImmuneToFire = true;
+        this.getEntityAttribute(SharedMonsterAttributes.maxHealth).
+        						setAttribute(12.5D);
+		this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).
+								setAttribute(0.925D + (rand.nextDouble() / 10));
+		this.getEntityAttribute(SharedMonsterAttributes.attackDamage).
+								setAttribute(1.5D + (rand.nextDouble()));
+		this.getEntityAttribute(SharedMonsterAttributes.knockbackResistance).
+								setAttribute(rand.nextDouble());
 	}
 
 	@Override
