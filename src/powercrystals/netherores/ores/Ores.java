@@ -58,14 +58,11 @@ public enum Ores
 	Tungsten(   8,     8,     2,    4),
 	Amber(      5,     6,     2,    4),
 	Tennantite( 8,     8,     2,    4),
-	Salt(       5,     5,     2,    8);
+	Salt(       5,     5,     2,   12),
+	Saltpeter(  6,     4,     2,   12);
 
 	private int _blockIndex;
 	private int _metadata;
-	private String _oreName;
-	private String _gemName;
-	private String _dustName;
-	private String _netherOreName;
 	private boolean _registeredSmelting;
 	private boolean _registeredMacerator;
 	private int _oreGenMinY = 1;
@@ -87,13 +84,8 @@ public enum Ores
 			int smeltCount, int maceCount, int miningLevel)
 	{
 		int meta = ordinal();
-		String oreSuffix = name();
 		_blockIndex = meta / 16;
 		_metadata = meta % 16;
-		_oreName = "ore" + oreSuffix;
-		_gemName = "gem" + oreSuffix;
-		_dustName = "dust" + oreSuffix;
-		_netherOreName = "oreNether" + oreSuffix;
 		_oreGenGroupsPerChunk = groupsPerChunk;
 		_oreGenBlocksPerGroup = blocksPerGroup;
 		_smeltCount = smeltCount;
@@ -113,17 +105,17 @@ public enum Ores
 
 	public String getOreName()
 	{
-		return _oreName;
+		return "ore" + name();
 	}
 
 	public String getDustName()
 	{
-		return _dustName;
+		return "dust" + name();
 	}
 
 	public String getGemName()
 	{
-		return _gemName;
+		return "gem" + name();
 	}
 
 	public boolean isRegisteredSmelting()
@@ -183,12 +175,14 @@ public enum Ores
 		if (_oreGenForced | !_oreGenDisable)
 		{
 			ItemStack oreStack = new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata);
-			OreDictionary.registerOre(_netherOreName, oreStack);
+			OreDictionary.registerOre("oreNether" + name(), oreStack);
 		}
 	}
 
 	public void registerSmelting(ItemStack smeltStack)
 	{
+		if (_registeredSmelting)
+			return;
 		_registeredSmelting = true;
 		if(NetherOresCore.enableStandardFurnaceRecipes.getBoolean(true))
 		{
@@ -240,6 +234,8 @@ public enum Ores
 
 	public void registerMacerator(ItemStack maceStack)
 	{
+		if (_registeredMacerator)
+			return;
 		_registeredMacerator = true;
 		if(NetherOresCore.enableMaceratorRecipes.getBoolean(true) && Loader.isModLoaded("IC2"))
 		{
@@ -306,7 +302,7 @@ public enum Ores
 
 			IGrinderRecipeManager grinder = Util.getGrinderRecipeManage();
 
-			for(ItemStack ore : OreDictionary.getOres(_oreName))
+			for(ItemStack ore : OreDictionary.getOres(getOreName()))
 			{
 				IAppEngGrinderRecipe recipe = grinder.getRecipeForInput(ore);
 
@@ -325,6 +321,7 @@ public enum Ores
 
 	public void loadConfig(Configuration c)
 	{
+		String _oreName = getOreName();
 		_oreGenMaxY = loadLegacy(c, "WorldGen", _oreName + ".MaxY", _oreName + "MaxY", _oreGenMaxY).getInt();
 		_oreGenMinY = loadLegacy(c, "WorldGen", _oreName + ".MinY", _oreName + "MinY",_oreGenMinY).getInt();
 		_oreGenGroupsPerChunk = loadLegacy(c, "WorldGen", _oreName + ".GroupsPerChunk", _oreName + "GroupsPerChunk", _oreGenGroupsPerChunk).
