@@ -9,7 +9,7 @@ import net.minecraft.world.World;
 
 import powercrystals.netherores.NetherOresCore;
 
-public class BlockNetherOverrideOre extends BlockOre
+public class BlockNetherOverrideOre extends BlockOre implements INetherOre
 {
 	public BlockNetherOverrideOre(int par1)
 	{

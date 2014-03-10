@@ -132,7 +132,8 @@ public class BlockNetherOres extends Block
 						int ty = y + yOffset;
 						int tz = z + zOffset;
 
-						if(world.getBlockId(tx, ty, tz) == block.blockID && world.rand.nextInt(1000) < NetherOresCore.explosionProbability.getInt())
+						if (Block.blocksList[world.getBlockId(tx, ty, tz)] instanceof INetherOre &&
+								world.rand.nextInt(1000) < NetherOresCore.explosionProbability.getInt())
 						{
 							EntityArmedOre eao = new EntityArmedOre(world, tx + 0.5, ty + 0.5, tz + 0.5, block);
 							world.spawnEntityInWorld(eao);
