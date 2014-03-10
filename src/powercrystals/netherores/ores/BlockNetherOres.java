@@ -44,9 +44,10 @@ public class BlockNetherOres extends Block
 	public void registerIcons(IconRegister ir)
 	{
 		Ores[] ores = Ores.values();
-		for(int i = 0, e = Math.min(_blockIndex * 16 + 15, ores.length - 1) % 16; i <= e; i++)
+		int start = _blockIndex * 16;
+		for(int i = 0, e = Math.min(start + 15, ores.length - 1) % 16; i <= e; i++)
 		{
-			_netherOresIcons[i] = ir.registerIcon("netherores:" + getUnlocalizedName() + "_" + i);
+			_netherOresIcons[i] = ir.registerIcon("netherores:" + ores[start + i].name());
 		}
 	}
 

@@ -28,7 +28,7 @@ public class ItemBlockNetherOre extends ItemBlock
 		int index = ((BlockNetherOres)Block.blocksList[getBlockID()]).getBlockIndex();
 		Ores[] ores = Ores.values();
 		int md = Math.min(index * 16 + stack.getItemDamage(), ores.length - 1);
-		return "tile.netherores.ore." + ores[md].name();
+		return "tile.netherores.ore." + ores[md].name().toLowerCase();
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })

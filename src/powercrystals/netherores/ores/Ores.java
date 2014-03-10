@@ -47,7 +47,7 @@ public enum Ores
 
 	Platinum(   1,     3,     2,    4),
 	Nickel(     4,     6,     2,    4),
-	Pigiron(    3,     4,     2,    4),
+	Steel(      3,     4,     2,    4),
 	Iridium(    1,     2,     2,    4),
 	Osmium(     8,     7,     2,    4),
 	Sulfur(    12,    12,     2,   24),
