@@ -6,6 +6,8 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.monster.EntitySilverfish;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.Facing;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
@@ -25,14 +27,14 @@ public class EntityHellfish extends EntitySilverfish
 	protected void applyEntityAttributes()
 	{
 		super.applyEntityAttributes();
-        this.getEntityAttribute(SharedMonsterAttributes.maxHealth).
-        						setAttribute(12.5D);
+		this.getEntityAttribute(SharedMonsterAttributes.maxHealth).
+		setAttribute(12.5D);
 		this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).
-								setAttribute(0.925D + (rand.nextDouble() / 10));
+		setAttribute(0.925D + (rand.nextDouble() / 10));
 		this.getEntityAttribute(SharedMonsterAttributes.attackDamage).
-								setAttribute(1.5D + (rand.nextDouble()));
+		setAttribute(1.5D + (rand.nextDouble()));
 		this.getEntityAttribute(SharedMonsterAttributes.knockbackResistance).
-								setAttribute(rand.nextDouble());
+		setAttribute(rand.nextDouble());
 	}
 
 	@Override
@@ -110,6 +112,24 @@ public class EntityHellfish extends EntitySilverfish
 	{
 		par1Entity.setFire(3);
 		return super.attackEntityAsMob(par1Entity);
+	}
+
+	@Override
+	public boolean attackEntityFrom(DamageSource source, float damage)
+	{
+		if (this.isEntityInvulnerable())
+			return false;
+		else
+		{
+			int c = allySummonCooldown;
+			boolean r = super.attackEntityFrom(source, damage);
+			allySummonCooldown = c;
+
+			if (allySummonCooldown <= 0 && source instanceof EntityDamageSource)
+				allySummonCooldown = 20;
+
+			return r;
+		}
 	}
 
 	@Override
