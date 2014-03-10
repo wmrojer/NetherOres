@@ -81,7 +81,7 @@ public class NetherOresCore extends BaseMod
 	public static Property hellFishPerGroup;
 	public static Property hellFishMinY;
 	public static Property hellFishMaxY;
-	public static Property enableGhastAngersPigmen;
+	public static Property enableMobsAngerPigmen;
 	
 	@SidedProxy(clientSide = "powercrystals.netherores.net.ClientProxy", serverSide="powercrystals.netherores.net.ServerProxy")
 	public static INetherOresProxy proxy;
@@ -135,22 +135,22 @@ public class NetherOresCore extends BaseMod
 	{
 		if(enableStandardFurnaceRecipes.getBoolean(true) || enableInductionSmelterRecipes.getBoolean(true))
 		{
-			Ores.coal.registerSmelting(new ItemStack(Block.oreCoal));
-			Ores.diamond.registerSmelting(new ItemStack(Block.oreDiamond));
-			Ores.gold.registerSmelting(new ItemStack(Block.oreGold));
-			Ores.iron.registerSmelting(new ItemStack(Block.oreIron));
-			Ores.lapis.registerSmelting(new ItemStack(Block.oreLapis));
-			Ores.redstone.registerSmelting(new ItemStack(Block.oreRedstone));
-			Ores.emerald.registerSmelting(new ItemStack(Block.oreEmerald));
+			Ores.Coal.registerSmelting(new ItemStack(Block.oreCoal));
+			Ores.Diamond.registerSmelting(new ItemStack(Block.oreDiamond));
+			Ores.Gold.registerSmelting(new ItemStack(Block.oreGold));
+			Ores.Iron.registerSmelting(new ItemStack(Block.oreIron));
+			Ores.Lapis.registerSmelting(new ItemStack(Block.oreLapis));
+			Ores.Redstone.registerSmelting(new ItemStack(Block.oreRedstone));
+			Ores.Emerald.registerSmelting(new ItemStack(Block.oreEmerald));
 		}
 		if (enableMaceratorRecipes.getBoolean(true) ||
 				enablePulverizerRecipes.getBoolean(true) ||
 				enableGrinderRecipes.getBoolean(true))
 		{
-			Ores.diamond.registerMacerator(new ItemStack(Item.diamond));
-			Ores.coal.registerMacerator(new ItemStack(Item.coal));
-			Ores.redstone.registerMacerator(new ItemStack(Item.redstone));
-			Ores.lapis.registerMacerator(new ItemStack(Item.dyePowder, 1, 4));
+			Ores.Diamond.registerMacerator(new ItemStack(Item.diamond));
+			Ores.Coal.registerMacerator(new ItemStack(Item.coal));
+			Ores.Redstone.registerMacerator(new ItemStack(Item.redstone));
+			Ores.Lapis.registerMacerator(new ItemStack(Item.dyePowder, 1, 4));
 		}
 		
 		for(Ores ore : Ores.values())
@@ -225,8 +225,8 @@ public class NetherOresCore extends BaseMod
 		enableHellQuartz.comment = "If true, Nether Quartz ore will be a NetherOre and will follow the same rules as all other NetherOres.";
 		silkyStopsPigmen = c.get(Configuration.CATEGORY_GENERAL, "SilkyAngryPigmenEnable", false);
 		silkyStopsPigmen.comment = "If true, when NetherOres are mined with Silk Touch, nearby pigmen become angry to the player.";
-		enableGhastAngersPigmen = c.get(Configuration.CATEGORY_GENERAL, "GhastsAngerPigmen", true);
-		enableGhastAngersPigmen.comment = "If true, ghasts exploding a NetherOre will anger nearby pigmen.";
+		enableMobsAngerPigmen = c.get(Configuration.CATEGORY_GENERAL, "MobsAngerPigmen", true);
+		enableMobsAngerPigmen.comment = "If true, any entity not a player exploding a NetherOre will anger nearby pigmen.";
 		
 		hellFishPerChunk = c.get("WorldGen", "HellFish.GroupsPerChunk", 9);
 		hellFishPerChunk.comment = "The maximum number of hellfish veins per chunk.";

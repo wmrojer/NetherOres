@@ -6,7 +6,7 @@ import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.monster.EntityGhast;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.monster.EntityPigZombie;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
@@ -23,7 +23,7 @@ public class BlockNetherOres extends Block
 	private static int _aggroRange = 32;
 	private int _blockIndex = 0;
 	private Icon[] _netherOresIcons = new Icon[16];
-	
+
 	public BlockNetherOres(int blockId, int blockIndex)
 	{
 		super(blockId, Block.netherrack.blockMaterial);
@@ -34,12 +34,12 @@ public class BlockNetherOres extends Block
 		setCreativeTab(NOCreativeTab.tab);
 		_blockIndex = blockIndex;
 	}
-	
+
 	public int getBlockIndex()
 	{
 		return _blockIndex;
 	}
-	
+
 	@Override
 	public void registerIcons(IconRegister ir)
 	{
@@ -49,25 +49,25 @@ public class BlockNetherOres extends Block
 			_netherOresIcons[i] = ir.registerIcon("netherores:" + getUnlocalizedName() + "_" + i);
 		}
 	}
-	
+
 	@Override
 	public Icon getIcon(int side, int meta)
 	{
 		return _netherOresIcons[meta];
 	}
-	
+
 	@Override
 	public int damageDropped(int meta)
 	{
 		return meta;
 	}
-	
+
 	@Override
 	public int quantityDropped(Random random)
 	{
 		return 1;
 	}
-	
+
 	private ThreadLocal<Boolean> explode = new ThreadLocal<Boolean>() {
 		@Override
 		protected Boolean initialValue()
@@ -75,7 +75,7 @@ public class BlockNetherOres extends Block
 			return true;
 		}
 	}, willAnger = new ThreadLocal<Boolean>();
-	
+
 	@Override
 	public boolean removeBlockByPlayer(World world, EntityPlayer player, int x, int y, int z)
 	{
@@ -89,7 +89,7 @@ public class BlockNetherOres extends Block
 		explode.set(true);
 		return r;
 	}
-	
+
 	@Override
 	public void breakBlock(World world, int x, int y, int z, int id, int meta)
 	{
@@ -98,22 +98,22 @@ public class BlockNetherOres extends Block
 		Boolean ex = willAnger.get();
 		if (ex == null || !ex)
 			angerPigmen(world, x, y, z);
+		super.breakBlock(world, x, y, z, id, meta);
 	}
-	
+
 	@Override
 	public void onBlockExploded(World world, int x, int y, int z, Explosion explosion)
 	{
 		explode.set(false);
-		willAnger.set(NetherOresCore.enableGhastAngersPigmen.getBoolean(true) ||
-				explosion == null || !(explosion.getExplosivePlacedBy() instanceof EntityGhast));
-		world.setBlockToAir(x, y, z);
+		willAnger.set(NetherOresCore.enableMobsAngerPigmen.getBoolean(true) ||
+				explosion == null || !(explosion.getExplosivePlacedBy() instanceof EntityLiving));
+		super.onBlockExploded(world, x, y, z, explosion);
 		willAnger.set(true);
 		explode.set(true);
 		if (NetherOresCore.enableExplosionChainReactions.getBoolean(true))
 			checkExplosionChances(this, world, x, y, z);
-		onBlockDestroyedByExplosion(world, x, y, z, explosion);
 	}
-	
+
 	public static void checkExplosionChances(Block block, World world, int x, int y, int z)
 	{
 		if(!world.isRemote && NetherOresCore.enableExplosions.getBoolean(true))
@@ -126,16 +126,16 @@ public class BlockNetherOres extends Block
 					{
 						if ((xOffset | yOffset | zOffset) == 0)
 							continue;
-						
+
 						int tx = x + xOffset;
 						int ty = y + yOffset;
 						int tz = z + zOffset;
-						
+
 						if(world.getBlockId(tx, ty, tz) == block.blockID && world.rand.nextInt(1000) < NetherOresCore.explosionProbability.getInt())
 						{
 							EntityArmedOre eao = new EntityArmedOre(world, tx + 0.5, ty + 0.5, tz + 0.5, block);
 							world.spawnEntityInWorld(eao);
-							
+
 							world.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "random.fuse", 1.0F, 1.0F);
 						}
 					}
@@ -143,7 +143,7 @@ public class BlockNetherOres extends Block
 			}
 		}
 	}
-	
+
 	public static void angerPigmen(EntityPlayer player, World world, int x, int y, int z)
 	{
 		if(NetherOresCore.enableAngryPigmen.getBoolean(true))
@@ -154,7 +154,7 @@ public class BlockNetherOres extends Block
 				list.get(j).becomeAngryAt(player);
 		}
 	}
-	
+
 	public static void angerPigmen(World world, int x, int y, int z)
 	{
 		angerPigmen(null, world, x, y, z);

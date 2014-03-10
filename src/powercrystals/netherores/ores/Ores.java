@@ -27,37 +27,38 @@ import powercrystals.netherores.NetherOresCore;
 
 public enum Ores
 {
-	/*         Name,     Chunk, Group, Smelt, Mace*/
-	coal(      "Coal",       8,    16,     2,    4),
-	diamond(   "Diamond",    4,     3,     2,    4),
-	gold(      "Gold",       8,     6,     2,    4),
-	iron(      "Iron",       8,     8,     2,    4),
-	lapis(     "Lapis",      6,     6,     2,   24),
-	redstone(  "Redstone",   6,     8,     2,   24),
-	copper(    "Copper",     8,     8,     2,    4),
-	tin(       "Tin",        8,     8,     2,    4),
-	emerald(   "Emerald",    3,     2,     2,    4),
-	silver(    "Silver",     6,     4,     2,    4),
-	lead(      "Lead",       6,     6,     2,    4),
-	uranium(   "Uranium",    3,     2,     2,    4),
-	nikolite(  "Nikolite",   8,     4,     2,   24),
-	ruby(      "Ruby",       6,     3,     2,    4),
-	peridot(   "Peridot",    6,     3,     2,    4),
-	sapphire(  "Sapphire",   6,     3,     2,    4),
+	/*Name, Chunk, Group, Smelt, Pulv*/
+	Coal(       8,    16,     2,    4),
+	Diamond(    4,     3,     2,    4),
+	Gold(       8,     6,     2,    4),
+	Iron(       8,     8,     2,    4),
+	Lapis(      6,     6,     2,   24),
+	Redstone(   6,     8,     2,   24),
+	Copper(     8,     8,     2,    4),
+	Tin(        8,     8,     2,    4),
+	Emerald(    3,     2,     2,    4),
+	Silver(     6,     4,     2,    4),
+	Lead(       6,     6,     2,    4),
+	Uranium(    3,     2,     2,    4),
+	Nikolite(   8,     4,     2,   24),
+	Ruby(       6,     3,     2,    4),
+	Peridot(    6,     3,     2,    4),
+	Sapphire(   6,     3,     2,    4),
 
-	platinum(  "Platinum",   1,     3,     2,    4),
-	nickel(    "Nickel",     4,     6,     2,    4),
-	pigiron(   "Steel",      3,     4,     2,    4),
-	iridium(   "Iridium",    1,     2,     2,    4),
-	osmium(    "Osmium",     8,     7,     2,    4),
-	sulfur(    "Sulfur",    12,    12,     2,   24),
-	titanium(  "Titanium",   3,     2,     2,    4),
-	mythril(   "Mythril",    6,     6,     2,    4),
-	adamantium("Adamantium", 5,     4,     2,    4),
-	rutile(    "Rutile",     3,     4,     2,    4),
-	tungsten(  "Tungsten",   8,     8,     2,    4),
-	amber(     "Amber",      5,     6,     2,    4),
-	tennantite("Tennantite", 8,     8,     2,    4);
+	Platinum(   1,     3,     2,    4),
+	Nickel(     4,     6,     2,    4),
+	Pigiron(    3,     4,     2,    4),
+	Iridium(    1,     2,     2,    4),
+	Osmium(     8,     7,     2,    4),
+	Sulfur(    12,    12,     2,   24),
+	Titanium(   3,     2,     2,    4),
+	Mythril(    6,     6,     2,    4),
+	Adamantium( 5,     4,     2,    4),
+	Rutile(     3,     4,     2,    4),
+	Tungsten(   8,     8,     2,    4),
+	Amber(      5,     6,     2,    4),
+	Tennantite( 8,     8,     2,    4),
+	Salt(       5,     5,     2,    8);
 
 	private int _blockIndex;
 	private int _metadata;
@@ -74,18 +75,19 @@ public enum Ores
 	private boolean _oreGenDisable = false;
 	private boolean _oreGenForced = false;
 	private int _smeltCount;
-	private int _maceCount;
+	private int _pulvCount;
 	private int _miningLevel;
-	
-	private Ores(String oreSuffix, int groupsPerChunk, int blocksPerGroup, int smeltCount, int maceCount)
+
+	private Ores(int groupsPerChunk, int blocksPerGroup, int smeltCount, int maceCount)
 	{
-		this(oreSuffix, groupsPerChunk, blocksPerGroup, smeltCount, maceCount, 2);
+		this(groupsPerChunk, blocksPerGroup, smeltCount, maceCount, 2);
 	}
-	
-	private Ores(String oreSuffix, int groupsPerChunk, int blocksPerGroup,
+
+	private Ores(int groupsPerChunk, int blocksPerGroup,
 			int smeltCount, int maceCount, int miningLevel)
 	{
-		int meta = this.ordinal();
+		int meta = ordinal();
+		String oreSuffix = name();
 		_blockIndex = meta / 16;
 		_metadata = meta % 16;
 		_oreName = "ore" + oreSuffix;
@@ -95,7 +97,7 @@ public enum Ores
 		_oreGenGroupsPerChunk = groupsPerChunk;
 		_oreGenBlocksPerGroup = blocksPerGroup;
 		_smeltCount = smeltCount;
-		_maceCount = maceCount;
+		_pulvCount = maceCount;
 		_miningLevel = miningLevel;
 	}
 
@@ -171,7 +173,7 @@ public enum Ores
 
 	public int getMaceCount()
 	{
-		return _maceCount;
+		return _pulvCount;
 	}
 
 	public void load()
@@ -193,7 +195,7 @@ public enum Ores
 			ItemStack smeltTo = smeltStack.copy();
 			smeltTo.stackSize = _smeltCount;
 			FurnaceRecipes.smelting().
-				addSmelting(NetherOresCore.getOreBlock(_blockIndex).blockID, _metadata, smeltTo, 1F);
+			addSmelting(NetherOresCore.getOreBlock(_blockIndex).blockID, _metadata, smeltTo, 1F);
 		}
 
 		if(NetherOresCore.enableInductionSmelterRecipes.getBoolean(true) &&
@@ -204,10 +206,9 @@ public enum Ores
 			ItemStack slagRich = GameRegistry.findItemStack("ThermalExpansion", "slagRich", 1);
 			ItemStack slag = GameRegistry.findItemStack("ThermalExpansion", "slag", 1);
 			ItemStack smeltToReg = smeltStack.copy();
-			ItemStack smeltToRich = smeltStack.copy();
-
-			smeltToReg.stackSize += 1;
-			smeltToRich.stackSize += 2;
+			smeltToReg.stackSize = _smeltCount;
+			ItemStack smeltToRich = smeltToReg.copy();
+			smeltToRich.stackSize += 1;
 
 			NBTTagCompound toSend = new NBTTagCompound();
 			toSend.setInteger("energy", 3200);
@@ -243,12 +244,11 @@ public enum Ores
 		if(NetherOresCore.enableMaceratorRecipes.getBoolean(true) && Loader.isModLoaded("IC2"))
 		{
 			ItemStack maceTo = maceStack.copy();
-			maceTo.stackSize = _maceCount;
+			maceTo.stackSize = _pulvCount;
 
 			Method m = null;
 			try
 			{
-
 				for (Method t : IMachineRecipeManager.class.getDeclaredMethods())
 					if (t.getName().equals("addRecipe"))
 					{
@@ -283,7 +283,7 @@ public enum Ores
 			ItemStack pulvPriTo = maceStack.copy();
 			ItemStack pulvSecTo = new ItemStack(Block.netherrack);
 
-			pulvPriTo.stackSize = _maceCount;
+			pulvPriTo.stackSize = _pulvCount;
 			pulvSecTo.stackSize = 1;
 
 			NBTTagCompound toSend = new NBTTagCompound();
@@ -302,7 +302,7 @@ public enum Ores
 				Loader.isModLoaded("AppliedEnergistics"))
 		{
 			ItemStack maceTo = maceStack.copy();
-			maceTo.stackSize = _maceCount;
+			maceTo.stackSize = _pulvCount;
 
 			IGrinderRecipeManager grinder = Util.getGrinderRecipeManage();
 
@@ -334,53 +334,53 @@ public enum Ores
 		_oreGenDisable = loadLegacy(c, "WorldGen", _oreName + ".Disable", _oreName + "Disable", false).getBoolean(false);
 		_oreGenForced = loadLegacy(c, "WorldGen", _oreName + ".Force", _oreName + "Force", false).getBoolean(false);
 		_miningLevel = c.get("WorldGen", _oreName + ".MiningLevel", _miningLevel).getInt();
-		_smeltCount = c.get("Smelting", _oreName + ".SmeltCount", _smeltCount).getInt();
-		_maceCount = c.get("Smelting", _oreName + ".MaceCount", _maceCount).getInt();
+		_smeltCount = c.get("Smelting", _oreName + ".SmeltedCount", _smeltCount).getInt();
+		_pulvCount = c.get("Smelting", _oreName + ".PulverizedCount", _pulvCount).getInt();
 
 		if(_oreGenMinY >= _oreGenMaxY)
 		{
 			_oreGenMinY = _oreGenMaxY - 1;
 		}
 	}
-	
+
 	// TODO: remove legacy loading in 1.7
 	private static Property loadLegacy(Configuration config, String category, String name,
-						String oldName, int def)
+			String oldName, int def)
 	{
 		Property r = null;
 		String old = null;
-		
+
 		if (config.hasKey(category, oldName))
 		{
-				r = config.get(category, oldName, def);
-				old = r.getString();
-				deleteEntry(config, category, oldName);
+			r = config.get(category, oldName, def);
+			old = r.getString();
+			deleteEntry(config, category, oldName);
 		}
-		
+
 		r = config.get(category, name, def);
 		if (old != null)
 			r.set(old);
 		return r;
 	}
 	private static Property loadLegacy(Configuration config, String category, String name,
-						String oldName, boolean def)
+			String oldName, boolean def)
 	{
 		Property r = null;
 		String old = null;
-		
+
 		if (config.hasKey(category, oldName))
 		{
-				r = config.get(category, oldName, def);
-				old = r.getString();
-				deleteEntry(config, category, oldName);
+			r = config.get(category, oldName, def);
+			old = r.getString();
+			deleteEntry(config, category, oldName);
 		}
-		
+
 		r = config.get(category, name, def);
 		if (old != null)
 			r.set(old);
 		return r;
 	}
-	
+
 	private static void deleteEntry(Configuration config, String category, String name)
 	{
 		config.getCategory(category).remove(name);

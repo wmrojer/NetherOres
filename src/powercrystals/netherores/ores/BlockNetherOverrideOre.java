@@ -1,12 +1,13 @@
 package powercrystals.netherores.ores;
 
-import powercrystals.netherores.NetherOresCore;
-
 import net.minecraft.block.BlockOre;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
+
+import powercrystals.netherores.NetherOresCore;
 
 public class BlockNetherOverrideOre extends BlockOre
 {
@@ -14,7 +15,7 @@ public class BlockNetherOverrideOre extends BlockOre
 	{
 		super(par1);
 	}
-	
+
 	private ThreadLocal<Boolean> explode = new ThreadLocal<Boolean>() {
 		@Override
 		protected Boolean initialValue()
@@ -22,7 +23,7 @@ public class BlockNetherOverrideOre extends BlockOre
 			return true;
 		}
 	}, willAnger = new ThreadLocal<Boolean>();
-	
+
 	@Override
 	public boolean removeBlockByPlayer(World world, EntityPlayer player, int x, int y, int z)
 	{
@@ -36,7 +37,7 @@ public class BlockNetherOverrideOre extends BlockOre
 		explode.set(true);
 		return r;
 	}
-	
+
 	@Override
 	public void breakBlock(World world, int x, int y, int z, int id, int meta)
 	{
@@ -45,15 +46,19 @@ public class BlockNetherOverrideOre extends BlockOre
 		Boolean ex = willAnger.get();
 		if (ex == null || !ex)
 			BlockNetherOres.angerPigmen(world, x, y, z);
-	}
-	
-	@Override
-	public void onBlockDestroyedByExplosion(World world, int x, int y, int z, Explosion explosion)
-	{
-		if(NetherOresCore.enableExplosionChainReactions.getBoolean(true))
-		{
-			BlockNetherOres.checkExplosionChances(this, world, x, y, z);
-		}
+		super.breakBlock(world, x, y, z, id, meta);
 	}
 
+	@Override
+	public void onBlockExploded(World world, int x, int y, int z, Explosion explosion)
+	{
+		explode.set(false);
+		willAnger.set(NetherOresCore.enableMobsAngerPigmen.getBoolean(true) ||
+				explosion == null || !(explosion.getExplosivePlacedBy() instanceof EntityLiving));
+		super.onBlockExploded(world, x, y, z, explosion);
+		willAnger.set(true);
+		explode.set(true);
+		if (NetherOresCore.enableExplosionChainReactions.getBoolean(true))
+			BlockNetherOres.checkExplosionChances(this, world, x, y, z);
+	}
 }
