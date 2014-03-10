@@ -17,6 +17,7 @@ import java.io.File;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
@@ -106,7 +107,7 @@ public class NetherOresCore extends BaseMod
 			GameRegistry.registerBlock(b, ItemBlockNetherOre.class, b.getUnlocalizedName());
 		}
 		blockHellfish = new BlockHellfish(hellfishBlockId.getInt());
-		GameRegistry.registerBlock(blockHellfish, "netherOresBlockHellfish");
+		GameRegistry.registerBlock(blockHellfish, ItemBlock.class, "netherOresBlockHellfish", "Minecraft");
 		GameRegistry.registerWorldGenerator(new NetherOresWorldGenHandler());
 		if (enableHellQuartz.getBoolean(true))
 		{
