@@ -133,25 +133,19 @@ public class NetherOresCore extends BaseMod
 	@EventHandler
 	public void postInit(FMLInterModComms.IMCEvent e)
 	{
-		if(enableStandardFurnaceRecipes.getBoolean(true) || enableInductionSmelterRecipes.getBoolean(true))
-		{
-			Ores.Coal.registerSmelting(new ItemStack(Block.oreCoal));
-			Ores.Diamond.registerSmelting(new ItemStack(Block.oreDiamond));
-			Ores.Gold.registerSmelting(new ItemStack(Block.oreGold));
-			Ores.Iron.registerSmelting(new ItemStack(Block.oreIron));
-			Ores.Lapis.registerSmelting(new ItemStack(Block.oreLapis));
-			Ores.Redstone.registerSmelting(new ItemStack(Block.oreRedstone));
-			Ores.Emerald.registerSmelting(new ItemStack(Block.oreEmerald));
-		}
-		if (enableMaceratorRecipes.getBoolean(true) ||
-				enablePulverizerRecipes.getBoolean(true) ||
-				enableGrinderRecipes.getBoolean(true))
-		{
-			Ores.Diamond.registerMacerator(new ItemStack(Item.diamond));
-			Ores.Coal.registerMacerator(new ItemStack(Item.coal));
-			Ores.Redstone.registerMacerator(new ItemStack(Item.redstone));
-			Ores.Lapis.registerMacerator(new ItemStack(Item.dyePowder, 1, 4));
-		}
+		Ores.Coal    .registerSmelting(new ItemStack(Block.oreCoal));
+		Ores.Gold    .registerSmelting(new ItemStack(Block.oreGold));
+		Ores.Iron    .registerSmelting(new ItemStack(Block.oreIron));
+		Ores.Lapis   .registerSmelting(new ItemStack(Block.oreLapis));
+		Ores.Diamond .registerSmelting(new ItemStack(Block.oreDiamond));
+		Ores.Emerald .registerSmelting(new ItemStack(Block.oreEmerald));
+		Ores.Redstone.registerSmelting(new ItemStack(Block.oreRedstone));
+		
+		Ores.Coal    .registerMacerator(new ItemStack(Item.coal));
+		Ores.Diamond .registerMacerator(new ItemStack(Item.diamond));
+		Ores.Emerald .registerMacerator(new ItemStack(Item.emerald));
+		Ores.Redstone.registerMacerator(new ItemStack(Item.redstone));
+		Ores.Lapis   .registerMacerator(new ItemStack(Item.dyePowder, 1, 4));
 		
 		for(Ores ore : Ores.values())
 		{
@@ -162,7 +156,7 @@ public class NetherOresCore extends BaseMod
 			oreName = ore.getDustName(); // Dust
 			if (OreDictionary.getOres(oreName).size() > 0)
 				registerOreDictDust(ore, oreName, OreDictionary.getOres(oreName).get(0));
-			oreName = ore.getGemName(); // Gem
+			oreName = ore.getAltName(); // Gem
 			if (OreDictionary.getOres(oreName).size() > 0)
 				registerOreDictGem(ore, oreName, OreDictionary.getOres(oreName).get(0));
 		}
@@ -273,7 +267,7 @@ public class NetherOresCore extends BaseMod
 	
 	private void registerOreDictGem(Ores ore, String oreName, ItemStack stack)
 	{
-		if (!ore.isRegisteredMacerator() && ore.getGemName().equals(oreName))
+		if (!ore.isRegisteredMacerator() && ore.getAltName().equals(oreName))
 			ore.registerMacerator(stack);
 	}
 

@@ -29,26 +29,26 @@ public enum Ores
 {
 	/*Name, Chunk, Group, Smelt, Pulv*/
 	Coal(       8,    16,     2,    4),
-	Diamond(    4,     3,     2,    4),
+	Diamond(    4,     3,     2,    5),
 	Gold(       8,     6,     2,    4),
 	Iron(       8,     8,     2,    4),
 	Lapis(      6,     6,     2,   24),
 	Redstone(   6,     8,     2,   24),
 	Copper(     8,     8,     2,    4),
 	Tin(        8,     8,     2,    4),
-	Emerald(    3,     2,     2,    4),
+	Emerald(    3,     2,     2,    5),
 	Silver(     6,     4,     2,    4),
 	Lead(       6,     6,     2,    4),
-	Uranium(    3,     2,     2,    4),
+	Uranium(    3,     2,     2,    4, "crushed"),
 	Nikolite(   8,     4,     2,   24),
-	Ruby(       6,     3,     2,    4),
-	Peridot(    6,     3,     2,    4),
-	Sapphire(   6,     3,     2,    4),
+	Ruby(       6,     3,     2,    5),
+	Peridot(    6,     3,     2,    5),
+	Sapphire(   6,     3,     2,    5),
 
 	Platinum(   1,     3,     2,    4),
 	Nickel(     4,     6,     2,    4),
 	Steel(      3,     4,     2,    4),
-	Iridium(    1,     2,     2,    4),
+	Iridium(    1,     2,     2,    4, "drop"),
 	Osmium(     8,     7,     2,    4),
 	Sulfur(    12,    12,     2,   24),
 	Titanium(   3,     2,     2,    4),
@@ -56,13 +56,14 @@ public enum Ores
 	Adamantium( 5,     4,     2,    4),
 	Rutile(     3,     4,     2,    4),
 	Tungsten(   8,     8,     2,    4),
-	Amber(      5,     6,     2,    4),
+	Amber(      5,     6,     2,    5),
 	Tennantite( 8,     8,     2,    4),
-	Salt(       5,     5,     2,   12),
-	Saltpeter(  6,     4,     2,   12);
+	Salt(       5,     5,     2,   12, "food"),
+	Saltpeter(  6,     4,     2,   10);
 
 	private int _blockIndex;
 	private int _metadata;
+	private String _secondary;
 	private boolean _registeredSmelting;
 	private boolean _registeredMacerator;
 	private int _oreGenMinY = 1;
@@ -77,11 +78,11 @@ public enum Ores
 
 	private Ores(int groupsPerChunk, int blocksPerGroup, int smeltCount, int maceCount)
 	{
-		this(groupsPerChunk, blocksPerGroup, smeltCount, maceCount, 2);
+		this(groupsPerChunk, blocksPerGroup, smeltCount, maceCount, "gem");
 	}
 
 	private Ores(int groupsPerChunk, int blocksPerGroup,
-			int smeltCount, int maceCount, int miningLevel)
+			int smeltCount, int maceCount, String secondaryType)
 	{
 		int meta = ordinal();
 		_blockIndex = meta / 16;
@@ -90,7 +91,8 @@ public enum Ores
 		_oreGenBlocksPerGroup = blocksPerGroup;
 		_smeltCount = smeltCount;
 		_pulvCount = maceCount;
-		_miningLevel = miningLevel;
+		_miningLevel = 2;
+		_secondary = secondaryType;
 	}
 
 	public int getBlockIndex()
@@ -113,9 +115,9 @@ public enum Ores
 		return "dust" + name();
 	}
 
-	public String getGemName()
+	public String getAltName()
 	{
-		return "gem" + name();
+		return _secondary + name();
 	}
 
 	public boolean isRegisteredSmelting()
@@ -201,8 +203,8 @@ public enum Ores
 			ItemStack slag = GameRegistry.findItemStack("ThermalExpansion", "slag", 1);
 			ItemStack smeltToReg = smeltStack.copy();
 			smeltToReg.stackSize = _smeltCount;
-			ItemStack smeltToRich = smeltToReg.copy();
-			smeltToRich.stackSize += 1;
+			ItemStack smeltToRich = smeltStack.copy();
+			smeltToRich.stackSize = _smeltCount + (int)Math.ceil(_smeltCount / 3f);
 
 			NBTTagCompound toSend = new NBTTagCompound();
 			toSend.setInteger("energy", 3200);
@@ -225,9 +227,9 @@ public enum Ores
 			toSend.setCompoundTag("secondaryOutput", new NBTTagCompound());
 			input.writeToNBT(toSend.getCompoundTag("primaryInput"));
 			slagRich.writeToNBT(toSend.getCompoundTag("secondaryInput"));
-			smeltToReg.writeToNBT(toSend.getCompoundTag("primaryOutput"));
+			smeltToRich.writeToNBT(toSend.getCompoundTag("primaryOutput"));
 			slag.writeToNBT(toSend.getCompoundTag("secondaryOutput"));
-			toSend.setInteger("secondaryChance", 80);
+			toSend.setInteger("secondaryChance", 100);
 			FMLInterModComms.sendMessage("ThermalExpansion", "SmelterRecipe", toSend);
 		}
 	}
