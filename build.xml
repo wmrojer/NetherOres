@@ -79,8 +79,10 @@
 	</target>
 
 	<target name="extract-dependencies" depends="setup-forge,get-dependencies" unless="${have-apis}">
+		<delete dir="${lib.dir}/"/>
+		<mkdir dir="${lib.dir}/"/>
 		<copy todir="${sources.dir}/powercrystals/core">
-			<fileset dir="${download.dir}/PowerCrystalsCore-1.6.2/src/powercrystals/core" />
+			<fileset dir="${download.dir}/PowerCrystalsCore-master/src/powercrystals/core" />
 		</copy>
 		
 		<echo message="Extracting BuildCraft API..." />
