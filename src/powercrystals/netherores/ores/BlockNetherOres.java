@@ -4,13 +4,14 @@ import java.util.List;
 import java.util.Random;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.monster.EntityPigZombie;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 
@@ -22,15 +23,15 @@ public class BlockNetherOres extends Block
 {	
 	private static int _aggroRange = 32;
 	private int _blockIndex = 0;
-	private Icon[] _netherOresIcons = new Icon[16];
+	private IIcon[] _netherOresIcons = new IIcon[16];
 
-	public BlockNetherOres(int blockId, int blockIndex)
+	public BlockNetherOres(int blockIndex)
 	{
-		super(blockId, Block.netherrack.blockMaterial);
+		super(Blocks.netherrack.getMaterial());
 		setHardness(5.0F);
 		setResistance(1.0F);
-		setUnlocalizedName("netherores.ore." + blockIndex);
-		setStepSound(soundStoneFootstep);
+		setBlockName("netherores.ore." + blockIndex);
+		setStepSound(soundTypeStone);
 		setCreativeTab(NOCreativeTab.tab);
 		_blockIndex = blockIndex;
 	}
@@ -41,7 +42,7 @@ public class BlockNetherOres extends Block
 	}
 
 	@Override
-	public void registerIcons(IconRegister ir)
+	public void registerBlockIcons(IIconRegister ir)
 	{
 		Ores[] ores = Ores.values();
 		int start = _blockIndex * 16;
@@ -52,7 +53,7 @@ public class BlockNetherOres extends Block
 	}
 
 	@Override
-	public Icon getIcon(int side, int meta)
+	public IIcon getIcon(int side, int meta)
 	{
 		return _netherOresIcons[meta];
 	}
@@ -78,12 +79,12 @@ public class BlockNetherOres extends Block
 	}, willAnger = new ThreadLocal<Boolean>();
 
 	@Override
-	public boolean removeBlockByPlayer(World world, EntityPlayer player, int x, int y, int z)
+	public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z)
 	{
 		boolean silky = player == null || !EnchantmentHelper.getSilkTouchModifier(player); 
 		explode.set(silky);
 		willAnger.set(true);
-		boolean r = super.removeBlockByPlayer(world, player, x, y, z);
+		boolean r = super.removedByPlayer(world, player, x, y, z);
 		if (silky || NetherOresCore.silkyStopsPigmen.getBoolean(true))
 			angerPigmen(player, world, x, y, z);
 		willAnger.set(false);
@@ -92,14 +93,14 @@ public class BlockNetherOres extends Block
 	}
 
 	@Override
-	public void breakBlock(World world, int x, int y, int z, int id, int meta)
+	public void breakBlock(World world, int x, int y, int z, Block block, int meta)
 	{
 		if (explode.get())
 			checkExplosionChances(this, world, x, y, z);
 		Boolean ex = willAnger.get();
 		if (ex == null || !ex)
 			angerPigmen(world, x, y, z);
-		super.breakBlock(world, x, y, z, id, meta);
+		super.breakBlock(world, x, y, z, block, meta);
 	}
 
 	@Override
@@ -132,7 +133,7 @@ public class BlockNetherOres extends Block
 						int ty = y + yOffset;
 						int tz = z + zOffset;
 
-						if (Block.blocksList[world.getBlockId(tx, ty, tz)] instanceof INetherOre &&
+						if (world.getBlock(tx, ty, tz) instanceof INetherOre &&
 								world.rand.nextInt(1000) < NetherOresCore.explosionProbability.getInt())
 						{
 							EntityArmedOre eao = new EntityArmedOre(world, tx + 0.5, ty + 0.5, tz + 0.5, block);

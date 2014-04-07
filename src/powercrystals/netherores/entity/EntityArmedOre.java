@@ -12,7 +12,7 @@ import net.minecraft.world.World;
 public class EntityArmedOre extends Entity
 {
 	private int _fuse;
-	private int _target;
+	private Block _target;
 	
 	public EntityArmedOre(World world)
 	{
@@ -36,8 +36,8 @@ public class EntityArmedOre extends Entity
 		prevPosX = x;
 		prevPosY = y;
 		prevPosZ = z;
-		_target = block != null ? block.blockID : -1;
-		setAir(_target);
+		_target = block;
+		setAir(Block.getIdFromBlock(_target));
 	}
 
 	@Override
@@ -72,16 +72,16 @@ public class EntityArmedOre extends Entity
 		{
 			if (isInvisible())
 				setDead();
-			int blockId = worldObj.getBlockId(MathHelper.floor_double(posX),
+			Block block = worldObj.getBlock(MathHelper.floor_double(posX),
 					MathHelper.floor_double(posY), MathHelper.floor_double(posZ));
-			if (blockId == getAir())
+			if (Block.getIdFromBlock(block) == getAir())
 				worldObj.spawnParticle("smoke", this.posX, this.posY + 0.5D, this.posZ, 0.0D, 0.0D, 0.0D);
 		}
 	}
 
 	private void explode()
 	{
-		int blockId = worldObj.getBlockId(MathHelper.floor_double(posX),
+		Block blockId = worldObj.getBlock(MathHelper.floor_double(posX),
 				MathHelper.floor_double(posY), MathHelper.floor_double(posZ));
 		if (blockId == _target)
 		{
@@ -94,15 +94,16 @@ public class EntityArmedOre extends Entity
 	protected void writeEntityToNBT(NBTTagCompound tag)
 	{
 		tag.setByte("Fuse", (byte)_fuse);
-		tag.setInteger("Target", _target);
+		tag.setString("STarget", Block.blockRegistry.getNameForObject(_target));
 	}
 
 	@Override
 	protected void readEntityFromNBT(NBTTagCompound tag)
 	{
 		_fuse = tag.getByte("Fuse");
-		_target = tag.hasKey("Target") ? tag.getInteger("Target") : -1;
-		setAir(_target);
+		_target = Block.getBlockFromName(tag.hasKey("Target") ?
+				Integer.toString(tag.getInteger("Target")) : tag.getString("STarget"));
+		setAir(Block.getIdFromBlock(_target));
 	}
 
 	@SideOnly(Side.CLIENT)

@@ -3,19 +3,20 @@ package powercrystals.netherores.world;
 import java.util.Random;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenerator;
 
 public class WorldGenNetherOres extends WorldGenerator
 {
-	private int _minableBlockId;
+	private Block _minableBlock;
 	private int _minableBlockMeta;
 	private int _numberOfBlocks;
 	
-	public WorldGenNetherOres(int blockId, int blockMeta, int numBlocks)
+	public WorldGenNetherOres(Block block, int blockMeta, int numBlocks)
 	{
-		_minableBlockId = blockId;
+		_minableBlock = block;
 		_minableBlockMeta = blockMeta;
 		_numberOfBlocks = numBlocks;
 	}
@@ -61,10 +62,10 @@ public class WorldGenNetherOres extends WorldGenerator
 					for(int blockZ = zStart; blockZ <= zStop; blockZ++)
 					{
 						double d14 = ((blockZ + 0.5D) - d8) / (d10 / 2D);
-						Block block = Block.blocksList[world.getBlockId(blockX, blockY, blockZ)];
-						if (block != null && d12 * d12 + d13 * d13 + d14 * d14 < 1.0D && block.isGenMineableReplaceable(world, blockX, blockY, blockZ, Block.netherrack.blockID))
+						Block block = world.getBlock(blockX, blockY, blockZ);
+						if (block != null && d12 * d12 + d13 * d13 + d14 * d14 < 1.0D && block.isReplaceableOreGen(world, blockX, blockY, blockZ, Blocks.netherrack))
 						{
-							world.setBlock(blockX, blockY, blockZ, _minableBlockId, _minableBlockMeta, 2);
+							world.setBlock(blockX, blockY, blockZ, _minableBlock, _minableBlockMeta, 2);
 						}
 					}
 				}

@@ -6,6 +6,7 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.monster.EntitySilverfish;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.Facing;
@@ -17,7 +18,7 @@ public class EntityHellfish extends EntitySilverfish
 	public EntityHellfish(World world)
 	{
 		super(world);
-		rand.setSeed(world.getSeed() ^ this.entityId);
+		rand.setSeed(world.getSeed() ^ this.getEntityId());
 		this.isImmuneToFire = true;
 		this.stepHeight = 1.0F;
 		this.hurtTime = 15;
@@ -28,13 +29,13 @@ public class EntityHellfish extends EntitySilverfish
 	{
 		super.applyEntityAttributes();
 		this.getEntityAttribute(SharedMonsterAttributes.maxHealth).
-		setAttribute(12.5D);
+		setBaseValue(12.5D);
 		this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).
-		setAttribute(0.925D + (rand.nextDouble() / 10));
+		setBaseValue(0.925D + (rand.nextDouble() / 10));
 		this.getEntityAttribute(SharedMonsterAttributes.attackDamage).
-		setAttribute(1.5D + (rand.nextDouble()));
+		setBaseValue(1.5D + (rand.nextDouble()));
 		this.getEntityAttribute(SharedMonsterAttributes.knockbackResistance).
-		setAttribute(rand.nextDouble());
+		setBaseValue(rand.nextDouble());
 	}
 
 	@Override
@@ -64,12 +65,12 @@ public class EntityHellfish extends EntitySilverfish
 						for (int x = 0; x <= 10 & x >= -10; x = x <= 0 ? 1 - x : 0 - x)
 							for (int z = 0; z <= 10 & z >= -10; z = z <= 0 ? 1 - z : 0 - z)
 							{
-								int blockId = worldObj.getBlockId(posX + x, posY + y, posZ + z);
+								Block block = worldObj.getBlock(posX + x, posY + y, posZ + z);
 
-								if (blockId == NetherOresCore.blockHellfish.blockID)
+								if (block == NetherOresCore.blockHellfish)
 								{
 									if (!worldObj.getGameRules().getGameRuleBooleanValue("mobGriefing"))
-										worldObj.setBlock(posX + x, posY + y, posZ + z, Block.netherrack.blockID, 0, 3);
+										worldObj.setBlock(posX + x, posY + y, posZ + z, Blocks.netherrack, 0, 3);
 									else
 										worldObj.destroyBlock(posX + x, posY + y, posZ + z, false);
 									BlockHellfish.spawnHellfish(worldObj, posX + x, posY + y, posZ + z);
@@ -87,11 +88,11 @@ public class EntityHellfish extends EntitySilverfish
 				posY = MathHelper.floor_double(this.posY + 0.5D);
 				posZ = MathHelper.floor_double(this.posZ);
 				int direction = this.rand.nextInt(6);
-				int blockId = this.worldObj.getBlockId(posX + Facing.offsetsXForSide[direction], posY + Facing.offsetsYForSide[direction], posZ + Facing.offsetsZForSide[direction]);
+				Block block = this.worldObj.getBlock(posX + Facing.offsetsXForSide[direction], posY + Facing.offsetsYForSide[direction], posZ + Facing.offsetsZForSide[direction]);
 
-				if(blockId == Block.netherrack.blockID && this.rand.nextInt(3) == 0)
+				if(block == Blocks.netherrack && this.rand.nextInt(3) == 0)
 				{
-					this.worldObj.setBlock(posX + Facing.offsetsXForSide[direction], posY + Facing.offsetsYForSide[direction], posZ + Facing.offsetsZForSide[direction], NetherOresCore.blockHellfish.blockID, 0, 0);
+					this.worldObj.setBlock(posX + Facing.offsetsXForSide[direction], posY + Facing.offsetsYForSide[direction], posZ + Facing.offsetsZForSide[direction], NetherOresCore.blockHellfish, 0, 0);
 					this.spawnExplosionParticle();
 					this.setDead();
 				}
@@ -135,6 +136,6 @@ public class EntityHellfish extends EntitySilverfish
 	@Override
 	public float getBlockPathWeight(int par1, int par2, int par3)
 	{
-		return this.worldObj.getBlockId(par1, par2 - 1, par3) == Block.netherrack.blockID ? 10.0F : (-this.worldObj.getLightBrightness(par1, par2, par3));
+		return this.worldObj.getBlock(par1, par2 - 1, par3) == Blocks.netherrack ? 10.0F : (-this.worldObj.getLightBrightness(par1, par2, par3));
 	}
 }

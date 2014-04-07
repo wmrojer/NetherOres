@@ -1,26 +1,22 @@
 package powercrystals.netherores.ores;
 
-import appeng.api.IAppEngGrinderRecipe;
-import appeng.api.IGrinderRecipeManager;
-import appeng.api.Util;
+//import appeng.api.IAppEngGrinderRecipe;
+//import appeng.api.IGrinderRecipeManager;
+//import appeng.api.Util;
 
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.event.FMLInterModComms;
 import cpw.mods.fml.common.registry.GameRegistry;
 
-import ic2.api.recipe.IMachineRecipeManager;
-import ic2.api.recipe.Recipes;
+//import ic2.api.recipe.IMachineRecipeManager;
+//import ic2.api.recipe.Recipes;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-
-import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.common.Configuration;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.Property;
+import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.config.Property;
 import net.minecraftforge.oredict.OreDictionary;
 
 import powercrystals.netherores.NetherOresCore;
@@ -172,12 +168,12 @@ public enum Ores
 
 	public void load()
 	{
-		MinecraftForge.setBlockHarvestLevel(NetherOresCore.getOreBlock(_blockIndex),
-				_metadata, "pickaxe", _miningLevel);
+		NetherOresCore.getOreBlock(_blockIndex).setHarvestLevel("pickaxe", _miningLevel, _metadata);
 		if (_oreGenForced | !_oreGenDisable)
 		{
 			ItemStack oreStack = new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata);
 			OreDictionary.registerOre("oreNether" + name(), oreStack);
+			GameRegistry.registerCustomItemStack("netherOresBlock" + name(), oreStack);
 		}
 	}
 
@@ -191,14 +187,14 @@ public enum Ores
 			ItemStack smeltTo = smeltStack.copy();
 			smeltTo.stackSize = _smeltCount;
 			FurnaceRecipes.smelting().
-			addSmelting(NetherOresCore.getOreBlock(_blockIndex).blockID, _metadata, smeltTo, 1F);
+			func_151394_a(new ItemStack(NetherOresCore.getOreBlock(_blockIndex), _metadata), smeltTo, 1F);
 		}
 
 		if(NetherOresCore.enableInductionSmelterRecipes.getBoolean(true) &&
 				Loader.isModLoaded("ThermalExpansion"))
 		{
 			ItemStack input = new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata);
-			ItemStack regSec = new ItemStack(Block.sand);
+			ItemStack regSec = new ItemStack(Blocks.sand);
 			ItemStack slagRich = GameRegistry.findItemStack("ThermalExpansion", "slagRich", 1);
 			ItemStack slag = GameRegistry.findItemStack("ThermalExpansion", "slag", 1);
 			ItemStack smeltToReg = smeltStack.copy();
@@ -208,10 +204,10 @@ public enum Ores
 
 			NBTTagCompound toSend = new NBTTagCompound();
 			toSend.setInteger("energy", 3200);
-			toSend.setCompoundTag("primaryInput", new NBTTagCompound());
-			toSend.setCompoundTag("secondaryInput", new NBTTagCompound());
-			toSend.setCompoundTag("primaryOutput", new NBTTagCompound());
-			toSend.setCompoundTag("secondaryOutput", new NBTTagCompound());
+			toSend.setTag("primaryInput", new NBTTagCompound());
+			toSend.setTag("secondaryInput", new NBTTagCompound());
+			toSend.setTag("primaryOutput", new NBTTagCompound());
+			toSend.setTag("secondaryOutput", new NBTTagCompound());
 			input.writeToNBT(toSend.getCompoundTag("primaryInput"));
 			regSec.writeToNBT(toSend.getCompoundTag("secondaryInput"));
 			smeltToReg.writeToNBT(toSend.getCompoundTag("primaryOutput"));
@@ -221,10 +217,10 @@ public enum Ores
 
 			toSend = new NBTTagCompound();
 			toSend.setInteger("energy", 4000);
-			toSend.setCompoundTag("primaryInput", new NBTTagCompound());
-			toSend.setCompoundTag("secondaryInput", new NBTTagCompound());
-			toSend.setCompoundTag("primaryOutput", new NBTTagCompound());
-			toSend.setCompoundTag("secondaryOutput", new NBTTagCompound());
+			toSend.setTag("primaryInput", new NBTTagCompound());
+			toSend.setTag("secondaryInput", new NBTTagCompound());
+			toSend.setTag("primaryOutput", new NBTTagCompound());
+			toSend.setTag("secondaryOutput", new NBTTagCompound());
 			input.writeToNBT(toSend.getCompoundTag("primaryInput"));
 			slagRich.writeToNBT(toSend.getCompoundTag("secondaryInput"));
 			smeltToRich.writeToNBT(toSend.getCompoundTag("primaryOutput"));
@@ -238,7 +234,7 @@ public enum Ores
 	{
 		if (_registeredMacerator)
 			return;
-		_registeredMacerator = true;
+		_registeredMacerator = true;/*
 		if(NetherOresCore.enableMaceratorRecipes.getBoolean(true) && Loader.isModLoaded("IC2"))
 		{
 			ItemStack maceTo = maceStack.copy();
@@ -272,23 +268,23 @@ public enum Ores
 					e.printStackTrace();
 				}
 			}
-		}
+		}//*/
 
 		if(NetherOresCore.enablePulverizerRecipes.getBoolean(true) &&
 				Loader.isModLoaded("ThermalExpansion"))
 		{
 			ItemStack input = new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata);
 			ItemStack pulvPriTo = maceStack.copy();
-			ItemStack pulvSecTo = new ItemStack(Block.netherrack);
+			ItemStack pulvSecTo = new ItemStack(Blocks.netherrack);
 
 			pulvPriTo.stackSize = _pulvCount;
 			pulvSecTo.stackSize = 1;
 
 			NBTTagCompound toSend = new NBTTagCompound();
 			toSend.setInteger("energy", 3200);
-			toSend.setCompoundTag("input", new NBTTagCompound());
-			toSend.setCompoundTag("primaryOutput", new NBTTagCompound());
-			toSend.setCompoundTag("secondaryOutput", new NBTTagCompound());
+			toSend.setTag("input", new NBTTagCompound());
+			toSend.setTag("primaryOutput", new NBTTagCompound());
+			toSend.setTag("secondaryOutput", new NBTTagCompound());
 			input.writeToNBT(toSend.getCompoundTag("input"));
 			pulvPriTo.writeToNBT(toSend.getCompoundTag("primaryOutput"));
 			pulvSecTo.writeToNBT(toSend.getCompoundTag("secondaryOutput"));
@@ -296,6 +292,7 @@ public enum Ores
 			FMLInterModComms.sendMessage("ThermalExpansion", "PulverizerRecipe", toSend);
 		}
 
+		/*
 		appeng: if(NetherOresCore.enableGrinderRecipes.getBoolean(true) && 
 				Loader.isModLoaded("AppliedEnergistics"))
 		{
@@ -318,7 +315,7 @@ public enum Ores
 			// if there's no overworld recipe to get the energy cost from, default to 16 turns
 			grinder.addRecipe(new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata),
 					maceTo, 16);
-		}
+		}//*/
 	}
 
 	public void loadConfig(Configuration c)

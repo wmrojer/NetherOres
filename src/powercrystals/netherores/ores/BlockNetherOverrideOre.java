@@ -1,5 +1,8 @@
 package powercrystals.netherores.ores;
 
+import static powercrystals.netherores.ores.BlockNetherOres.*;
+
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockOre;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLiving;
@@ -11,11 +14,6 @@ import powercrystals.netherores.NetherOresCore;
 
 public class BlockNetherOverrideOre extends BlockOre implements INetherOre
 {
-	public BlockNetherOverrideOre(int par1)
-	{
-		super(par1);
-	}
-
 	private ThreadLocal<Boolean> explode = new ThreadLocal<Boolean>() {
 		@Override
 		protected Boolean initialValue()
@@ -25,28 +23,28 @@ public class BlockNetherOverrideOre extends BlockOre implements INetherOre
 	}, willAnger = new ThreadLocal<Boolean>();
 
 	@Override
-	public boolean removeBlockByPlayer(World world, EntityPlayer player, int x, int y, int z)
+	public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z)
 	{
 		boolean silky = player == null || !EnchantmentHelper.getSilkTouchModifier(player); 
 		explode.set(silky);
 		willAnger.set(true);
-		boolean r = super.removeBlockByPlayer(world, player, x, y, z);
+		boolean r = super.removedByPlayer(world, player, x, y, z);
 		if (silky || NetherOresCore.silkyStopsPigmen.getBoolean(true))
-			BlockNetherOres.angerPigmen(player, world, x, y, z);
+			angerPigmen(player, world, x, y, z);
 		willAnger.set(false);
 		explode.set(true);
 		return r;
 	}
 
 	@Override
-	public void breakBlock(World world, int x, int y, int z, int id, int meta)
+	public void breakBlock(World world, int x, int y, int z, Block block, int meta)
 	{
 		if (explode.get())
-			BlockNetherOres.checkExplosionChances(this, world, x, y, z);
+			checkExplosionChances(this, world, x, y, z);
 		Boolean ex = willAnger.get();
 		if (ex == null || !ex)
-			BlockNetherOres.angerPigmen(world, x, y, z);
-		super.breakBlock(world, x, y, z, id, meta);
+			angerPigmen(world, x, y, z);
+		super.breakBlock(world, x, y, z, block, meta);
 	}
 
 	@Override
@@ -59,6 +57,6 @@ public class BlockNetherOverrideOre extends BlockOre implements INetherOre
 		willAnger.set(true);
 		explode.set(true);
 		if (NetherOresCore.enableExplosionChainReactions.getBoolean(true))
-			BlockNetherOres.checkExplosionChances(this, world, x, y, z);
+			checkExplosionChances(this, world, x, y, z);
 	}
 }

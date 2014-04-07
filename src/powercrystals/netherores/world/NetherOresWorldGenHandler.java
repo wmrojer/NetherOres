@@ -37,7 +37,7 @@ public class NetherOresWorldGenHandler implements IWorldGenerator
 						int x = chunkX + random.nextInt(16);
 						int y = o.getMinY() + random.nextInt(o.getMaxY() - o.getMinY());
 						int z = chunkZ + random.nextInt(16);
-						new WorldGenNetherOres(NetherOresCore.getOreBlock(o.getBlockIndex()).blockID, o.getMetadata(), o.getBlocksPerGroup()).generate(world, random, x, y, z);
+						new WorldGenNetherOres(NetherOresCore.getOreBlock(o.getBlockIndex()), o.getMetadata(), o.getBlocksPerGroup()).generate(world, random, x, y, z);
 					}
 				}
 			}
@@ -55,7 +55,7 @@ public class NetherOresWorldGenHandler implements IWorldGenerator
 				int x = chunkX + random.nextInt(16); 
 				int y = minY + random.nextInt(maxY - minY);
 				int z = chunkZ + random.nextInt(16);
-				new WorldGenNetherOres(NetherOresCore.blockHellfish.blockID, 0, hellfishVein).generate(world, random, x, y, z);
+				new WorldGenNetherOres(NetherOresCore.blockHellfish, 0, hellfishVein).generate(world, random, x, y, z);
 			}
 		}
 	}

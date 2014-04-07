@@ -6,50 +6,51 @@ import powercrystals.netherores.NetherOresCore;
 import powercrystals.netherores.entity.EntityHellfish;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockNetherrack;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.world.World;
 
 public class BlockHellfish extends BlockNetherrack
 {
-	public BlockHellfish(int blockId)
+	public BlockHellfish()
 	{
-		super(blockId);
 		setHardness(0.4F);
-		setStepSound(soundStoneFootstep);
-		setUnlocalizedName("netherores.hellfish");
-		setTextureName("netherrack");
+		setStepSound(soundTypePiston);
+		setBlockName("netherores.hellfish");
+		setBlockTextureName("netherrack");
 	}
-	
+
 	@Override
 	public boolean canSilkHarvest()
 	{
 		return false;
 	}
-	
+
 	@Override
-	public int idDropped(int meta, Random rand, int fortune)
+	public Item getItemDropped(int meta, Random rand, int fortune)
 	{
-		return Block.netherrack.blockID;
+		return Item.getItemFromBlock(Blocks.netherrack);
 	}
-	
+
 	@Override
 	public int quantityDropped(Random rand)
 	{
 		return NetherOresCore.enableHellfish.getBoolean(true) ? 0 : 1;
 	}
-	
+
 	@Override
-	public void breakBlock(World world, int x, int y, int z, int id, int meta)
+	public void breakBlock(World world, int x, int y, int z, Block block, int meta)
 	{
 		spawnHellfish(world, x, y, z);
-		super.breakBlock(world, x, y, z, id, meta);
+		super.breakBlock(world, x, y, z, block, meta);
 	}
-	
+
 	@Override
-	public boolean isGenMineableReplaceable(World world, int x, int y, int z, int target)
+	public boolean isReplaceableOreGen(World world, int x, int y, int z, Block target)
 	{
-		return blockID == target | target == Block.netherrack.blockID;
+		return this == target | target == Blocks.netherrack;
 	}
-	
+
 	public static void spawnHellfish(World world, int x, int y, int z)
 	{
 		if(!world.isRemote && NetherOresCore.enableHellfish.getBoolean(true))

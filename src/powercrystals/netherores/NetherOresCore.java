@@ -6,36 +6,30 @@ import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLInterModComms;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.network.NetworkMod;
-import cpw.mods.fml.common.network.NetworkMod.SidedPacketHandler;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.common.registry.TickRegistry;
-import cpw.mods.fml.relauncher.Side;
+//import cpw.mods.fml.common.registry.TickRegistry;
 
 import java.io.File;
 
 import net.minecraft.block.Block;
-import net.minecraft.item.Item;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.Configuration;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.Property;
-import net.minecraftforge.event.ForgeSubscribe;
+import net.minecraftforge.common.config.Property;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.OreDictionary.OreRegisterEvent;
 
-import powercrystals.core.mod.BaseMod;
-import powercrystals.core.updater.UpdateManager;
+//import powercrystals.core.mod.BaseMod;
+//import powercrystals.core.updater.UpdateManager;
 import powercrystals.netherores.entity.EntityArmedOre;
 import powercrystals.netherores.entity.EntityHellfish;
-import powercrystals.netherores.net.ClientPacketHandler;
-import powercrystals.netherores.net.ConnectionHandler;
 import powercrystals.netherores.net.INetherOresProxy;
-import powercrystals.netherores.net.ServerPacketHandler;
 import powercrystals.netherores.ores.BlockNetherOres;
-import powercrystals.netherores.ores.BlockNetherOverrideOre;
 import powercrystals.netherores.ores.ItemBlockNetherOre;
 import powercrystals.netherores.ores.Ores;
 import powercrystals.netherores.world.BlockHellfish;
@@ -43,23 +37,16 @@ import powercrystals.netherores.world.NetherOresWorldGenHandler;
 
 @Mod(modid = NetherOresCore.modId, name = NetherOresCore.modName, version = NetherOresCore.version,
 dependencies = "required-after:PowerCrystalsCore;before:ThermalExpansion")
-@NetworkMod(clientSideRequired = true, serverSideRequired = false,
-clientPacketHandlerSpec = @SidedPacketHandler(channels = { NetherOresCore.modId }, packetHandler = ClientPacketHandler.class),
-serverPacketHandlerSpec = @SidedPacketHandler(channels = { NetherOresCore.modId }, packetHandler = ServerPacketHandler.class),
-connectionHandler = ConnectionHandler.class)
-public class NetherOresCore extends BaseMod
+public class NetherOresCore// extends BaseMod
 {
 	public static final String modId = "NetherOres";
-	public static final String version = "1.6.2R2.2.2";
+	public static final String version = "1.7.2R2.3.0B1";
 	public static final String modName = "Nether Ores";
 	
 	public static final String mobTextureFolder = "netherores:textures/mob/";
 
 	public static Block[] blockNetherOres = new Block[(Ores.values().length + 15) / 16];
 	public static Block blockHellfish;
-	
-	private static Property[] netherOreBlockIds = new Property[blockNetherOres.length];
-	private static Property hellfishBlockId;
 
 	public static Property explosionPower;
 	public static Property explosionProbability;
@@ -89,13 +76,13 @@ public class NetherOresCore extends BaseMod
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent evt)
 	{
-		setConfigFolderBase(evt.getModConfigurationDirectory());
+		//setConfigFolderBase(evt.getModConfigurationDirectory());
 		
-		loadConfig(getCommonConfig());
+		//loadConfig(getCommonConfig());
 		
-		extractLang(new String[] {  "en_US", "es_AR", "es_ES", "es_MX", "es_UY", "es_VE", "de_DE",
-									"ru_RU", "sv_SE" });
-		loadLang();
+		//extractLang(new String[] {  "en_US", "es_AR", "es_ES", "es_MX", "es_UY", "es_VE", "de_DE",
+		//							"ru_RU", "sv_SE" });
+		//loadLang();
 	}
 
 	@EventHandler
@@ -103,18 +90,19 @@ public class NetherOresCore extends BaseMod
 	{
 		for (int i = 0, e = blockNetherOres.length; i < e; ++i)
 		{
-			Block b = blockNetherOres[i] = new BlockNetherOres(netherOreBlockIds[i].getInt(), i);
+			Block b = blockNetherOres[i] = new BlockNetherOres(i);
 			GameRegistry.registerBlock(b, ItemBlockNetherOre.class, b.getUnlocalizedName());
 		}
-		blockHellfish = new BlockHellfish(hellfishBlockId.getInt());
+		blockHellfish = new BlockHellfish();
 		GameRegistry.registerBlock(blockHellfish, ItemBlock.class, "netherOresBlockHellfish", "Minecraft");
-		GameRegistry.registerWorldGenerator(new NetherOresWorldGenHandler());
+		GameRegistry.registerCustomItemStack("netherOresBlockHellfish", new ItemStack(blockHellfish));
+		GameRegistry.registerWorldGenerator(new NetherOresWorldGenHandler(), 10);
 		if (enableHellQuartz.getBoolean(true))
-		{
+		{/*
 			int id = Block.oreNetherQuartz.blockID;
 			Block.blocksList[id] = null;
 			Block quartz = new BlockNetherOverrideOre(id).setHardness(3.0F).setResistance(5.0F).setStepSound(Block.soundStoneFootstep).setUnlocalizedName("netherquartz").setTextureName("quartz_ore");
-			Block.oreNetherQuartz = quartz;
+			Block.oreNetherQuartz = quartz;//*/
 		}
 		
 		for(Ores o : Ores.values())
@@ -127,25 +115,25 @@ public class NetherOresCore extends BaseMod
 		
 		proxy.load();
 
-		TickRegistry.registerScheduledTickHandler(new UpdateManager(this), Side.CLIENT);
+		//TickRegistry.registerScheduledTickHandler(new UpdateManager(this), Side.CLIENT);
 	}
 	
 	@EventHandler
 	public void postInit(FMLInterModComms.IMCEvent e)
 	{
-		Ores.Coal    .registerSmelting(new ItemStack(Block.oreCoal));
-		Ores.Gold    .registerSmelting(new ItemStack(Block.oreGold));
-		Ores.Iron    .registerSmelting(new ItemStack(Block.oreIron));
-		Ores.Lapis   .registerSmelting(new ItemStack(Block.oreLapis));
-		Ores.Diamond .registerSmelting(new ItemStack(Block.oreDiamond));
-		Ores.Emerald .registerSmelting(new ItemStack(Block.oreEmerald));
-		Ores.Redstone.registerSmelting(new ItemStack(Block.oreRedstone));
+		Ores.Coal    .registerSmelting(new ItemStack(Blocks.coal_ore));
+		Ores.Gold    .registerSmelting(new ItemStack(Blocks.gold_ore));
+		Ores.Iron    .registerSmelting(new ItemStack(Blocks.iron_ore));
+		Ores.Lapis   .registerSmelting(new ItemStack(Blocks.lapis_ore));
+		Ores.Diamond .registerSmelting(new ItemStack(Blocks.diamond_ore));
+		Ores.Emerald .registerSmelting(new ItemStack(Blocks.emerald_ore));
+		Ores.Redstone.registerSmelting(new ItemStack(Blocks.redstone_ore));
 		
-		Ores.Coal    .registerMacerator(new ItemStack(Item.coal));
-		Ores.Diamond .registerMacerator(new ItemStack(Item.diamond));
-		Ores.Emerald .registerMacerator(new ItemStack(Item.emerald));
-		Ores.Redstone.registerMacerator(new ItemStack(Item.redstone));
-		Ores.Lapis   .registerMacerator(new ItemStack(Item.dyePowder, 1, 4));
+		Ores.Coal    .registerMacerator(new ItemStack(Items.coal));
+		Ores.Diamond .registerMacerator(new ItemStack(Items.diamond));
+		Ores.Emerald .registerMacerator(new ItemStack(Items.emerald));
+		Ores.Redstone.registerMacerator(new ItemStack(Items.redstone));
+		Ores.Lapis   .registerMacerator(new ItemStack(Items.dye, 1, 4));
 		
 		for(Ores ore : Ores.values())
 		{
@@ -175,17 +163,6 @@ public class NetherOresCore extends BaseMod
 	{
 		Configuration c = new Configuration(f);
 		c.load();
-		
-		Property base = c.get(Configuration.CATEGORY_BLOCK, "BaseID", 1440);
-		base.comment = "This is the base ID blocks will assign from. Delete the other IDs here to auto-align to this value.";
-		int baseID = base.getInt(1440),
-				curID = baseID;
-		
-		netherOreBlockIds[0] = c.getBlock(Configuration.CATEGORY_BLOCK, "ID.NetherOreBlock", curID++);
-		hellfishBlockId = c.getBlock(Configuration.CATEGORY_BLOCK, "ID.HellfishBlock", curID++);
-		for (int i = 1; i < netherOreBlockIds.length; ++i)
-			netherOreBlockIds[i] = c.getBlock(Configuration.CATEGORY_BLOCK, "ID.NetherOreBlock"+i, curID++);
-		// add new blocks using baseID--
 		
 		explosionPower = c.get(Configuration.CATEGORY_GENERAL, "ExplosionPower", 2);
 		explosionPower.comment = "How powerful an explosion will be. Creepers are 3, TNT is 4, electrified creepers are 6. This affects both the ability of the explosion to punch through blocks as well as the blast radius.";
@@ -237,7 +214,7 @@ public class NetherOresCore extends BaseMod
 		c.save();
 	}
 
-	@ForgeSubscribe
+	@SubscribeEvent
 	public void registerOreEvent(OreRegisterEvent event)
 	{
 		registerOreDictionaryEntry(event.Name, event.Ore);
@@ -271,19 +248,19 @@ public class NetherOresCore extends BaseMod
 			ore.registerMacerator(stack);
 	}
 
-	@Override
+	//@Override
 	public String getModId()
 	{
 		return modId;
 	}
 
-	@Override
+	//@Override
 	public String getModName()
 	{
 		return modName;
 	}
 
-	@Override
+	//@Override
 	public String getModVersion()
 	{
 		return version;
