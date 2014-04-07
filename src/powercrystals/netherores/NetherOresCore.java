@@ -30,6 +30,7 @@ import powercrystals.netherores.entity.EntityArmedOre;
 import powercrystals.netherores.entity.EntityHellfish;
 import powercrystals.netherores.net.INetherOresProxy;
 import powercrystals.netherores.ores.BlockNetherOres;
+import powercrystals.netherores.ores.BlockNetherOverrideOre;
 import powercrystals.netherores.ores.ItemBlockNetherOre;
 import powercrystals.netherores.ores.Ores;
 import powercrystals.netherores.world.BlockHellfish;
@@ -98,11 +99,12 @@ public class NetherOresCore// extends BaseMod
 		GameRegistry.registerCustomItemStack("netherOresBlockHellfish", new ItemStack(blockHellfish));
 		GameRegistry.registerWorldGenerator(new NetherOresWorldGenHandler(), 10);
 		if (enableHellQuartz.getBoolean(true))
-		{/*
-			int id = Block.oreNetherQuartz.blockID;
-			Block.blocksList[id] = null;
-			Block quartz = new BlockNetherOverrideOre(id).setHardness(3.0F).setResistance(5.0F).setStepSound(Block.soundStoneFootstep).setUnlocalizedName("netherquartz").setTextureName("quartz_ore");
-			Block.oreNetherQuartz = quartz;//*/
+		{
+			Block quartz = new BlockNetherOverrideOre().setHardness(3.0F).setResistance(5.0F).
+					setStepSound(Block.soundTypePiston).setBlockName("netherquartz").
+					setBlockTextureName("quartz_ore");
+			Blocks.quartz_ore = quartz;
+			Block.blockRegistry.addObject(153, "quartz_ore", quartz);
 		}
 		
 		for(Ores o : Ores.values())

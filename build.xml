@@ -288,7 +288,7 @@
 		<property name="build.full" value="[${mcv}]${mfrv}-"/>
 	</target>
 
-	<target name="get-build-number" depends="build-number-there" unless="${build.number}">
+	<target name="get-build-number" depends="build-number-there" unless="build.number">
 		<echo message="!! No build number set !!"/>
 		<property name="build.number" value="CUSTOM_BUILD"/>
 	</target>
