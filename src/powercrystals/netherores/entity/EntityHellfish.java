@@ -72,7 +72,7 @@ public class EntityHellfish extends EntitySilverfish
 									if (!worldObj.getGameRules().getGameRuleBooleanValue("mobGriefing"))
 										worldObj.setBlock(posX + x, posY + y, posZ + z, Blocks.netherrack, 0, 3);
 									else
-										worldObj.destroyBlock(posX + x, posY + y, posZ + z, false);
+										worldObj.func_147480_a(posX + x, posY + y, posZ + z, false);
 									BlockHellfish.spawnHellfish(worldObj, posX + x, posY + y, posZ + z);
 
 									if (rand.nextBoolean())

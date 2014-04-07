@@ -7,7 +7,7 @@
 	<property name="src.dir" value="src"/>
 	<property name="resources.dir" value="resources"/>
 	<!-- Version file (main class) -->
-	<property name="verclass.dir" value="${mcpsrc.dir}/powercrystals/netherores" />
+	<property name="verclass.dir" value="${src.dir}/powercrystals/netherores" />
 	<property name="verclass.name" value="NetherOresCore.java"/>
 	
 	<!-- Forge version -->
@@ -26,7 +26,8 @@
 	<!-- Forge paths -->
 	<property name="forge.dir" value="${build.dir}/forge"/>
 	<property name="forgebuild.dir" value="${forge.dir}/build"/>
-	<property name="compile.dir" value="${forgebuild.dir}/classes/main"/>
+	<property name="compile.dir" value="${forgebuild.dir}/tmp/compile"/>
+	<property name="reobf.dir" value="${forgebuild.dir}/classes/main"/>
 	<property name="lib.dir" value="${forgebuild.dir}/libs"/>
 	<property name="sources.dir" value="${forgebuild.dir}/sources/minecraft"/>
 	<property name="forge.version"
@@ -49,18 +50,17 @@
 	
 	<!-- Task skipping -->
 	<available property="already-compiled" file="${lib.dir}/modid-1.0.jar"/>
-	<available property="den-exists" file="${basedir}/MFR-Forestry/build.xml"/>
 	<available property="forge-exists" file="${download.dir}/forge-${forge.version}-src.zip"/>
 	<condition property="forge.already.installed">
 		<available file="${forge.dir}/build/dirtyArtifacts/forgeSrc-${forge.version}.jar" type="file"/>
 	</condition>
 	<condition property="have-apis">
 		<and>
-			<available file="${mcpsrc.dir}/powercrystals/core" type="dir"/>
-			<available file="${mcpsrc.dir}/buildcraft" type="dir"/>
-			<available file="${mcpsrc.dir}/ic2" type="dir"/>
-			<available file="${mcpsrc.dir}/appeng" type="dir"/>
-			<!--<available file="${mcpsrc.dir}/thermalexpansion" type="dir"/>-->
+			<available file="${sources.dir}/powercrystals/core" type="dir"/>
+			<available file="${sources.dir}/buildcraft" type="dir"/>
+			<available file="${sources.dir}/ic2" type="dir"/>
+			<available file="${sources.dir}/appeng" type="dir"/>
+			<!--<available file="${sources.dir}/thermalexpansion" type="dir"/>-->
 		</and>
 	</condition>
 	
@@ -79,24 +79,24 @@
 	</target>
 
 	<target name="extract-dependencies" depends="setup-forge,get-dependencies" unless="${have-apis}">
-		<copy todir="${mcpsrc.dir}/powercrystals/core">
+		<copy todir="${sources.dir}/powercrystals/core">
 			<fileset dir="${download.dir}/PowerCrystalsCore-1.6.2/src/powercrystals/core" />
 		</copy>
 		
 		<echo message="Extracting BuildCraft API..." />
 		<unzip src="${download.dir}/BuildCraft-master.zip" dest="${download.dir}"/>
-		<mkdir dir="${mcpsrc.dir}/buildcraft/" />
-		<move file="${download.dir}/BuildCraft-3e13bbb166568624cc918f8a9f916fa2062f6c37/common/buildcraft/api" todir="${mcpsrc.dir}/buildcraft/"/>
+		<mkdir dir="${sources.dir}/buildcraft/" />
+		<move file="${download.dir}/BuildCraft-3e13bbb166568624cc918f8a9f916fa2062f6c37/common/buildcraft/api" todir="${sources.dir}/buildcraft/"/>
 		
 		<echo message="Extracting IC2 API... " />
 		<unzip src="${download.dir}/industrialcraft-2-api.zip" dest="${download.dir}" />
-		<move file="${download.dir}/ic2" todir="${mcpsrc.dir}" />
+		<move file="${download.dir}/ic2" todir="${sources.dir}" />
 		
 		<echo message="Extracting AppEng API... " />
 		<unzip src="${download.dir}/appeng.zip" dest="${download.dir}" />
 		<delete file="${download.dir}/appeng" />
 		<unzip src="${download.dir}/appeng_api.zip" dest="${download.dir}" />
-		<move file="${download.dir}/appeng" todir="${mcpsrc.dir}" />
+		<move file="${download.dir}/appeng" todir="${sources.dir}" />
 	</target>
 	
 	<target name="install" depends="build">
@@ -106,6 +106,8 @@
 		<!-- Cleanup -->
 		<delete dir="${apiclasses.dir}"/>
 		<delete dir="${sources.dir}/powercrystals/netherores"/>
+		<delete dir="${classes.dir}"/>
+		<delete dir="${reobf.dir}"/>
 	</target>
 
 	<macrodef name="install-lite">
@@ -120,7 +122,6 @@
 			<copy-assets/>
 			<jar destfile="${dist.dir}/NetherOres-${build.full}@{build}.jar"
 				compress="true" level="9" basedir="${classes.dir}"/>
-			<delete dir="${classes.dir}"/>
 		</sequential>
 	</macrodef>
 	
@@ -154,7 +155,10 @@
 		<install-lite build="dev-${build.number}"/>
 
 		<!-- Reobf -->
-		<exec executable="gradlew" failonerror="true" dir="${forge.dir}/" vmlauncher="false">
+		<copy todir="${reobf.dir}">
+			<fileset dir="${classes.dir}"/>
+		</copy>
+		<exec executable="./gradlew" failonerror="true" dir="${forge.dir}/" vmlauncher="false">
 			<arg line="-g .gradle"/>
 			<arg line="reobf"/>
 			<arg line="-x compileJava"/>
@@ -182,11 +186,11 @@
 		<delete>
 			<fileset dir="${forge.dir}">
 				<include name="*.txt"/>
+				<include name="src/**/*.info"/>
 			</fileset>
 		</delete>
 		<delete dir="${forge.dir}/eclipse" failonerror="false"/>
 		<delete dir="${forge.dir}/src/main/java" failonerror="false"/>
-		<mkdir dir="${mcp.dir}"/>
 		
 		<!-- Change executables' permissions -->
 		<chmod file="${forge.dir}/gradlew" perm="+x"/>
@@ -194,7 +198,7 @@
 		<copy file="${download.dir}/PowerCrystalsCore-master/pcc_at.cfg" todir="${forge.dir}/src/main/resources/"/>
 
 		<!-- Install forge -->
-		<exec executable="gradlew" failonerror="true" dir="${forge.dir}/" vmlauncher="false">
+		<exec executable="./gradlew" failonerror="true" dir="${forge.dir}/" vmlauncher="false">
 			<arg line="-g .gradle"/>
 			<arg line="extractForgeSrc"/>
 			<arg line="eclipseClasspath"/>
@@ -211,24 +215,6 @@
 		<copy todir="${sources.dir}" overwrite="true">
 			<fileset dir="${forge.dir}/build/tmp/recompSrc"/>
 		</copy>
-	</target>
-	
-	<target name="clone-MFR-Forestry" depends="download-jgit" unless="den-exists">
-		<taskdef resource="org/eclipse/jgit/ant/ant-tasks.properties">
-			<classpath>
-				<pathelement location="${download.dir}/jgit/jgit-ant.jar"/>
-				<pathelement location="${download.dir}/jgit/jgit.jar"/>
-				<pathelement location="${download.dir}/jgit/jsch.jar"/>
-			</classpath>
-		</taskdef>
-		<loadfile property="mfr-forestry-revision" srcFile="mfr-forestry.revision">
-			<filterchain>
-				<striplinebreaks/>
-			</filterchain>
-		</loadfile>
-		<fail unless="mfr-forestry-revision" message="MFR-Forestry revision not found."/>
-		<git-clone uri="https://github.com/denoflionsx/MFR-Forestry.git" dest="MFR-Forestry"/>
-		<git-checkout branch="${mfr-forestry-revision}" src="MFR-Forestry"/>
 	</target>
 
 	<target name="download-core" unless="forge-exists">
@@ -298,14 +284,6 @@
 		]]></script>
 		<echo message="Version: ${mfrv}"/>
 		<property name="build.full" value="[${mcv}]${mfrv}-"/>
-	</target>
-
-	<target name="download-jgit" unless="should-download-jgit">
-		<echo message="Getting: JGit"/>
-		<mkdir dir="${download.dir}/jgit"/>
-		<get dest="${download.dir}/jgit/jsch.jar" src="http://downloads.sourceforge.net/project/jsch/jsch.jar/0.1.50/jsch-0.1.50.jar"/>
-		<get dest="${download.dir}/jgit/jgit.jar" src="https://repo.eclipse.org/content/repositories/jgit-releases/org/eclipse/jgit/org.eclipse.jgit/3.0.3.201309161630-r/org.eclipse.jgit-3.0.3.201309161630-r.jar"/>
-		<get dest="${download.dir}/jgit/jgit-ant.jar" src="https://repo.eclipse.org/content/repositories/jgit-releases/org/eclipse/jgit/org.eclipse.jgit.ant/3.0.3.201309161630-r/org.eclipse.jgit.ant-3.0.3.201309161630-r.jar"/>
 	</target>
 
 	<target name="get-build-number" depends="build-number-there" unless="${build.number}">
