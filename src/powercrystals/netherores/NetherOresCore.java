@@ -1,5 +1,8 @@
 package powercrystals.netherores;
 
+//import static cofh.core.CoFHProps.VERSION;
+
+//import cofh.mod.BaseMod;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.SidedProxy;
@@ -24,8 +27,6 @@ import net.minecraftforge.common.config.Property;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.OreDictionary.OreRegisterEvent;
 
-//import powercrystals.core.mod.BaseMod;
-//import powercrystals.core.updater.UpdateManager;
 import powercrystals.netherores.entity.EntityArmedOre;
 import powercrystals.netherores.entity.EntityHellfish;
 import powercrystals.netherores.net.INetherOresProxy;
@@ -37,8 +38,8 @@ import powercrystals.netherores.world.BlockHellfish;
 import powercrystals.netherores.world.NetherOresWorldGenHandler;
 
 @Mod(modid = NetherOresCore.modId, name = NetherOresCore.modName, version = NetherOresCore.version,
-dependencies = "required-after:PowerCrystalsCore;before:ThermalExpansion")
-public class NetherOresCore// extends BaseMod
+dependencies = "required-after:CoFHCore@[2.0.1.0,);before:ThermalExpansion")
+public class NetherOresCore// extends BaseMod ^
 {
 	public static final String modId = "NetherOres";
 	public static final String version = "1.7.2R2.3.0B1";
@@ -100,9 +101,7 @@ public class NetherOresCore// extends BaseMod
 		GameRegistry.registerWorldGenerator(new NetherOresWorldGenHandler(), 10);
 		if (enableHellQuartz.getBoolean(true))
 		{
-			Block quartz = new BlockNetherOverrideOre().setHardness(3.0F).setResistance(5.0F).
-					setStepSound(Block.soundTypePiston).setBlockName("netherquartz").
-					setBlockTextureName("quartz_ore");
+			Block quartz = new BlockNetherOverrideOre(Blocks.quartz_ore);
 			Blocks.quartz_ore = quartz;
 			Block.blockRegistry.addObject(153, "quartz_ore", quartz);
 		}

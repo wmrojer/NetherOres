@@ -9,6 +9,7 @@ import net.minecraft.block.BlockNetherrack;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 
 public class BlockHellfish extends BlockNetherrack
 {
@@ -18,6 +19,12 @@ public class BlockHellfish extends BlockNetherrack
 		setStepSound(soundTypePiston);
 		setBlockName("netherores.hellfish");
 		setBlockTextureName("netherrack");
+	}
+
+	@Override
+	public boolean isFireSource(World world, int x, int y, int z, ForgeDirection side)
+	{
+		return side == ForgeDirection.UP;
 	}
 
 	@Override
@@ -48,7 +55,7 @@ public class BlockHellfish extends BlockNetherrack
 	@Override
 	public boolean isReplaceableOreGen(World world, int x, int y, int z, Block target)
 	{
-		return this == target | target == Blocks.netherrack;
+		return this == target || Blocks.netherrack.isReplaceableOreGen(world, x, y, z, target);
 	}
 
 	public static void spawnHellfish(World world, int x, int y, int z)

@@ -14,6 +14,7 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 
 import powercrystals.netherores.NetherOresCore;
 import powercrystals.netherores.entity.EntityArmedOre;
@@ -114,6 +115,12 @@ public class BlockNetherOres extends Block
 		explode.set(true);
 		if (NetherOresCore.enableExplosionChainReactions.getBoolean(true))
 			checkExplosionChances(this, world, x, y, z);
+	}
+
+	@Override
+	public boolean isFireSource(World world, int x, int y, int z, ForgeDirection side)
+	{
+		return side == ForgeDirection.UP;
 	}
 
 	public static void checkExplosionChances(Block block, World world, int x, int y, int z)
