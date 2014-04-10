@@ -45,10 +45,12 @@
 
 	<!-- Classpaths -->
 	<path id="mcp.classpath">
-		<fileset>
+		<files>
 			<include name="forge.jar"/>
-			<include name="${lib.dir}/*.jar"/>
-			<include name="${lib.dir}/**/*.jar"/>
+		</files>
+		<fileset dir="${lib.dir}">
+			<include name="*.jar"/>
+			<include name="**/*.jar"/>
 			<exclude name="${reobf.jar}"/>
 		</fileset>
 		<fileset dir="${forge.dir}/.gradle/caches">
@@ -63,12 +65,13 @@
 	</path>
 	
 	<!-- Task skipping -->
-	<available property="already-compiled" file="${reobf.jar}"/>
-	<available property="forge-exists" file="${download.dir}/forge-${forge.version}-src.zip"/>
+	<available property="has.api" file="${src.dir}/${class.pckg}/api"/>
+	<available property="already.compiled" file="${reobf.jar}"/>
+	<available property="forge.exists" file="${download.dir}/forge-${forge.version}-src.zip"/>
 	<condition property="forge.already.installed">
 		<available file="${forge.dir}/build/dirtyArtifacts/forgeSrc-${forge.version}.jar" type="file"/>
 	</condition>
-	<condition property="have-apis">
+	<condition property="have.libs">
 		<and>
 			<available file="${sources.dir}/powercrystals/core" type="dir"/>
 			<!--<available file="${sources.dir}/buildcraft" type="dir"/>
@@ -80,7 +83,7 @@
 	
 	<!-- Dependency downloading -->
 
-	<target name="download-core" unless="forge-exists">
+	<target name="download-core" unless="forge.exists">
 		<echo message="Downloading PowerCrystalsCore... "/>
 		<get src="https://github.com/skyboy/PowerCrystalsCore/archive/master.zip" dest="${download.dir}/PowerCrystalsCore-master.zip"/>
 		
@@ -88,7 +91,7 @@
 		<unzip src="${download.dir}/PowerCrystalsCore-master.zip" dest="${download.dir}"/>
 	</target>
 
-	<target name="get-dependencies" depends="get-version" unless="${have-apis}">
+	<target name="get-dependencies" depends="get-version" unless="have.libs">
 		<!--
 		<echo message="Downloading IC2... " />
 		<get src="http://ic2api.player.to:8080/job/IC2_experimental/253/artifact/packages/industrialcraft-2-api_2.0.253-experimental.zip" dest="${download.dir}/industrialcraft-2-api.zip" />
@@ -101,7 +104,7 @@
 		-->
 	</target>
 
-	<target name="extract-dependencies" depends="setup-forge,get-dependencies" unless="${have-apis}">
+	<target name="extract-dependencies" depends="setup-forge,get-dependencies" unless="have.libs">
 		<!--
 		<delete dir="${lib.dir}/"/>
 		<mkdir dir="${lib.dir}/"/>
@@ -158,7 +161,7 @@
 		</sequential>
 	</macrodef>
 
-	<target name="build" depends="extract-dependencies,get-build-number,copy-sources" unless="already-compiled">
+	<target name="build" depends="extract-dependencies,get-build-number,copy-sources" unless="already.compiled">
 		<!-- Recompile -->
 		<mkdir dir="${compile.dir}"/>
 		
@@ -185,7 +188,7 @@
 		</exec>
 	</target>
 
-	<target name="copy-sources" unless="already-compiled">
+	<target name="copy-sources" depends="package-api" unless="already.compiled">
 		<!-- Copy source -->
 		<mkdir dir="${sources.dir}/${class.pckg}"/>
 		<dependset>
@@ -195,6 +198,14 @@
 		<copy todir="${sources.dir}/${class.pckg}" preservelastmodified="true">
 			<fileset dir="${src.dir}/${class.pckg}"/>
 		</copy>
+	</target>
+
+	<target name="package-api" depends="get-version" unless="already.compiled" if="has.api">
+		<!-- Copy & package API -->
+		<copy todir="${apiclasses.dir}/${class.pckg}/api">
+			<fileset dir="${src.dir}/${class.pckg}/api"/>
+		</copy>
+		<zip destfile="${dist.dir}/${build.name}-API-${build.full}${build.number}.zip" basedir="${apiclasses.dir}"/>
 	</target>
 
 	<target name="setup-forge" depends="download-forge" unless="forge.already.installed">
@@ -241,7 +252,7 @@
 		</copy>
 	</target>
 
-	<target name="download-forge" depends="download-core" unless="forge-exists">
+	<target name="download-forge" depends="download-core" unless="forge.exists">
 		<echo message="Downloading forge... "/>
 		<get src="${forge.url}" dest="${download.dir}/forge-${forge.version}-src.zip"/>
 	</target>
@@ -326,12 +337,12 @@
 		<property name="build.full" value="[${mcv}]${mfrv}-"/>
 	</target>
 
-	<target name="get-build-number" depends="build-number-there" unless="build.number">
+	<target name="get-build-number" depends="build-number-there" unless="${build.number}">
 		<echo message="!! No build number set !!"/>
 		<property name="build.number" value="CUSTOM_BUILD"/>
 	</target>
 
-	<target name="build-number-there" depends="get-version" if="env.BUILD_NUMBER" unless="build.number">
+	<target name="build-number-there" depends="get-version" if="env.BUILD_NUMBER" unless="${build.number}">
 		<echo message="Using build number ${env.BUILD_NUMBER}..."/>
 		<property name="build.number" value="${env.BUILD_NUMBER}"/>
 	</target>
