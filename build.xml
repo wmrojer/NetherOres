@@ -2,21 +2,24 @@
 	<property environment="env"/>
 	
 	<!-- Basic directories -->
-	<property name="download.dir" value="downloads"/>
-	<property name="build.dir" value="build"/>
 	<property name="src.dir" value="src"/>
+	<property name="build.dir" value="build"/>
+	<property name="download.dir" value="downloads"/>
 	<property name="resources.dir" value="resources"/>
+	
+	<!-- Project information -->
+	<property name="build.name" value="${ant.project.name}"/>
+	<property name="class.pckg" value="powercrystals/netherores"/>
 	<!-- Version file (main class) -->
-	<property name="verclass.dir" value="${src.dir}/powercrystals/netherores" />
+	<property name="verclass.dir" value="${src.dir}/${class.pckg}" />
 	<property name="verclass.name" value="NetherOresCore.java"/>
 	
 	<!-- Forge version -->
-	<property name="minecraft.version" value="1.7.2"/>
+	<property name="mc.version"  value="1.7.2"/>
 	<property name="forge.major" value="10"/>
 	<property name="forge.minor" value="12"/>
-	<property name="forge.bugfix" value="0"/>
-	<property name="forge.build" value="1055"/>
-	<property name="cofh.commit" value="24600c4cfda893a16316c0631972170413f3a1e3"/>
+	<property name="forge.patch" value="0"/>
+	<property name="forge.build" value="1056"/>
 	
 	<!-- Packaging -->
 	<property name="dist.dir" value="${build.dir}/dist"/>
@@ -24,19 +27,30 @@
 	<property name="apiclasses.dir" value="${build.dir}/api-packaging"/>
 	
 	<!-- Forge paths -->
+	<property name="forge.version" value="${mc.version}-${forge.major}.${forge.minor}.${forge.patch}.${forge.build}"/>
 	<property name="forge.dir" value="${build.dir}/forge"/>
 	<property name="forgebuild.dir" value="${forge.dir}/build"/>
 	<property name="compile.dir" value="${forgebuild.dir}/tmp/compile"/>
 	<property name="reobf.dir" value="${forgebuild.dir}/classes/main"/>
 	<property name="lib.dir" value="${forgebuild.dir}/libs"/>
 	<property name="sources.dir" value="${forgebuild.dir}/sources/minecraft"/>
-	<property name="forge.version"
-		value="${minecraft.version}-${forge.major}.${forge.minor}.${forge.bugfix}.${forge.build}"/>
+	<property name="transformers.dir" value="${forge.dir}/src/main/resources/"/>
+	<property name="forge.jar" value="${forgebuild.dir}/dirtyArtifacts/forgeSrc-${forge.version}.jar"/>
+	<property name="reobf.jar" value="${lib.dir}/modid-1.0.jar"/>
 	<property name="forge.url" value="http://files.minecraftforge.net/maven/net/minecraftforge/forge/${forge.version}/forge-${forge.version}-src.zip"/>
+	
+	<!-- Enforce some paths -->
+	<mkdir dir="${download.dir}"/>
+	<mkdir dir="${build.dir}"/>
 
 	<!-- Classpaths -->
 	<path id="mcp.classpath">
-		<pathelement location="${compile.dir}"/>
+		<fileset>
+			<include name="forge.jar"/>
+			<include name="${lib.dir}/*.jar"/>
+			<include name="${lib.dir}/**/*.jar"/>
+			<exclude name="${reobf.jar}"/>
+		</fileset>
 		<fileset dir="${forge.dir}/.gradle/caches">
 			<include name="modules*/files*/**/*.jar"/>
 			<exclude name="modules*/files*/commons-io/commons-io/1.4/**/*.jar"/>
@@ -49,7 +63,7 @@
 	</path>
 	
 	<!-- Task skipping -->
-	<available property="already-compiled" file="${lib.dir}/modid-1.0.jar"/>
+	<available property="already-compiled" file="${reobf.jar}"/>
 	<available property="forge-exists" file="${download.dir}/forge-${forge.version}-src.zip"/>
 	<condition property="forge.already.installed">
 		<available file="${forge.dir}/build/dirtyArtifacts/forgeSrc-${forge.version}.jar" type="file"/>
@@ -57,17 +71,25 @@
 	<condition property="have-apis">
 		<and>
 			<available file="${sources.dir}/powercrystals/core" type="dir"/>
-			<available file="${sources.dir}/buildcraft" type="dir"/>
+			<!--<available file="${sources.dir}/buildcraft" type="dir"/>
 			<available file="${sources.dir}/ic2" type="dir"/>
 			<available file="${sources.dir}/appeng" type="dir"/>
-			<!--<available file="${sources.dir}/thermalexpansion" type="dir"/>-->
+			<available file="${sources.dir}/thermalexpansion" type="dir"/>-->
 		</and>
 	</condition>
 	
-	<mkdir dir="${download.dir}"/>
-	<mkdir dir="${build.dir}"/>
+	<!-- Dependency downloading -->
+
+	<target name="download-core" unless="forge-exists">
+		<echo message="Downloading PowerCrystalsCore... "/>
+		<get src="https://github.com/skyboy/PowerCrystalsCore/archive/master.zip" dest="${download.dir}/PowerCrystalsCore-master.zip"/>
+		
+		<echo message="Extracting PowerCrystalsCore... "/>
+		<unzip src="${download.dir}/PowerCrystalsCore-master.zip" dest="${download.dir}"/>
+	</target>
 
 	<target name="get-dependencies" depends="get-version" unless="${have-apis}">
+		<!--
 		<echo message="Downloading IC2... " />
 		<get src="http://ic2api.player.to:8080/job/IC2_experimental/253/artifact/packages/industrialcraft-2-api_2.0.253-experimental.zip" dest="${download.dir}/industrialcraft-2-api.zip" />
 		
@@ -76,9 +98,11 @@
 		
 		<echo message="Downloading AppEng API..." />
 		<get src="http://ae-mod.info/releases/appeng-rv13-c-mc162.jar" dest="${download.dir}/appeng.zip"/>
+		-->
 	</target>
 
 	<target name="extract-dependencies" depends="setup-forge,get-dependencies" unless="${have-apis}">
+		<!--
 		<delete dir="${lib.dir}/"/>
 		<mkdir dir="${lib.dir}/"/>
 		<copy todir="${sources.dir}/powercrystals/core">
@@ -99,15 +123,21 @@
 		<delete file="${download.dir}/appeng" />
 		<unzip src="${download.dir}/appeng_api.zip" dest="${download.dir}" />
 		<move file="${download.dir}/appeng" todir="${sources.dir}" />
+		-->
 	</target>
 	
+	<macrodef name="move-transformers"><sequential>
+		
+		<copy file="${download.dir}/PowerCrystalsCore-master/pcc_at.cfg" todir="${transformers.dir}"/>
+		
+	</sequential></macrodef>
+	
+	<!-- Building process -->
 	<target name="install" depends="build">
-		<move file="${lib.dir}/modid-1.0.jar"
-			tofile="${dist.dir}/NetherOres-${build.full}${build.number}.jar"/>
+		<move file="${reobf.jar}" tofile="${dist.dir}/${build.name}-${build.full}${build.number}.jar"/>
 		
 		<!-- Cleanup -->
 		<delete dir="${apiclasses.dir}"/>
-		<delete dir="${sources.dir}/powercrystals/netherores"/>
 		<delete dir="${classes.dir}"/>
 		<delete dir="${reobf.dir}"/>
 	</target>
@@ -118,12 +148,12 @@
 		<sequential>
 			<copy todir="${classes.dir}" preservelastmodified="true">
 				<fileset dir="@{classes}">
-					<include name="powercrystals/netherores/**/*.class"/>
+					<include name="${class.pckg}/**/*.class"/>
 				</fileset>
 				<fileset dir="${resources.dir}"/>
 			</copy>
 			<update-languages/>
-			<jar destfile="${dist.dir}/NetherOres-${build.full}@{build}.jar"
+			<jar destfile="${dist.dir}/${build.name}-${build.full}@{build}.jar"
 				compress="true" level="9" basedir="${classes.dir}"/>
 		</sequential>
 	</macrodef>
@@ -132,33 +162,38 @@
 		<!-- Recompile -->
 		<mkdir dir="${compile.dir}"/>
 		
-		<depend srcdir="${sources.dir}" destdir="${compile.dir}">
-			<include name="powercrystals/netherores/**/*.java"/>
+		<depend srcdir="${sources.dir}" destdir="${compile.dir}"
+			cache="${forgebuild.dir}/tmp/depcache" closure="true">
+			<include name="${class.pckg}/**/*.java"/>
 		</depend>
 		<javac srcdir="${sources.dir}" destdir="${compile.dir}" target="1.6" source="1.6"
 			classpathref="mcp.classpath" debug="true" debuglevel="lines,source" includeAntRuntime="false">
-			<include name="powercrystals/netherores/**/*.java"/>
+			<include name="${class.pckg}/**/*.java"/>
 		</javac>
 		
 		<!-- Dev jar -->
-		<install-lite build="dev-${build.number}"/>
+		<local name="build"/><property name="build" value="dev-${build.number}"/>
+		<install-lite build="${build}"/>
 
 		<!-- Reobf -->
-		<copy todir="${reobf.dir}">
-			<fileset dir="${classes.dir}"/>
-		</copy>
+		<copy file="${dist.dir}/${build.name}-${build.full}${build}.jar" tofile="${reobf.jar}"/>
 		<exec executable="./gradlew" failonerror="true" dir="${forge.dir}/" vmlauncher="false">
 			<arg line="-g .gradle"/>
 			<arg line="reobf"/>
 			<arg line="-x compileJava"/>
+			<arg line="-x jar"/>
 		</exec>
 	</target>
 
 	<target name="copy-sources" unless="already-compiled">
 		<!-- Copy source -->
-		<mkdir dir="${sources.dir}/powercrystals"/>
-		<copy todir="${sources.dir}/powercrystals" overwrite="true" preservelastmodified="true">
-			<fileset dir="${src.dir}/powercrystals"/>
+		<mkdir dir="${sources.dir}/${class.pckg}"/>
+		<dependset>
+			<srcfileset dir="${src.dir}/${class.pckg}" includes="**/*"/>
+			<targetfileset dir="${sources.dir}/${class.pckg}" includes="**/*"/>
+		</dependset>  
+		<copy todir="${sources.dir}/${class.pckg}" preservelastmodified="true">
+			<fileset dir="${src.dir}/${class.pckg}"/>
 		</copy>
 	</target>
 
@@ -184,7 +219,7 @@
 		<!-- Change executables' permissions -->
 		<chmod file="${forge.dir}/gradlew" perm="+x"/>
 
-		<copy file="${download.dir}/PowerCrystalsCore-master/pcc_at.cfg" todir="${forge.dir}/src/main/resources/"/>
+		<move-transformers/>
 
 		<!-- Install forge -->
 		<exec executable="./gradlew" failonerror="true" dir="${forge.dir}/" vmlauncher="false">
@@ -206,14 +241,6 @@
 		</copy>
 	</target>
 
-	<target name="download-core" unless="forge-exists">
-		<echo message="Downloading PowerCrystalsCore... "/>
-		<get src="https://github.com/skyboy/PowerCrystalsCore/archive/master.zip" dest="${download.dir}/PowerCrystalsCore-master.zip"/>
-		
-		<echo message="Extracting PowerCrystalsCore... "/>
-		<unzip src="${download.dir}/PowerCrystalsCore-master.zip" dest="${download.dir}"/>
-	</target>
-
 	<target name="download-forge" depends="download-core" unless="forge-exists">
 		<echo message="Downloading forge... "/>
 		<get src="${forge.url}" dest="${download.dir}/forge-${forge.version}-src.zip"/>
@@ -226,10 +253,8 @@
 				var path = "/assets/" + project.getName().toLowerCase() + "/language/";
 				var languages = new File(project.getProperty("resources.dir") + path);
 				if (languages.exists() && languages.isDirectory()) {
-					project.log("Scanning " + languages.toString());
 					var out = "";
 					for each(var i in languages.list()) {
-						project.log("File: " + (i.length() - 5) + "  " + i.indexOf(".lang"));
 						if (i != null && i.length() > 5 && i.indexOf(".lang") == i.length() - 5) {
 							out += i.substring(0, i.length() - 5) + ", ";
 						}
