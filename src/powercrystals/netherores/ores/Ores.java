@@ -16,7 +16,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.config.Property;
 import net.minecraftforge.oredict.OreDictionary;
 
 import powercrystals.netherores.NetherOresCore;
@@ -320,65 +319,26 @@ public enum Ores
 
 	public void loadConfig(Configuration c)
 	{
-		String _oreName = getOreName();
-		_oreGenMaxY = loadLegacy(c, "WorldGen", _oreName + ".MaxY", _oreName + "MaxY", _oreGenMaxY).getInt();
-		_oreGenMinY = loadLegacy(c, "WorldGen", _oreName + ".MinY", _oreName + "MinY",_oreGenMinY).getInt();
-		_oreGenGroupsPerChunk = loadLegacy(c, "WorldGen", _oreName + ".GroupsPerChunk", _oreName + "GroupsPerChunk", _oreGenGroupsPerChunk).
-				getInt();
-		_oreGenBlocksPerGroup = loadLegacy(c, "WorldGen", _oreName + ".BlocksPerGroup", _oreName + "BlocksPerGroup", _oreGenBlocksPerGroup).
-				getInt();
-		_oreGenDisable = loadLegacy(c, "WorldGen", _oreName + ".Disable", _oreName + "Disable", false).getBoolean(false);
-		_oreGenForced = loadLegacy(c, "WorldGen", _oreName + ".Force", _oreName + "Force", false).getBoolean(false);
-		_miningLevel = c.get("WorldGen", _oreName + ".MiningLevel", _miningLevel).getInt();
-		_smeltCount = c.get("Smelting", _oreName + ".SmeltedCount", _smeltCount).getInt();
-		_pulvCount = c.get("Smelting", _oreName + ".PulverizedCount", _pulvCount).getInt();
-
+		String cat = "WorldGen.Ores." + name();
+		_oreGenMaxY = c.get(cat, "MaxY", _oreGenMaxY).getInt();
+		_oreGenMinY = c.get(cat, "MinY", _oreGenMinY).getInt();
 		if(_oreGenMinY >= _oreGenMaxY)
 		{
 			_oreGenMinY = _oreGenMaxY - 1;
+			c.get(cat, "MinY", _oreGenMinY).set(_oreGenMinY);
 		}
-	}
-
-	// TODO: remove legacy loading in 1.7
-	private static Property loadLegacy(Configuration config, String category, String name,
-			String oldName, int def)
-	{
-		Property r = null;
-		String old = null;
-
-		if (config.hasKey(category, oldName))
-		{
-			r = config.get(category, oldName, def);
-			old = r.getString();
-			deleteEntry(config, category, oldName);
-		}
-
-		r = config.get(category, name, def);
-		if (old != null)
-			r.set(old);
-		return r;
-	}
-	private static Property loadLegacy(Configuration config, String category, String name,
-			String oldName, boolean def)
-	{
-		Property r = null;
-		String old = null;
-
-		if (config.hasKey(category, oldName))
-		{
-			r = config.get(category, oldName, def);
-			old = r.getString();
-			deleteEntry(config, category, oldName);
-		}
-
-		r = config.get(category, name, def);
-		if (old != null)
-			r.set(old);
-		return r;
-	}
-
-	private static void deleteEntry(Configuration config, String category, String name)
-	{
-		config.getCategory(category).remove(name);
+		
+		_oreGenGroupsPerChunk = c.get(cat, "GroupsPerChunk", _oreGenGroupsPerChunk).getInt();
+		_oreGenBlocksPerGroup = c.get(cat, "BlocksPerGroup", _oreGenBlocksPerGroup).getInt();
+		_oreGenDisable = c.get(cat, "Disable", false, "Disables generation of this ore (overrides ForceOreSpawn)").
+				getBoolean(false);
+		_oreGenForced = c.get(cat, "Force", false, "Force this ore to generate (overrides Disable)").
+				getBoolean(false);
+		_miningLevel = c.get(cat, "MiningLevel", _miningLevel, "The pickaxe level required to mine").getInt();
+		cat = "Processing.Ores." + name();
+		_smeltCount = c.get(cat, "SmeltedCount", _smeltCount, "Output from smelting").getInt();
+		_pulvCount = c.get(cat, "PulverizedCount", _pulvCount, "Output from grinding").getInt();
+		_secondary = c.get(cat, "AlternateOrePrefix", _secondary, "Output from grinding if dust* not found").
+				getString();
 	}
 }

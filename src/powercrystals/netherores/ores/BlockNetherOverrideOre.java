@@ -46,6 +46,18 @@ public class BlockNetherOverrideOre extends Block implements INetherOre
 	{
 		return block == this | block == _override || _override.isAssociatedBlock(block);
 	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return obj instanceof Block && isAssociatedBlock((Block)obj);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return _override.hashCode();
+	}
 
 	/**
 	 * Overrides to proxy to the overridden block

@@ -1,5 +1,7 @@
 package powercrystals.netherores;
 
+import static net.minecraftforge.common.config.Configuration.CATEGORY_GENERAL;
+
 //import static cofh.core.CoFHProps.VERSION;
 
 //import cofh.mod.BaseMod;
@@ -165,47 +167,49 @@ public class NetherOresCore// extends BaseMod ^
 		Configuration c = new Configuration(f);
 		c.load();
 		
-		explosionPower = c.get(Configuration.CATEGORY_GENERAL, "ExplosionPower", 2);
+		explosionPower = c.get(CATEGORY_GENERAL, "ExplosionPower", 2);
 		explosionPower.comment = "How powerful an explosion will be. Creepers are 3, TNT is 4, electrified creepers are 6. This affects both the ability of the explosion to punch through blocks as well as the blast radius.";
-		explosionProbability = c.get(Configuration.CATEGORY_GENERAL, "ExplosionProbability", 75);
+		explosionProbability = c.get(CATEGORY_GENERAL, "ExplosionProbability", 75);
 		explosionProbability.comment = "The likelyhood an adjacent netherore will turn into an armed ore when one is mined. Percent chance out of 1000 (lower is less likely).";
-		enableExplosions = c.get(Configuration.CATEGORY_GENERAL, "ExplosionEnable", true);
+		enableExplosions = c.get(CATEGORY_GENERAL, "ExplosionEnable", true);
 		enableExplosions.comment = "NetherOres have a chance to explode when mined if true.";
-		enableExplosionChainReactions = c.get(Configuration.CATEGORY_GENERAL, "ExplosionChainReactEnable", true);
+		enableExplosionChainReactions = c.get(CATEGORY_GENERAL, "ExplosionChainReactEnable", true);
 		enableExplosionChainReactions.comment = "NetherOre explosions can trigger more explosions if true. Does nothing if ExplosionEnable is false.";
-		enableAngryPigmen = c.get(Configuration.CATEGORY_GENERAL, "AngryPigmenEnable", true);
+		enableAngryPigmen = c.get(CATEGORY_GENERAL, "AngryPigmenEnable", true);
 		enableAngryPigmen.comment = "If true, when NetherOres are mined, nearby pigmen become angry to the player.";
-		enableStandardFurnaceRecipes = c.get(Configuration.CATEGORY_GENERAL, "EnableStandardFurnaceRecipes", true);
-		enableStandardFurnaceRecipes.comment = "Set this to false to remove the standard furnace recipes (ie, nether iron ore -> normal iron ore).";
-		enableMaceratorRecipes = c.get(Configuration.CATEGORY_GENERAL, "EnableMaceratorRecipes", true);
-		enableMaceratorRecipes.comment = "Set this to false to remove the IC2 Macerator recipes (ie, nether iron ore -> 4x iron dust).";
-		enablePulverizerRecipes = c.get(Configuration.CATEGORY_GENERAL, "EnablePulverizerRecipes", true);
-		enablePulverizerRecipes.comment = "Set this to false to remove the TE Pulvierzer recipes (ie, nether iron ore -> 4x iron dust).";
-		enableInductionSmelterRecipes = c.get(Configuration.CATEGORY_GENERAL, "EnableInductionSmelterRecipes", true);
-		enableInductionSmelterRecipes.comment = "Set this to false to remove the TE Induction Smelter recipes (ie, nether iron ore -> 2x normal iron ore).";
-		enableGrinderRecipes = c.get(Configuration.CATEGORY_GENERAL, "EnableGrinderRecipes", true);
-		enableGrinderRecipes.comment = "Set this to false to remove the AE Grind Stone recipes (ie, nether iron ore -> 4x iron dust).";
-		forceOreSpawn = c.get(Configuration.CATEGORY_GENERAL, "ForceOreSpawn", false);
-		forceOreSpawn.comment = "If true, will spawn nether ores regardless of if a furnace or macerator recipe was found. If false, at least one of those two must be found to spawn the ore.";
-		enableHellfish = c.get(Configuration.CATEGORY_GENERAL, "HellfishEnable", true);
-		enableHellfish.comment = "If true, Hellfish will spawn in the Nether. Note that setting this false will not kill active Hellfish mobs.";
-		worldGenAllDimensions = c.get(Configuration.CATEGORY_GENERAL, "AllDimensionWorldGen", false);
-		worldGenAllDimensions.comment = "If true, Nether Ores oregen will run in all dimensions instead of just the Nether. It will still require netherrack to place ores.";
-		enableWorldGen = c.get(Configuration.CATEGORY_GENERAL, "EnableOreWorldGen", true);
-		enableWorldGen.comment = "If true, Nether Ores oregen will run and places ores in the world where appropriate. Only disable this if you intend to use the ores with a custom ore generator.";
-		enableHellQuartz = c.get(Configuration.CATEGORY_GENERAL, "OverrideNetherQuartz", true);
-		enableHellQuartz.comment = "If true, Nether Quartz ore will be a NetherOre and will follow the same rules as all other NetherOres.";
-		silkyStopsPigmen = c.get(Configuration.CATEGORY_GENERAL, "SilkyAngryPigmenEnable", false);
+		silkyStopsPigmen = c.get(CATEGORY_GENERAL, "SilkyAngryPigmenEnable", false);
 		silkyStopsPigmen.comment = "If true, when NetherOres are mined with Silk Touch, nearby pigmen become angry to the player.";
-		enableMobsAngerPigmen = c.get(Configuration.CATEGORY_GENERAL, "MobsAngerPigmen", true);
-		enableMobsAngerPigmen.comment = "If true, any entity not a player exploding a NetherOre will anger nearby pigmen.";
+		enableMobsAngerPigmen = c.get(CATEGORY_GENERAL, "MobsAngerPigmen", true);
+		enableMobsAngerPigmen.comment = "If true, any entity not a player exploding a NetherOre will anger nearby pigmen. This only accounts for exploding, entities breaking the blocks normally will still anger pigmen.";
 		
-		hellFishPerChunk = c.get("WorldGen", "HellFish.GroupsPerChunk", 9);
+		enableStandardFurnaceRecipes = c.get("Processing.Enable", "StandardFurnaceRecipes", true);
+		enableStandardFurnaceRecipes.comment = "Set this to false to remove the standard furnace recipes (ie, nether iron ore -> normal iron ore).";
+		enableMaceratorRecipes = c.get("Processing.Enable", "MaceratorRecipes", true);
+		enableMaceratorRecipes.comment = "Set this to false to remove the IC2 Macerator recipes (ie, nether iron ore -> 4x iron dust).";
+		enablePulverizerRecipes = c.get("Processing.Enable", "PulverizerRecipes", true);
+		enablePulverizerRecipes.comment = "Set this to false to remove the TE Pulvierzer recipes (ie, nether iron ore -> 4x iron dust).";
+		enableInductionSmelterRecipes = c.get("Processing.Enable", "InductionSmelterRecipes", true);
+		enableInductionSmelterRecipes.comment = "Set this to false to remove the TE Induction Smelter recipes (ie, nether iron ore -> 2x normal iron ore).";
+		enableGrinderRecipes = c.get("Processing.Enable", "GrinderRecipes", true);
+		enableGrinderRecipes.comment = "Set this to false to remove the AE Grind Stone recipes (ie, nether iron ore -> 4x iron dust).";
+		
+		forceOreSpawn = c.get("WorldGen.Enable", "ForceOreSpawn", false);
+		forceOreSpawn.comment = "If true, will spawn nether ores regardless of if a furnace or macerator recipe was found. If false, at least one of those two must be found to spawn the ore.";
+		worldGenAllDimensions = c.get("WorldGen.Enable", "AllDimensionWorldGen", false);
+		worldGenAllDimensions.comment = "If true, Nether Ores worldgen will run in all dimensions instead of just the Nether. It will still require netherrack to place ores.";
+		enableWorldGen = c.get("WorldGen.Enable", "OreGen", true);
+		enableWorldGen.comment = "If true, Nether Ores oregen will run and places ores in the world where appropriate. Only disable this if you intend to use the ores with a custom ore generator. (overrides per-ore forcing; hellfish still generate if enabled)";
+		enableHellQuartz = c.get("WorldGen.Enable", "OverrideNetherQuartz", true);
+		enableHellQuartz.comment = "If true, Nether Quartz ore will be a NetherOre and will follow the same rules as all other NetherOres.";
+		
+		hellFishPerChunk = c.get("WorldGen.HellFish", "GroupsPerChunk", 9);
 		hellFishPerChunk.comment = "The maximum number of hellfish veins per chunk.";
-		hellFishPerGroup = c.get("WorldGen", "HellFish.BlocksPerGroup", 12);
+		hellFishPerGroup = c.get("WorldGen.HellFish", "BlocksPerGroup", 12);
 		hellFishPerGroup.comment = "The maximum number of hellfish blocks per vein.";
-		hellFishMinY = c.get("WorldGen", "HellFish.MinY", 1);
-		hellFishMaxY = c.get("WorldGen", "HellFish.MaxY", 127);
+		enableHellfish = c.get("WorldGen.HellFish", "Enable", true);
+		enableHellfish.comment = "If true, Hellfish will spawn in the Nether. Note that setting this false will not kill active Hellfish mobs.";
+		hellFishMinY = c.get("WorldGen.HellFish", "MinY", 1);
+		hellFishMaxY = c.get("WorldGen.HellFish", "MaxY", 127);
 
 		for(Ores o : Ores.values())
 		{

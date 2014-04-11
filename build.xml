@@ -249,7 +249,7 @@
 		<sequential>
 			<script language="javascript"><![CDATA[
 				importPackage(java.io);
-				var path = "/assets/" + project.getName().toLowerCase() + "/language/";
+				var path = "/assets/" + project.getProperty("build.name").toLowerCase() + "/language/";
 				var languages = new File(project.getProperty("resources.dir") + path);
 				if (languages.exists() && languages.isDirectory()) {
 					var out = "";
