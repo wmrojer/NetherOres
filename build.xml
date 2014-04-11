@@ -4,8 +4,8 @@
 	<!-- Basic directories -->
 	<property name="src.dir" value="src"/>
 	<property name="build.dir" value="build"/>
-	<property name="download.dir" value="downloads"/>
 	<property name="resources.dir" value="resources"/>
+	<property name="download.dir" value="${build.dir}/downloads"/>
 	
 	<!-- Project information -->
 	<property name="build.name" value="${ant.project.name}"/>
@@ -19,7 +19,7 @@
 	<property name="forge.major" value="10"/>
 	<property name="forge.minor" value="12"/>
 	<property name="forge.patch" value="0"/>
-	<property name="forge.build" value="1056"/>
+	<property name="forge.build" value="1057"/>
 	
 	<!-- Packaging -->
 	<property name="dist.dir" value="${build.dir}/dist"/>
@@ -31,7 +31,6 @@
 	<property name="forge.dir" value="${build.dir}/forge"/>
 	<property name="forgebuild.dir" value="${forge.dir}/build"/>
 	<property name="compile.dir" value="${forgebuild.dir}/tmp/compile"/>
-	<property name="reobf.dir" value="${forgebuild.dir}/classes/main"/>
 	<property name="lib.dir" value="${forgebuild.dir}/libs"/>
 	<property name="sources.dir" value="${forgebuild.dir}/sources/minecraft"/>
 	<property name="transformers.dir" value="${forge.dir}/src/main/resources/"/>
@@ -40,26 +39,24 @@
 	<property name="forge.url" value="http://files.minecraftforge.net/maven/net/minecraftforge/forge/${forge.version}/forge-${forge.version}-src.zip"/>
 	
 	<!-- Enforce some paths -->
-	<mkdir dir="${download.dir}"/>
 	<mkdir dir="${build.dir}"/>
+	<mkdir dir="${download.dir}"/>
 
 	<!-- Classpaths -->
 	<path id="mcp.classpath">
-		<files>
-			<include name="forge.jar"/>
-		</files>
+		<pathelement location="${forge.jar}"/>
 		<fileset dir="${lib.dir}">
 			<include name="*.jar"/>
 			<include name="**/*.jar"/>
 			<exclude name="${reobf.jar}"/>
 		</fileset>
-		<fileset dir="${forge.dir}/.gradle/caches">
+		<fileset dir="${build.dir}/.gradle/caches">
 			<include name="modules*/files*/**/*.jar"/>
 			<exclude name="modules*/files*/commons-io/commons-io/1.4/**/*.jar"/>
 		</fileset>
 	</path>
 	<path id="gson">
-		<fileset dir="${forge.dir}/.gradle/caches">
+		<fileset dir="${build.dir}/.gradle/caches">
 			<include name="modules*/files*/com.google.code.gson/**/*.jar"/>
 		</fileset>
 	</path>
@@ -142,7 +139,6 @@
 		<!-- Cleanup -->
 		<delete dir="${apiclasses.dir}"/>
 		<delete dir="${classes.dir}"/>
-		<delete dir="${reobf.dir}"/>
 	</target>
 
 	<macrodef name="install-lite">
@@ -151,7 +147,7 @@
 		<sequential>
 			<copy todir="${classes.dir}" preservelastmodified="true">
 				<fileset dir="@{classes}">
-					<include name="${class.pckg}/**/*.class"/>
+					<include name="**/*.class"/>
 				</fileset>
 				<fileset dir="${resources.dir}"/>
 			</copy>
@@ -181,7 +177,7 @@
 		<!-- Reobf -->
 		<copy file="${dist.dir}/${build.name}-${build.full}${build}.jar" tofile="${reobf.jar}"/>
 		<exec executable="./gradlew" failonerror="true" dir="${forge.dir}/" vmlauncher="false">
-			<arg line="-g .gradle"/>
+			<arg line="-g ../.gradle"/>
 			<arg line="reobf"/>
 			<arg line="-x compileJava"/>
 			<arg line="-x jar"/>
@@ -190,14 +186,10 @@
 
 	<target name="copy-sources" depends="package-api" unless="already.compiled">
 		<!-- Copy source -->
-		<mkdir dir="${sources.dir}/${class.pckg}"/>
-		<dependset>
-			<srcfileset dir="${src.dir}/${class.pckg}" includes="**/*"/>
-			<targetfileset dir="${sources.dir}/${class.pckg}" includes="**/*"/>
-		</dependset>  
-		<copy todir="${sources.dir}/${class.pckg}" preservelastmodified="true">
-			<fileset dir="${src.dir}/${class.pckg}"/>
-		</copy>
+		<mkdir dir="${sources.dir}"/>
+		<sync todir="${sources.dir}">
+			<fileset dir="${src.dir}"/>
+		</sync>
 	</target>
 
 	<target name="package-api" depends="get-version" unless="already.compiled" if="has.api">
@@ -209,15 +201,15 @@
 	</target>
 
 	<target name="setup-forge" depends="download-forge" unless="forge.already.installed">
-		<delete dir="${build.dir}" failonerror="false"/>
-		<mkdir dir="${build.dir}"/>
+		<delete dir="${forge.dir}" failonerror="false"/>
+		<mkdir dir="${forge.dir}"/>
 		<unzip dest="${forge.dir}">
 			<fileset dir="${download.dir}">
 				<include name="forge-${forge.version}-src.zip"/>
 			</fileset>
 		</unzip>
 		
-		<!-- Cleanup, and adding in old file structure for convenience -->
+		<!-- Cleanup -->
 		<delete>
 			<fileset dir="${forge.dir}">
 				<include name="*.txt"/>
@@ -234,22 +226,18 @@
 
 		<!-- Install forge -->
 		<exec executable="./gradlew" failonerror="true" dir="${forge.dir}/" vmlauncher="false">
-			<arg line="-g .gradle"/>
+			<arg line="-g ../.gradle"/>
 			<arg line="extractForgeSrc"/>
 			<arg line="eclipseClasspath"/>
 		</exec>
 
 		<mkdir dir="${compile.dir}"/>
+		<mkdir dir="${lib.dir}"/>
 		<javac srcdir="${forge.dir}/build/tmp/recompSrc" destdir="${compile.dir}" target="1.6" source="1.6"
 			classpathref="mcp.classpath" debug="true" debuglevel="lines,source" includeAntRuntime="false"/>
 		<jar destfile="${forge.dir}/build/dirtyArtifacts/forgeSrc-${forge.version}.jar" compress="true"
 			level="9" basedir="${compile.dir}"/>
 		<delete dir="${compile.dir}"/>
-		
-		<!-- Move decompiled files -->
-		<copy todir="${sources.dir}" overwrite="true">
-			<fileset dir="${forge.dir}/build/tmp/recompSrc"/>
-		</copy>
 	</target>
 
 	<target name="download-forge" depends="download-core" unless="forge.exists">
@@ -282,6 +270,7 @@
 	</macrodef>
 
 	<target name="get-version" depends="setup-forge" unless="${build.full}">
+		<local name="grep.out"/><local name="mfrv"/><local name="mcv"/>
 		<!-- Read version out of file -->
 		<script language="javascript"><![CDATA[
 			importClass(java.io.File);
@@ -347,7 +336,7 @@
 		<property name="build.number" value="${env.BUILD_NUMBER}"/>
 	</target>
 
-	<target name="clean" >
+	<target name="clean">
 		<delete dir="${build.dir}"/>
 	</target>
 
