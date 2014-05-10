@@ -8,8 +8,8 @@ import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.event.FMLInterModComms;
 import cpw.mods.fml.common.registry.GameRegistry;
 
-//import ic2.api.recipe.IMachineRecipeManager;
-//import ic2.api.recipe.Recipes;
+import ic2.api.recipe.RecipeInputItemStack;
+import ic2.api.recipe.Recipes;
 
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
@@ -47,7 +47,7 @@ public enum Ores
 	Osmium(     8,     7,     2,    4),
 	Sulfur(    12,    12,     2,   24),
 	Titanium(   3,     2,     2,    4),
-	Mythril(    6,     6,     2,    4),
+	Mithril(    6,     6,     2,    4),
 	Adamantium( 5,     4,     2,    4),
 	Rutile(     3,     4,     2,    4),
 	Tungsten(   8,     8,     2,    4),
@@ -233,41 +233,14 @@ public enum Ores
 	{
 		if (_registeredMacerator)
 			return;
-		_registeredMacerator = true;/*
+		_registeredMacerator = true;
 		if(NetherOresCore.enableMaceratorRecipes.getBoolean(true) && Loader.isModLoaded("IC2"))
 		{
+			ItemStack input = new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata);
 			ItemStack maceTo = maceStack.copy();
 			maceTo.stackSize = _pulvCount;
-
-			Method m = null;
-			try
-			{
-				for (Method t : IMachineRecipeManager.class.getDeclaredMethods())
-					if (t.getName().equals("addRecipe"))
-					{
-						m = t;
-						break;
-					}
-				m.invoke(Recipes.macerator,
-						new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata),
-						maceTo.copy());
-			}
-			catch (Throwable _)
-			{
-				try
-				{
-					Class<?> clazz = Class.forName("ic2.api.recipe.RecipeInputItemStack");
-					Constructor<?> c = clazz.getDeclaredConstructor(ItemStack.class);
-					Object o = c.newInstance(new ItemStack(NetherOresCore.getOreBlock(_blockIndex),
-							1, _metadata));
-					m.invoke(Recipes.macerator, o, null, new ItemStack[] {maceTo.copy()});
-				}
-				catch (Throwable e)
-				{
-					e.printStackTrace();
-				}
-			}
-		}//*/
+			Recipes.macerator.addRecipe(new RecipeInputItemStack(input), null, maceTo.copy());
+		}
 
 		if(NetherOresCore.enablePulverizerRecipes.getBoolean(true) &&
 				Loader.isModLoaded("ThermalExpansion"))
@@ -335,6 +308,7 @@ public enum Ores
 		_oreGenForced = c.get(cat, "Force", false, "Force this ore to generate (overrides Disable)").
 				getBoolean(false);
 		_miningLevel = c.get(cat, "MiningLevel", _miningLevel, "The pickaxe level required to mine").getInt();
+		
 		cat = "Processing.Ores." + name();
 		_smeltCount = c.get(cat, "SmeltedCount", _smeltCount, "Output from smelting").getInt();
 		_pulvCount = c.get(cat, "PulverizedCount", _pulvCount, "Output from grinding").getInt();
