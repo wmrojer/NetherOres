@@ -189,7 +189,7 @@ public class NetherOresCore extends BaseMod
 		_log.info("Load Complete.");
 	}
 
-	@SubscribeEvent
+	@EventHandler
 	public void serverStarting(FMLServerAboutToStartEvent evt)
 	{
 		if (!complete)
