@@ -2,6 +2,7 @@ package powercrystals.netherores.ores;
 
 import java.util.List;
 
+import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
@@ -11,11 +12,12 @@ public class ItemBlockNetherOre extends ItemBlock
 {
 	protected BlockNetherOres _block;
 
-	public ItemBlockNetherOre(BlockNetherOres block)
+	public ItemBlockNetherOre(Block block)
 	{
 		super(block);
 		setHasSubtypes(true);
 		setMaxDamage(0);
+		_block = (BlockNetherOres)block;
 	}
 
 	@Override

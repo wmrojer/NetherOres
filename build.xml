@@ -3,14 +3,14 @@
 	
 	<!-- Basic directories -->
 	<property name="src.dir" value="src"/>
-	<property name="build.dir" value="build"/>
 	<property name="resources.dir" value="resources"/>
+	<property name="build.dir" value="build"/>
 	<property name="download.dir" value="${build.dir}/downloads"/>
 	
 	<!-- Project information -->
 	<property name="build.name" value="${ant.project.name}"/>
 	<property name="class.pckg" value="powercrystals/netherores"/>
-	<!-- Version file (main class) -->
+	<!-- Version file -->
 	<property name="verclass.dir" value="${src.dir}/${class.pckg}" />
 	<property name="verclass.name" value="NetherOresCore.java"/>
 	
@@ -18,8 +18,8 @@
 	<property name="mc.version"  value="1.7.2"/>
 	<property name="forge.major" value="10"/>
 	<property name="forge.minor" value="12"/>
-	<property name="forge.patch" value="0"/>
-	<property name="forge.build" value="1057"/>
+	<property name="forge.patch" value="1"/>
+	<property name="forge.build" value="1074"/>
 	
 	<!-- Packaging -->
 	<property name="dist.dir" value="${build.dir}/dist"/>
@@ -34,7 +34,7 @@
 	<property name="lib.dir" value="${forgebuild.dir}/libs"/>
 	<property name="sources.dir" value="${forgebuild.dir}/sources/minecraft"/>
 	<property name="transformers.dir" value="${forge.dir}/src/main/resources/"/>
-	<property name="forge.jar" value="${forgebuild.dir}/dirtyArtifacts/forgeSrc-${forge.version}.jar"/>
+	<property name="forge.jar" value="${build.dir}/.gradle/caches/minecraft/net/minecraftforge/forge/${forge.version}/forgeSrc-${forge.version}.jar"/>
 	<property name="reobf.jar" value="${lib.dir}/modid-1.0.jar"/>
 	<property name="forge.url" value="http://files.minecraftforge.net/maven/net/minecraftforge/forge/${forge.version}/forge-${forge.version}-src.zip"/>
 	
@@ -62,62 +62,94 @@
 	</path>
 	
 	<!-- Task skipping -->
-	<available property="has.api" file="${src.dir}/${class.pckg}/api"/>
-	<available property="already.compiled" file="${reobf.jar}"/>
-	<available property="forge.exists" file="${download.dir}/forge-${forge.version}-src.zip"/>
-	<condition property="forge.already.installed">
-		<available file="${forge.dir}/build/dirtyArtifacts/forgeSrc-${forge.version}.jar" type="file"/>
-	</condition>
-	<condition property="have.libs">
-		<and>
-			<available file="${sources.dir}/powercrystals/core" type="dir"/>
-			<!--<available file="${sources.dir}/buildcraft" type="dir"/>
-			<available file="${sources.dir}/ic2" type="dir"/>
-			<available file="${sources.dir}/appeng" type="dir"/>
-			<available file="${sources.dir}/thermalexpansion" type="dir"/>-->
-		</and>
-	</condition>
+	<target name="properties">
+		<available property="has.api" file="${src.dir}/${class.pckg}/api"/>
+		<available property="already.compiled" file="${reobf.jar}"/>
+		<available property="forge.exists" file="${download.dir}/forge-${forge.version}-src.zip"/>
+		<condition property="forge.already.installed">
+			<available file="${forge.dir}/build/dirtyArtifacts/forgeSrc-${forge.version}.jar" type="file"/>
+		</condition>
+		<condition property="have.libs">
+			<and>
+				<available file="${lib.dir}/CoFHLib.jar" type="file"/>
+				<available file="${lib.dir}/CoFHCore.jar" type="file"/>
+				<available file="${lib.dir}/industrialcraft-2-api.jar" type="file"/>
+				<!--
+				<available file="${sources.dir}/appeng" type="dir"/>
+				-->
+			</and>
+		</condition>
+	</target>
 	
 	<!-- Dependency downloading -->
 
-	<target name="download-core" unless="forge.exists">
-		<echo message="Downloading PowerCrystalsCore... "/>
-		<get src="https://github.com/skyboy/PowerCrystalsCore/archive/master.zip" dest="${download.dir}/PowerCrystalsCore-master.zip"/>
-		
-		<echo message="Extracting PowerCrystalsCore... "/>
-		<unzip src="${download.dir}/PowerCrystalsCore-master.zip" dest="${download.dir}"/>
+	<target name="download-core" depends="properties" unless="forge.exists">
+		<echo message="Downloading CoFHCore... "/>
+		<get src="https://github.com/CoFH/CoFHCore/archive/master.zip" dest="${download.dir}/CoFHCore.zip"/>
+		<delete dir="CoFHCore-master" failonerror="false"/>
+		<unzip src="${download.dir}/CoFHCore.zip" dest="${download.dir}"/>
 	</target>
 
 	<target name="get-dependencies" depends="get-version" unless="have.libs">
+		<echo message="Downloading CCL..."/>
+		<get src="http://files.minecraftforge.net/maven/codechicken/CodeChickenLib/1.7.2-1.1.0.73/CodeChickenLib-1.7.2-1.1.0.73-dev.jar" dest="${download.dir}/codechickenlib.jar"/>
+
+		<echo message="Downloading CoFHLib... "/>
+		<get src="https://github.com/CoFH/CoFHLib/archive/master.zip" dest="${download.dir}/CoFHLib.zip"/>
+		<!-- Begin hack -->
+		<unzip src="${download.dir}/CoFHLib.zip" dest="${download.dir}"/>
+		<delete dir="${compile.dir}" failonerror="false"/>
+		<mkdir dir="${compile.dir}"/>
+		<javac srcdir="${download.dir}/CoFHLib-master/src/main/java" destdir="${compile.dir}"
+			target="1.6" source="1.6"
+			classpathref="mcp.classpath" debug="true" debuglevel="lines,source" includeAntRuntime="false">
+			<include name="**/*.java"/>
+		      <classpath>
+				<fileset file="${download.dir}/codechickenlib.jar"/>
+		      </classpath>
+		</javac>
+		<jar destfile="${download.dir}/CoFHLib.jar" compress="true" level="9" basedir="${compile.dir}"/>
+		<delete dir="${compile.dir}" failonerror="false"/>
+		<delete dir="CoFHLib-master"/>
+		<!-- End hack -->
+		<echo message="Compiling CoFHCore... "/>
+		<!-- Begin hack -->
+		<delete dir="${compile.dir}" failonerror="false"/>
+		<mkdir dir="${compile.dir}"/>
+		<javac srcdir="${download.dir}/CoFHCore-master/src/main/java" destdir="${compile.dir}"
+			target="1.6" source="1.6"
+			classpathref="mcp.classpath" debug="true" debuglevel="lines,source" includeAntRuntime="false">
+			<include name="**/*.java"/>
+		      <classpath>
+				<fileset file="${download.dir}/codechickenlib.jar"/>
+				<fileset file="${download.dir}/CoFHLib.jar"/>
+		      </classpath>
+		</javac>
+		<jar destfile="${download.dir}/CoFHCore.jar" compress="true" level="9" basedir="${compile.dir}"/>
+		<delete dir="${compile.dir}" failonerror="false"/>
+		<!-- End hack -->
+		
+		<echo message="Downloading IC2 API... "/>
+		<get src="http://ic2api.player.to:8080/job/IC2_experimental/477/artifact/build/libs/industrialcraft-2-2.1.477-experimental-api.jar" dest="${download.dir}/industrialcraft-2-api.jar"/>
 		<!--
-		<echo message="Downloading IC2... " />
-		<get src="http://ic2api.player.to:8080/job/IC2_experimental/253/artifact/packages/industrialcraft-2-api_2.0.253-experimental.zip" dest="${download.dir}/industrialcraft-2-api.zip" />
-		
-		<echo message="Downloading BuildCraft API..." />
-		<get src="https://github.com/BuildCraft/BuildCraft/archive/3e13bbb166568624cc918f8a9f916fa2062f6c37.zip" dest="${download.dir}/BuildCraft-master.zip"/>
-		
 		<echo message="Downloading AppEng API..." />
 		<get src="http://ae-mod.info/releases/appeng-rv13-c-mc162.jar" dest="${download.dir}/appeng.zip"/>
 		-->
 	</target>
 
 	<target name="extract-dependencies" depends="setup-forge,get-dependencies" unless="have.libs">
-		<!--
 		<delete dir="${lib.dir}/"/>
 		<mkdir dir="${lib.dir}/"/>
-		<copy todir="${sources.dir}/powercrystals/core">
-			<fileset dir="${download.dir}/PowerCrystalsCore-master/src/powercrystals/core" />
-		</copy>
+
+		<echo message="Extracting CoFHLib..."/>
+		<copy file="${download.dir}/CoFHLib.jar" todir="${lib.dir}"/>
 		
-		<echo message="Extracting BuildCraft API..." />
-		<unzip src="${download.dir}/BuildCraft-master.zip" dest="${download.dir}"/>
-		<mkdir dir="${sources.dir}/buildcraft/" />
-		<move file="${download.dir}/BuildCraft-3e13bbb166568624cc918f8a9f916fa2062f6c37/common/buildcraft/api" todir="${sources.dir}/buildcraft/"/>
+		<echo message="Extracting CoFHCore..."/>
+		<copy file="${download.dir}/CoFHCore.jar" todir="${lib.dir}"/>
 		
-		<echo message="Extracting IC2 API... " />
-		<unzip src="${download.dir}/industrialcraft-2-api.zip" dest="${download.dir}" />
-		<move file="${download.dir}/ic2" todir="${sources.dir}" />
-		
+		<echo message="Extracting IC2 API... "/>
+		<copy file="${download.dir}/industrialcraft-2-api.jar" todir="${lib.dir}"/>
+		<!--
 		<echo message="Extracting AppEng API... " />
 		<unzip src="${download.dir}/appeng.zip" dest="${download.dir}" />
 		<delete file="${download.dir}/appeng" />
@@ -128,17 +160,24 @@
 	
 	<macrodef name="move-transformers"><sequential>
 		
-		<copy file="${download.dir}/PowerCrystalsCore-master/pcc_at.cfg" todir="${transformers.dir}"/>
+		<copy file="${download.dir}/CoFHCore-master/src/main/resources/CoFH_at.cfg" todir="${transformers.dir}"/>
 		
 	</sequential></macrodef>
 	
 	<!-- Building process -->
 	<target name="install" depends="build">
-		<move file="${reobf.jar}" tofile="${dist.dir}/${build.name}-${build.full}${build.number}.jar"/>
+		<move file="${reobf.jar}" tofile="${dist.dir}/${build.name}${build.full}${build.number}.jar"/>
 		
 		<!-- Cleanup -->
 		<delete dir="${apiclasses.dir}"/>
 		<delete dir="${classes.dir}"/>
+		<delete>
+			<fileset dir="${dist.dir}">
+				<exclude name="${build.name}${build.full}${build.number}.jar"/>
+				<exclude name="${build.name}${build.full}dev-${build.number}.jar"/>
+				<exclude name="${build.name}-API${build.full}${build.number}.zip"/>
+			</fileset>
+		</delete>
 	</target>
 
 	<macrodef name="install-lite">
@@ -152,7 +191,7 @@
 				<fileset dir="${resources.dir}"/>
 			</copy>
 			<update-languages/>
-			<jar destfile="${dist.dir}/${build.name}-${build.full}@{build}.jar"
+			<jar destfile="${dist.dir}/${build.name}${build.full}@{build}.jar"
 				compress="true" level="9" basedir="${classes.dir}"/>
 		</sequential>
 	</macrodef>
@@ -175,7 +214,7 @@
 		<install-lite build="${build}"/>
 
 		<!-- Reobf -->
-		<copy file="${dist.dir}/${build.name}-${build.full}${build}.jar" tofile="${reobf.jar}"/>
+		<copy file="${dist.dir}/${build.name}${build.full}${build}.jar" tofile="${reobf.jar}"/>
 		<exec executable="./gradlew" failonerror="true" dir="${forge.dir}/" vmlauncher="false">
 			<arg line="-g ../.gradle"/>
 			<arg line="reobf"/>
@@ -197,7 +236,7 @@
 		<copy todir="${apiclasses.dir}/${class.pckg}/api">
 			<fileset dir="${src.dir}/${class.pckg}/api"/>
 		</copy>
-		<zip destfile="${dist.dir}/${build.name}-API-${build.full}${build.number}.zip" basedir="${apiclasses.dir}"/>
+		<zip destfile="${dist.dir}/${build.name}-API${build.full}${build.number}.zip" basedir="${apiclasses.dir}"/>
 	</target>
 
 	<target name="setup-forge" depends="download-forge" unless="forge.already.installed">
@@ -218,6 +257,7 @@
 		</delete>
 		<delete dir="${forge.dir}/eclipse" failonerror="false"/>
 		<delete dir="${forge.dir}/src/main/java" failonerror="false"/>
+		<delete dir="${build.dir}/.gradle/caches/minecraft/net/minecraftforge/forge/${forge.version}/srgs" failonerror="false"/>
 		
 		<!-- Change executables' permissions -->
 		<chmod file="${forge.dir}/gradlew" perm="+x"/>
@@ -227,7 +267,7 @@
 		<!-- Install forge -->
 		<exec executable="./gradlew" failonerror="true" dir="${forge.dir}/" vmlauncher="false">
 			<arg line="-g ../.gradle"/>
-			<arg line="extractForgeSrc"/>
+			<arg line="extractMinecraftSrc"/>
 			<arg line="eclipseClasspath"/>
 		</exec>
 
@@ -235,8 +275,8 @@
 		<mkdir dir="${lib.dir}"/>
 		<javac srcdir="${forge.dir}/build/tmp/recompSrc" destdir="${compile.dir}" target="1.6" source="1.6"
 			classpathref="mcp.classpath" debug="true" debuglevel="lines,source" includeAntRuntime="false"/>
-		<jar destfile="${forge.dir}/build/dirtyArtifacts/forgeSrc-${forge.version}.jar" compress="true"
-			level="9" basedir="${compile.dir}"/>
+		<jar destfile="${forge.jar}" compress="true" level="9" basedir="${compile.dir}"/>
+		<copy file="${forge.jar}" todir="${forgebuild.dir}/dirtyArtifacts/"/>
 		<delete dir="${compile.dir}"/>
 	</target>
 
@@ -268,8 +308,20 @@
 			]]></script>
 		</sequential>
 	</macrodef>
+	
+	<target name="verify-version">
+		<script language="javascript"><![CDATA[
+			var name = project.getProperty("build.full");
+			if (name == null || name == "") {
+				name = project.getProperty("verclass.name");
+				if (name == null || name == "") {
+					project.setProperty("build.full", "-");
+				}
+			}
+		]]></script>
+	</target>
 
-	<target name="get-version" depends="setup-forge" unless="${build.full}">
+	<target name="get-version" depends="verify-version,setup-forge" unless="build.full">
 		<local name="grep.out"/><local name="mfrv"/><local name="mcv"/>
 		<!-- Read version out of file -->
 		<script language="javascript"><![CDATA[
@@ -303,41 +355,54 @@
 			project.setProperty("mfrv", mfrversion);
 			project.setProperty("mcv", mcversion);
 			
+			var c = project.getProperty("build.channel");
+			if (c == null || c == "")
+				project.setProperty("build.channel", mfrversion.indexOf("B") > 0 ? "alpha" : (
+													 mfrversion.indexOf("RC") > 0 ? "beta" : "release"));
+			
 			// open file and parse JSON structure
 			var file = new File(project.getProperty("resources.dir") + "/mcmod.info");
-			var mcmod = new Scanner(file, "UTF-8").useDelimiter("\\Z");
-			var data = new JsonParser().parse(mcmod.next()).getAsJsonArray();
-			mcmod.close();
-			
-			// update all version elements
-			for (var i = 0, e = data.size(); i < e; ++i) {
-				var element = data.get(i).getAsJsonObject();
-				element.addProperty("version", mfrversion);
-				element.addProperty("mcversion", mcversion);
+			if (file.exists())
+			{
+				var mcmod = new Scanner(file, "UTF-8").useDelimiter("\\Z");
+				var data = new JsonParser().parse(mcmod.next()).getAsJsonArray();
+				mcmod.close();
+				
+				// update all version elements
+				for (var i = 0, e = data.size(); i < e; ++i) {
+					var element = data.get(i).getAsJsonObject();
+					element.addProperty("version", mfrversion);
+					element.addProperty("mcversion", mcversion);
+				}
+				
+				// write file back, pretty-printed
+				var output = new JsonWriter(new FileWriter(file));
+				output.setIndent("    ");
+				new Gson().toJson(data, output);
+				output.close();
 			}
-			
-			// write file back, pretty-printed
-			var output = new JsonWriter(new FileWriter(file));
-			output.setIndent("    ");
-			new Gson().toJson(data, output);
-			output.close();
 		]]></script>
-		<echo message="Version: ${mfrv}"/>
-		<property name="build.full" value="[${mcv}]${mfrv}-"/>
+		<echo message="Version: ${mfrv}  Channel: ${build.channel}"/>
+		<property name="build.full" value="-[${mcv}]${mfrv}-"/>
 	</target>
 
-	<target name="get-build-number" depends="build-number-there" unless="${build.number}">
+	<target name="get-build-number" depends="build-number-there" unless="build.number">
 		<echo message="!! No build number set !!"/>
 		<property name="build.number" value="CUSTOM_BUILD"/>
 	</target>
 
-	<target name="build-number-there" depends="get-version" if="env.BUILD_NUMBER" unless="${build.number}">
+	<target name="build-number-there" depends="get-version" if="env.BUILD_NUMBER" unless="build.number">
 		<echo message="Using build number ${env.BUILD_NUMBER}..."/>
 		<property name="build.number" value="${env.BUILD_NUMBER}"/>
 	</target>
 
 	<target name="clean">
 		<delete dir="${build.dir}"/>
+	</target>
+
+	<target name="rebuild">
+		<delete file="${forge.jar}"/>
+		<antcall target="install"/>
 	</target>
 
 	<target name="jar" depends="install"/>

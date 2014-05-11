@@ -1,9 +1,7 @@
 package powercrystals.netherores.ores;
 
-import static powercrystals.netherores.ores.BlockNetherOres.angerPigmen;
-import static powercrystals.netherores.ores.BlockNetherOres.checkExplosionChances;
+import static powercrystals.netherores.ores.BlockNetherOres.*;
 
-import com.sun.istack.internal.NotNull;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -34,7 +32,7 @@ public class BlockNetherOverrideOre extends Block implements INetherOre
 {
 	protected Block _override;
 
-	public BlockNetherOverrideOre(@NotNull Block override)
+	public BlockNetherOverrideOre(Block override)
 	{
 		super(override.getMaterial());
 		_override = override;
@@ -50,7 +48,7 @@ public class BlockNetherOverrideOre extends Block implements INetherOre
 	@Override
 	public boolean equals(Object obj)
 	{
-		return obj instanceof Block && isAssociatedBlock((Block)obj);
+		return obj == this | obj == _override;
 	}
 
 	@Override

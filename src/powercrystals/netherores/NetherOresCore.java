@@ -2,9 +2,10 @@ package powercrystals.netherores;
 
 import static net.minecraftforge.common.config.Configuration.CATEGORY_GENERAL;
 
-//import static cofh.core.CoFHProps.VERSION;
-
-//import cofh.mod.BaseMod;
+import cofh.core.CoFHProps;
+import cofh.mod.BaseMod;
+import cofh.updater.UpdateManager;
+import cofh.util.RegistryUtils;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.SidedProxy;
@@ -14,7 +15,6 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
-//import cpw.mods.fml.common.registry.TickRegistry;
 
 import java.io.File;
 
@@ -23,8 +23,8 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.OreDictionary.OreRegisterEvent;
@@ -40,8 +40,8 @@ import powercrystals.netherores.world.BlockHellfish;
 import powercrystals.netherores.world.NetherOresWorldGenHandler;
 
 @Mod(modid = NetherOresCore.modId, name = NetherOresCore.modName, version = NetherOresCore.version,
-dependencies = "required-after:CoFHCore@[2.0.1.0,);before:ThermalExpansion")
-public class NetherOresCore// extends BaseMod ^
+dependencies = "required-after:CoFHCore@["+CoFHProps.VERSION+",);before:ThermalExpansion")
+public class NetherOresCore extends BaseMod
 {
 	public static final String modId = "NetherOres";
 	public static final String version = "1.7.2R2.3.0B1";
@@ -80,13 +80,11 @@ public class NetherOresCore// extends BaseMod ^
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent evt)
 	{
-		//setConfigFolderBase(evt.getModConfigurationDirectory());
+		setConfigFolderBase(evt.getModConfigurationDirectory());
 		
-		//loadConfig(getCommonConfig());
-		
-		//extractLang(new String[] {  "en_US", "es_AR", "es_ES", "es_MX", "es_UY", "es_VE", "de_DE",
-		//							"ru_RU", "sv_SE" });
-		//loadLang();
+		loadConfig(getCommonConfig());
+
+		loadLang();
 	}
 
 	@EventHandler
@@ -98,14 +96,14 @@ public class NetherOresCore// extends BaseMod ^
 			GameRegistry.registerBlock(b, ItemBlockNetherOre.class, b.getUnlocalizedName());
 		}
 		blockHellfish = new BlockHellfish();
-		GameRegistry.registerBlock(blockHellfish, ItemBlock.class, "netherOresBlockHellfish", "Minecraft");
+		GameRegistry.registerBlock(blockHellfish, ItemBlock.class, "netherOresBlockHellfish");
 		GameRegistry.registerCustomItemStack("netherOresBlockHellfish", new ItemStack(blockHellfish));
 		GameRegistry.registerWorldGenerator(new NetherOresWorldGenHandler(), 10);
 		if (enableHellQuartz.getBoolean(true))
 		{
-			Block quartz = new BlockNetherOverrideOre(Blocks.quartz_ore);
+			BlockNetherOverrideOre quartz = new BlockNetherOverrideOre(Blocks.quartz_ore);
 			Blocks.quartz_ore = quartz;
-			Block.blockRegistry.addObject(153, "quartz_ore", quartz);
+			RegistryUtils.overwriteEntry(Block.blockRegistry, "minecraft:quartz_ore", quartz);
 		}
 		
 		for(Ores o : Ores.values())
@@ -118,7 +116,7 @@ public class NetherOresCore// extends BaseMod ^
 		
 		proxy.load();
 
-		//TickRegistry.registerScheduledTickHandler(new UpdateManager(this), Side.CLIENT);
+		UpdateManager.registerUpdater(new UpdateManager(this));
 	}
 	
 	@EventHandler
@@ -253,19 +251,19 @@ public class NetherOresCore// extends BaseMod ^
 			ore.registerMacerator(stack);
 	}
 
-	//@Override
+	@Override
 	public String getModId()
 	{
 		return modId;
 	}
 
-	//@Override
+	@Override
 	public String getModName()
 	{
 		return modName;
 	}
 
-	//@Override
+	@Override
 	public String getModVersion()
 	{
 		return version;
