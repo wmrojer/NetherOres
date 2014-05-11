@@ -6,17 +6,28 @@ import cofh.core.CoFHProps;
 import cofh.mod.BaseMod;
 import cofh.updater.UpdateManager;
 import cofh.util.RegistryUtils;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.FMLModContainer;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLInterModComms;
+import cpw.mods.fml.common.event.FMLInterModComms.IMCEvent;
+import cpw.mods.fml.common.event.FMLInterModComms.IMCMessage;
+import cpw.mods.fml.common.event.FMLLoadCompleteEvent;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.event.FMLServerAboutToStartEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 
 import java.io.File;
+import java.lang.reflect.Field;
+import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -46,7 +57,7 @@ public class NetherOresCore extends BaseMod
 	public static final String modId = "NetherOres";
 	public static final String version = "1.7.2R2.3.0B1";
 	public static final String modName = "Nether Ores";
-	
+
 	public static final String mobTextureFolder = "netherores:textures/mob/";
 
 	public static Block[] blockNetherOres = new Block[(Ores.values().length + 15) / 16];
@@ -73,7 +84,7 @@ public class NetherOresCore extends BaseMod
 	public static Property hellFishMinY;
 	public static Property hellFishMaxY;
 	public static Property enableMobsAngerPigmen;
-	
+
 	@SidedProxy(clientSide = "powercrystals.netherores.net.ClientProxy", serverSide="powercrystals.netherores.net.ServerProxy")
 	public static INetherOresProxy proxy;
 
@@ -81,7 +92,7 @@ public class NetherOresCore extends BaseMod
 	public void preInit(FMLPreInitializationEvent evt)
 	{
 		setConfigFolderBase(evt.getModConfigurationDirectory());
-		
+
 		loadConfig(getCommonConfig());
 
 		loadLang();
@@ -105,22 +116,37 @@ public class NetherOresCore extends BaseMod
 			Blocks.quartz_ore = quartz;
 			RegistryUtils.overwriteEntry(Block.blockRegistry, "minecraft:quartz_ore", quartz);
 		}
-		
+
 		for(Ores o : Ores.values())
 		{
 			o.load();
 		}
-		
+
 		EntityRegistry.registerModEntity(EntityArmedOre.class, "netherOresArmedOre", 0, this, 80, 5, false);
 		EntityRegistry.registerModEntity(EntityHellfish.class, "netherOresHellfish", 1, this, 160, 5, true);
-		
+
 		proxy.load();
 
 		UpdateManager.registerUpdater(new UpdateManager(this));
+
+		try {
+			Field eBus = FMLModContainer.class.getDeclaredField("eventBus");
+			eBus.setAccessible(true);
+			EventBus FMLbus = (EventBus) eBus.get(FMLCommonHandler.instance().findContainerFor(this));
+			FMLbus.register(this);
+		} catch (Throwable t) {
+			_log.debug("Error hooking LoadComplete", t);
+		}
 	}
-	
+
 	@EventHandler
-	public void postInit(FMLInterModComms.IMCEvent e)
+	public void handleIMC(IMCEvent e)
+	{
+		processIMC(e.getMessages());
+	}
+
+	@EventHandler
+	public void postInit(FMLPostInitializationEvent e)
 	{
 		Ores.Coal    .registerSmelting(new ItemStack(Blocks.coal_ore));
 		Ores.Gold    .registerSmelting(new ItemStack(Blocks.gold_ore));
@@ -129,13 +155,13 @@ public class NetherOresCore extends BaseMod
 		Ores.Diamond .registerSmelting(new ItemStack(Blocks.diamond_ore));
 		Ores.Emerald .registerSmelting(new ItemStack(Blocks.emerald_ore));
 		Ores.Redstone.registerSmelting(new ItemStack(Blocks.redstone_ore));
-		
+
 		Ores.Coal    .registerMacerator(new ItemStack(Items.coal));
 		Ores.Diamond .registerMacerator(new ItemStack(Items.diamond));
 		Ores.Emerald .registerMacerator(new ItemStack(Items.emerald));
 		Ores.Redstone.registerMacerator(new ItemStack(Items.redstone));
 		Ores.Lapis   .registerMacerator(new ItemStack(Items.dye, 1, 4));
-		
+
 		for(Ores ore : Ores.values())
 		{
 			String oreName;
@@ -149,10 +175,50 @@ public class NetherOresCore extends BaseMod
 			if (OreDictionary.getOres(oreName).size() > 0)
 				registerOreDictGem(ore, oreName, OreDictionary.getOres(oreName).get(0));
 		}
-		
+
 		MinecraftForge.EVENT_BUS.register(this);
 	}
-	
+
+	private boolean complete = false;
+
+	@Subscribe
+	public void loadComplete(FMLLoadCompleteEvent evt)
+	{
+		processIMC(FMLInterModComms.fetchRuntimeMessages(this));
+		complete = true;
+		_log.info("Load Complete.");
+	}
+
+	@SubscribeEvent
+	public void serverStarting(FMLServerAboutToStartEvent evt)
+	{
+		if (!complete)
+			loadComplete(null);
+	}
+
+	private void processIMC(List<IMCMessage> l)
+	{
+		for (IMCMessage m : l)
+		{
+			try
+			{
+				String k = m.key;
+				if ("registerOverrideOre".equals(k))
+				{
+					String name = m.getStringValue();
+					Block ore = Block.getBlockFromName(name);
+					RegistryUtils.overwriteEntry(Block.blockRegistry, name, new BlockNetherOverrideOre(ore));
+				}
+				else
+					_log.debug("Unknown IMC message (%s) from %s", k, m.getSender());
+			}
+			catch (Throwable _)
+			{
+				_log.error("Bad IMC message (%s) from %s", m.key, m.getSender(), _);
+			}
+		}
+	}
+
 	public static Block getOreBlock(int index)
 	{
 		if (index >= 0 && index < blockNetherOres.length)
@@ -164,7 +230,7 @@ public class NetherOresCore extends BaseMod
 	{
 		Configuration c = new Configuration(f);
 		c.load();
-		
+
 		explosionPower = c.get(CATEGORY_GENERAL, "ExplosionPower", 2);
 		explosionPower.comment = "How powerful an explosion will be. Creepers are 3, TNT is 4, electrified creepers are 6. This affects both the ability of the explosion to punch through blocks as well as the blast radius.";
 		explosionProbability = c.get(CATEGORY_GENERAL, "ExplosionProbability", 75);
@@ -179,7 +245,7 @@ public class NetherOresCore extends BaseMod
 		silkyStopsPigmen.comment = "If true, when NetherOres are mined with Silk Touch, nearby pigmen become angry to the player.";
 		enableMobsAngerPigmen = c.get(CATEGORY_GENERAL, "MobsAngerPigmen", true);
 		enableMobsAngerPigmen.comment = "If true, any entity not a player exploding a NetherOre will anger nearby pigmen. This only accounts for exploding, entities breaking the blocks normally will still anger pigmen.";
-		
+
 		enableStandardFurnaceRecipes = c.get("Processing.Enable", "StandardFurnaceRecipes", true);
 		enableStandardFurnaceRecipes.comment = "Set this to false to remove the standard furnace recipes (ie, nether iron ore -> normal iron ore).";
 		enableMaceratorRecipes = c.get("Processing.Enable", "MaceratorRecipes", true);
@@ -190,7 +256,7 @@ public class NetherOresCore extends BaseMod
 		enableInductionSmelterRecipes.comment = "Set this to false to remove the TE Induction Smelter recipes (ie, nether iron ore -> 2x normal iron ore).";
 		enableGrinderRecipes = c.get("Processing.Enable", "GrinderRecipes", true);
 		enableGrinderRecipes.comment = "Set this to false to remove the AE Grind Stone recipes (ie, nether iron ore -> 4x iron dust).";
-		
+
 		forceOreSpawn = c.get("WorldGen.Enable", "ForceOreSpawn", false);
 		forceOreSpawn.comment = "If true, will spawn nether ores regardless of if a furnace or macerator recipe was found. If false, at least one of those two must be found to spawn the ore.";
 		worldGenAllDimensions = c.get("WorldGen.Enable", "AllDimensionWorldGen", false);
@@ -199,7 +265,7 @@ public class NetherOresCore extends BaseMod
 		enableWorldGen.comment = "If true, Nether Ores oregen will run and places ores in the world where appropriate. Only disable this if you intend to use the ores with a custom ore generator. (overrides per-ore forcing; hellfish still generate if enabled)";
 		enableHellQuartz = c.get("WorldGen.Enable", "OverrideNetherQuartz", true);
 		enableHellQuartz.comment = "If true, Nether Quartz ore will be a NetherOre and will follow the same rules as all other NetherOres.";
-		
+
 		hellFishPerChunk = c.get("WorldGen.HellFish", "GroupsPerChunk", 9);
 		hellFishPerChunk.comment = "The maximum number of hellfish veins per chunk.";
 		hellFishPerGroup = c.get("WorldGen.HellFish", "BlocksPerGroup", 12);
@@ -213,7 +279,7 @@ public class NetherOresCore extends BaseMod
 		{
 			o.loadConfig(c);
 		}
-		
+
 		c.save();
 	}
 
@@ -222,7 +288,7 @@ public class NetherOresCore extends BaseMod
 	{
 		registerOreDictionaryEntry(event.Name, event.Ore);
 	}
-	
+
 	private void registerOreDictionaryEntry(String oreName, ItemStack stack)
 	{
 		for(Ores ore : Ores.values())
@@ -232,19 +298,19 @@ public class NetherOresCore extends BaseMod
 			registerOreDictGem(ore, oreName, stack);
 		}
 	}
-	
+
 	private void registerOreDictSmelt(Ores ore, String oreName, ItemStack stack)
 	{
 		if (!ore.isRegisteredSmelting() && ore.getOreName().equals(oreName))
 			ore.registerSmelting(stack);
 	}
-	
+
 	private void registerOreDictDust(Ores ore, String oreName, ItemStack stack)
 	{
 		if (!ore.isRegisteredMacerator() && ore.getDustName().equals(oreName))
 			ore.registerMacerator(stack);
 	}
-	
+
 	private void registerOreDictGem(Ores ore, String oreName, ItemStack stack)
 	{
 		if (!ore.isRegisteredMacerator() && ore.getAltName().equals(oreName))
