@@ -74,9 +74,7 @@
 				<available file="${lib.dir}/CoFHLib.jar" type="file"/>
 				<available file="${lib.dir}/CoFHCore.jar" type="file"/>
 				<available file="${lib.dir}/industrialcraft-2-api.jar" type="file"/>
-				<!--
-				<available file="${sources.dir}/appeng" type="dir"/>
-				-->
+				<available file="${lib.dir}/AppEng.jar" type="file"/>
 			</and>
 		</condition>
 	</target>
@@ -131,10 +129,9 @@
 		
 		<echo message="Downloading IC2 API... "/>
 		<get src="http://ic2api.player.to:8080/job/IC2_experimental/477/artifact/build/libs/industrialcraft-2-2.1.477-experimental-api.jar" dest="${download.dir}/industrialcraft-2-api.jar"/>
-		<!--
+		
 		<echo message="Downloading AppEng API..." />
-		<get src="http://ae-mod.info/releases/appeng-rv13-c-mc162.jar" dest="${download.dir}/appeng.zip"/>
-		-->
+		<get src="http://ae2.ae-mod.info/builds/appliedenergistics2-deobf-rv0-beta-4.jar" dest="${download.dir}/AppEng.jar"/>
 	</target>
 
 	<target name="extract-dependencies" depends="setup-forge,get-dependencies" unless="have.libs">
@@ -149,13 +146,9 @@
 		
 		<echo message="Extracting IC2 API... "/>
 		<copy file="${download.dir}/industrialcraft-2-api.jar" todir="${lib.dir}"/>
-		<!--
+		
 		<echo message="Extracting AppEng API... " />
-		<unzip src="${download.dir}/appeng.zip" dest="${download.dir}" />
-		<delete file="${download.dir}/appeng" />
-		<unzip src="${download.dir}/appeng_api.zip" dest="${download.dir}" />
-		<move file="${download.dir}/appeng" todir="${sources.dir}" />
-		-->
+		<copy file="${download.dir}/AppEng.jar" todir="${lib.dir}"/>
 	</target>
 	
 	<macrodef name="move-transformers"><sequential>
