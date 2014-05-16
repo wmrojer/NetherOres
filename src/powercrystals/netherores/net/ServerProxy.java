@@ -1,6 +1,6 @@
 package powercrystals.netherores.net;
 
-public class ServerProxy implements INetherOresProxy
+public class ServerProxy extends NetherOresProxy
 {
 	@Override
 	public void load()

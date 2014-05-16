@@ -1,10 +1,11 @@
 package powercrystals.netherores.ores;
 
-//import appeng.api.IAppEngGrinderRecipe;
-//import appeng.api.IGrinderRecipeManager;
-//import appeng.api.Util;
+import appeng.api.AEApi;
+import appeng.api.features.IGrinderEntry;
+import appeng.api.features.IGrinderRegistry;
 
 import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.Optional;
 import cpw.mods.fml.common.event.FMLInterModComms;
 import cpw.mods.fml.common.registry.GameRegistry;
 
@@ -62,7 +63,7 @@ public enum Ores
 	private boolean _registeredSmelting;
 	private boolean _registeredMacerator;
 	private int _oreGenMinY = 1;
-	private int _oreGenMaxY = 126;
+	private int _oreGenMaxY = 127;
 	private int _oreGenGroupsPerChunk = 6;
 	private int _oreGenBlocksPerGroup = 14;
 	private boolean _oreGenDisable = false;
@@ -164,13 +165,18 @@ public enum Ores
 	{
 		return _pulvCount;
 	}
+	
+	public ItemStack getItemStack(int amt)
+	{
+		return new ItemStack(NetherOresCore.getOreBlock(_blockIndex), amt, _metadata);
+	}
 
 	public void load()
 	{
 		NetherOresCore.getOreBlock(_blockIndex).setHarvestLevel("pickaxe", _miningLevel, _metadata);
 		if (_oreGenForced | !_oreGenDisable)
 		{
-			ItemStack oreStack = new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata);
+			ItemStack oreStack = getItemStack(1);
 			OreDictionary.registerOre("oreNether" + name(), oreStack);
 			GameRegistry.registerCustomItemStack("netherOresBlock" + name(), oreStack);
 		}
@@ -185,14 +191,13 @@ public enum Ores
 		{
 			ItemStack smeltTo = smeltStack.copy();
 			smeltTo.stackSize = _smeltCount;
-			FurnaceRecipes.smelting().
-			func_151394_a(new ItemStack(NetherOresCore.getOreBlock(_blockIndex), _metadata), smeltTo, 1F);
+			FurnaceRecipes.smelting().func_151394_a(getItemStack(1), smeltTo, 1F);
 		}
 
 		if(NetherOresCore.enableInductionSmelterRecipes.getBoolean(true) &&
 				Loader.isModLoaded("ThermalExpansion"))
 		{
-			ItemStack input = new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata);
+			ItemStack input = getItemStack(1);
 			ItemStack regSec = new ItemStack(Blocks.sand);
 			ItemStack slagRich = GameRegistry.findItemStack("ThermalExpansion", "slagRich", 1);
 			ItemStack slag = GameRegistry.findItemStack("ThermalExpansion", "slag", 1);
@@ -229,23 +234,22 @@ public enum Ores
 		}
 	}
 
-	public void registerMacerator(ItemStack maceStack)
+	public void registerPulverizing(ItemStack maceStack)
 	{
 		if (_registeredMacerator)
 			return;
 		_registeredMacerator = true;
-		if(NetherOresCore.enableMaceratorRecipes.getBoolean(true) && Loader.isModLoaded("IC2"))
+		
+		if (NetherOresCore.enableMaceratorRecipes.getBoolean(true) &&
+				Loader.isModLoaded("IC2"))
 		{
-			ItemStack input = new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata);
-			ItemStack maceTo = maceStack.copy();
-			maceTo.stackSize = _pulvCount;
-			Recipes.macerator.addRecipe(new RecipeInputItemStack(input), null, maceTo.copy());
+			registerMacerator(maceStack);
 		}
 
-		if(NetherOresCore.enablePulverizerRecipes.getBoolean(true) &&
+		if (NetherOresCore.enablePulverizerRecipes.getBoolean(true) &&
 				Loader.isModLoaded("ThermalExpansion"))
 		{
-			ItemStack input = new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata);
+			ItemStack input = getItemStack(1);
 			ItemStack pulvPriTo = maceStack.copy();
 			ItemStack pulvSecTo = new ItemStack(Blocks.netherrack);
 
@@ -264,30 +268,42 @@ public enum Ores
 			FMLInterModComms.sendMessage("ThermalExpansion", "PulverizerRecipe", toSend);
 		}
 
-		/*
-		appeng: if(NetherOresCore.enableGrinderRecipes.getBoolean(true) && 
-				Loader.isModLoaded("AppliedEnergistics"))
+		if (NetherOresCore.enableGrinderRecipes.getBoolean(true) && 
+				Loader.isModLoaded("appliedenergistics2"))
 		{
-			ItemStack maceTo = maceStack.copy();
-			maceTo.stackSize = _pulvCount;
+			registerAEGrinder(maceStack.copy());
+		}
+	}
+	
+	@Optional.Method(modid="IC2")
+	private void registerMacerator(ItemStack maceStack)
+	{
+		ItemStack input = getItemStack(1);
+		ItemStack maceTo = maceStack.copy();
+		maceTo.stackSize = _pulvCount;
+		Recipes.macerator.addRecipe(new RecipeInputItemStack(input), null, maceTo.copy());
+	}
+	
+	@Optional.Method(modid="appliedenergistics2")
+	private void registerAEGrinder(ItemStack maceStack)
+	{
+		ItemStack maceTo = maceStack.copy();
+		maceTo.stackSize = _pulvCount;
 
-			IGrinderRecipeManager grinder = Util.getGrinderRecipeManage();
+		IGrinderRegistry grinder = AEApi.instance().registries().grinder();
 
-			for(ItemStack ore : OreDictionary.getOres(getOreName()))
+		for (ItemStack ore : OreDictionary.getOres(getOreName()))
+		{
+			IGrinderEntry recipe = grinder.getRecipeForInput(ore);
+
+			if (recipe != null)
 			{
-				IAppEngGrinderRecipe recipe = grinder.getRecipeForInput(ore);
-
-				if(recipe != null)
-				{
-					grinder.addRecipe(new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1,
-							_metadata), maceTo, recipe.getEnergyCost() * 2);
-					break appeng;
-				}
+				grinder.addRecipe(getItemStack(1), maceTo, recipe.getEnergyCost() * 2);
+				return;
 			}
-			// if there's no overworld recipe to get the energy cost from, default to 16 turns
-			grinder.addRecipe(new ItemStack(NetherOresCore.getOreBlock(_blockIndex), 1, _metadata),
-					maceTo, 16);
-		}//*/
+		}
+		// if there's no overworld recipe to get the energy cost from, default to 16 turns
+		grinder.addRecipe(getItemStack(1), maceTo, 16);
 	}
 
 	public void loadConfig(Configuration c)
@@ -295,7 +311,7 @@ public enum Ores
 		String cat = "WorldGen.Ores." + name();
 		_oreGenMaxY = c.get(cat, "MaxY", _oreGenMaxY).getInt();
 		_oreGenMinY = c.get(cat, "MinY", _oreGenMinY).getInt();
-		if(_oreGenMinY >= _oreGenMaxY)
+		if (_oreGenMinY >= _oreGenMaxY)
 		{
 			_oreGenMinY = _oreGenMaxY - 1;
 			c.get(cat, "MinY", _oreGenMinY).set(_oreGenMinY);
@@ -303,16 +319,17 @@ public enum Ores
 		
 		_oreGenGroupsPerChunk = c.get(cat, "GroupsPerChunk", _oreGenGroupsPerChunk).getInt();
 		_oreGenBlocksPerGroup = c.get(cat, "BlocksPerGroup", _oreGenBlocksPerGroup).getInt();
-		_oreGenDisable = c.get(cat, "Disable", false, "Disables generation of this ore (overrides ForceOreSpawn)").
-				getBoolean(false);
-		_oreGenForced = c.get(cat, "Force", false, "Force this ore to generate (overrides Disable)").
-				getBoolean(false);
-		_miningLevel = c.get(cat, "MiningLevel", _miningLevel, "The pickaxe level required to mine").getInt();
+		_oreGenDisable = c.get(cat, "Disable", false, "Disables generation of " + name() +
+				" (overrides ForceOreSpawn)").getBoolean(false);
+		_oreGenForced = c.get(cat, "Force", false, "Force " + name() +
+				" to generate (overrides Disable)").getBoolean(false);
+		_miningLevel = c.get(cat, "MiningLevel", _miningLevel, "The pickaxe level required to mine " +
+				name()).getInt();
 		
 		cat = "Processing.Ores." + name();
-		_smeltCount = c.get(cat, "SmeltedCount", _smeltCount, "Output from smelting").getInt();
-		_pulvCount = c.get(cat, "PulverizedCount", _pulvCount, "Output from grinding").getInt();
-		_secondary = c.get(cat, "AlternateOrePrefix", _secondary, "Output from grinding if dust* not found").
-				getString();
+		_smeltCount = c.get(cat, "SmeltedCount", _smeltCount, "Output from smelting " + name()).getInt();
+		_pulvCount = c.get(cat, "PulverizedCount", _pulvCount, "Output from grinding " + name()).getInt();
+		_secondary = c.get(cat, "AlternateOrePrefix", _secondary, "Output from grinding " +
+				 name() + " if dust" + name() + " is not found (i.e., " + _secondary + name() + ")").getString();
 	}
 }

@@ -24,13 +24,18 @@ public class WorldGenNetherOres extends WorldGenerator
 	@Override
 	public boolean generate(World world, Random random, int chunkX, int y, int chunkZ)
 	{
+		int _numberOfBlocks = this._numberOfBlocks;
 		float f = random.nextFloat() * (float)Math.PI;
+		double d4 = (y + random.nextInt(3)) - 2;
+		double d5 = (y + random.nextInt(3)) - 2;
+		//{ HACK: at 1 and 2 no ores are ever generated
+		if (_numberOfBlocks == 1 && d4 > d5) ++_numberOfBlocks;
+		if (_numberOfBlocks == 2 && f > (float)Math.PI * 0.5f) ++_numberOfBlocks;
+		//}
 		double d = chunkX + 8 + (MathHelper.sin(f) * _numberOfBlocks) / 8F;
 		double d1 = chunkX + 8 - (MathHelper.sin(f) * _numberOfBlocks) / 8F;
 		double d2 = chunkZ + 8 + (MathHelper.cos(f) * _numberOfBlocks) / 8F;
 		double d3 = chunkZ + 8 - (MathHelper.cos(f) * _numberOfBlocks) / 8F;
-		double d4 = (y + random.nextInt(3)) - 2;
-		double d5 = (y + random.nextInt(3)) - 2;
 		for(int blockNum = 0; blockNum <= _numberOfBlocks; blockNum++)
 		{
 			double d6 = d + ((d1 - d) * blockNum) / _numberOfBlocks;

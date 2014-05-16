@@ -4,6 +4,7 @@ import java.util.Random;
 
 import powercrystals.netherores.NetherOresCore;
 import powercrystals.netherores.entity.EntityHellfish;
+import powercrystals.netherores.net.NetherOresProxy;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockNetherrack;
 import net.minecraft.init.Blocks;
@@ -60,7 +61,9 @@ public class BlockHellfish extends BlockNetherrack
 
 	public static void spawnHellfish(World world, int x, int y, int z)
 	{
-		if(!world.isRemote && NetherOresCore.enableHellfish.getBoolean(true))
+		if (!world.isRemote &&
+				!NetherOresProxy.isChunkPopulating(world, x, y, z) &&
+				NetherOresCore.enableHellfish.getBoolean(true))
 		{
 			EntityHellfish hellfish = new EntityHellfish(world);
 			hellfish.setLocationAndAngles(x + 0.5D, y, z + 0.5D, 0.0F, 0.0F);

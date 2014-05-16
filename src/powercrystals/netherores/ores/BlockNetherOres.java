@@ -20,8 +20,8 @@ import powercrystals.netherores.NetherOresCore;
 import powercrystals.netherores.entity.EntityArmedOre;
 import powercrystals.netherores.gui.NOCreativeTab;
 
-public class BlockNetherOres extends Block
-{	
+public class BlockNetherOres extends Block implements INetherOre
+{
 	private static int _aggroRange = 32;
 	private int _blockIndex = 0;
 	private IIcon[] _netherOresIcons = new IIcon[16];
@@ -140,7 +140,8 @@ public class BlockNetherOres extends Block
 						int ty = y + yOffset;
 						int tz = z + zOffset;
 
-						if (world.getBlock(tx, ty, tz) instanceof INetherOre &&
+						block = world.getBlock(tx, ty, tz);
+						if (block instanceof INetherOre &&
 								world.rand.nextInt(1000) < NetherOresCore.explosionProbability.getInt())
 						{
 							EntityArmedOre eao = new EntityArmedOre(world, tx + 0.5, ty + 0.5, tz + 0.5, block);

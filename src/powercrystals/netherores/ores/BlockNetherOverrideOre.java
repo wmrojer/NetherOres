@@ -2,6 +2,7 @@ package powercrystals.netherores.ores;
 
 import static powercrystals.netherores.ores.BlockNetherOres.*;
 
+import cpw.mods.fml.common.ObfuscationReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -11,12 +12,14 @@ import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
@@ -37,6 +40,8 @@ public class BlockNetherOverrideOre extends Block implements INetherOre
 		super(override.getMaterial());
 		_override = override;
 		setStepSound(override.stepSound);
+		ObfuscationReflectionHelper.setPrivateValue(ItemBlock.class,
+				(ItemBlock)Item.getItemFromBlock(_override), this, "field_150939_a");
 	}
 
 	@Override
@@ -44,7 +49,7 @@ public class BlockNetherOverrideOre extends Block implements INetherOre
 	{
 		return block == this | block == _override || _override.isAssociatedBlock(block);
 	}
-	
+
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -60,6 +65,12 @@ public class BlockNetherOverrideOre extends Block implements INetherOre
 	/**
 	 * Overrides to proxy to the overridden block
 	 */
+	
+    @Override
+	public CreativeTabs getCreativeTabToDisplayOn()
+    {
+        return _override.getCreativeTabToDisplayOn();
+    }
 
 	@Override
 	public boolean canHarvestBlock(EntityPlayer player, int meta)
@@ -96,7 +107,7 @@ public class BlockNetherOverrideOre extends Block implements INetherOre
 	{
 		return _override.getExpDrop(world, a, b);
 	}
-	
+
 	@Override
 	public void dropXpOnBlockBreak(World p_149657_1_, int p_149657_2_, int p_149657_3_, int p_149657_4_, int p_149657_5_)
 	{
@@ -138,6 +149,20 @@ public class BlockNetherOverrideOre extends Block implements INetherOre
 	public IIcon func_149735_b(int a, int b)
 	{
 		return _override.func_149735_b(a, b);
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public IIcon getIcon(IBlockAccess world, int x, int y, int z, int side)
+	{
+		return _override.getIcon(world, x, y, z, side);
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public IIcon getIcon(int a, int b)
+	{
+		return _override.getIcon(a, b);
 	}
 
 	@Override
@@ -221,7 +246,7 @@ public class BlockNetherOverrideOre extends Block implements INetherOre
 	{
 		return _override.tickRate(p_149738_1_);
 	}
-	
+
 	@Override
 	public boolean getTickRandomly()
 	{

@@ -28,6 +28,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Map;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -35,6 +36,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import net.minecraftforge.oredict.OreDictionary;
@@ -42,7 +44,7 @@ import net.minecraftforge.oredict.OreDictionary.OreRegisterEvent;
 
 import powercrystals.netherores.entity.EntityArmedOre;
 import powercrystals.netherores.entity.EntityHellfish;
-import powercrystals.netherores.net.INetherOresProxy;
+import powercrystals.netherores.net.NetherOresProxy;
 import powercrystals.netherores.ores.BlockNetherOres;
 import powercrystals.netherores.ores.BlockNetherOverrideOre;
 import powercrystals.netherores.ores.ItemBlockNetherOre;
@@ -60,33 +62,38 @@ public class NetherOresCore extends BaseMod
 
 	public static final String mobTextureFolder = "netherores:textures/mob/";
 
-	public static Block[] blockNetherOres = new Block[(Ores.values().length + 15) / 16];
+	public static Block[] blockNetherOres = new Block[(Ores.values().length+15) / 16];
 	public static Block blockHellfish;
 
+	public static Property enableWorldGen;
+	public static Property enableExplosions;
 	public static Property explosionPower;
 	public static Property explosionProbability;
-	public static Property enableExplosions;
 	public static Property enableExplosionChainReactions;
 	public static Property enableAngryPigmen;
+	public static Property silkyStopsPigmen;
+	public static Property enableMobsAngerPigmen;
 	public static Property enableHellfish;
+
 	public static Property enableStandardFurnaceRecipes;
 	public static Property enableMaceratorRecipes;
 	public static Property enablePulverizerRecipes;
 	public static Property enableInductionSmelterRecipes;
 	public static Property enableGrinderRecipes;
+
 	public static Property forceOreSpawn;
 	public static Property worldGenAllDimensions;
-	public static Property enableWorldGen;
 	public static Property enableHellQuartz;
-	public static Property silkyStopsPigmen;
+
 	public static Property hellFishPerChunk;
 	public static Property hellFishPerGroup;
 	public static Property hellFishMinY;
 	public static Property hellFishMaxY;
-	public static Property enableMobsAngerPigmen;
 
-	@SidedProxy(clientSide = "powercrystals.netherores.net.ClientProxy", serverSide="powercrystals.netherores.net.ServerProxy")
-	public static INetherOresProxy proxy;
+	public static ConfigCategory overrideOres;
+
+	@SidedProxy(clientSide="powercrystals.netherores.net.ClientProxy",serverSide="powercrystals.netherores.net.ServerProxy")
+	public static NetherOresProxy proxy;
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent evt)
@@ -106,16 +113,19 @@ public class NetherOresCore extends BaseMod
 			Block b = blockNetherOres[i] = new BlockNetherOres(i);
 			GameRegistry.registerBlock(b, ItemBlockNetherOre.class, b.getUnlocalizedName());
 		}
+		
 		blockHellfish = new BlockHellfish();
 		GameRegistry.registerBlock(blockHellfish, ItemBlock.class, "netherOresBlockHellfish");
 		GameRegistry.registerCustomItemStack("netherOresBlockHellfish", new ItemStack(blockHellfish));
-		GameRegistry.registerWorldGenerator(new NetherOresWorldGenHandler(), 10);
+		
 		if (enableHellQuartz.getBoolean(true))
 		{
 			BlockNetherOverrideOre quartz = new BlockNetherOverrideOre(Blocks.quartz_ore);
 			Blocks.quartz_ore = quartz;
 			RegistryUtils.overwriteEntry(Block.blockRegistry, "minecraft:quartz_ore", quartz);
 		}
+		
+		GameRegistry.registerWorldGenerator(new NetherOresWorldGenHandler(), 10);
 
 		for(Ores o : Ores.values())
 		{
@@ -156,21 +166,23 @@ public class NetherOresCore extends BaseMod
 		Ores.Emerald .registerSmelting(new ItemStack(Blocks.emerald_ore));
 		Ores.Redstone.registerSmelting(new ItemStack(Blocks.redstone_ore));
 
-		Ores.Coal    .registerMacerator(new ItemStack(Items.coal));
-		Ores.Diamond .registerMacerator(new ItemStack(Items.diamond));
-		Ores.Emerald .registerMacerator(new ItemStack(Items.emerald));
-		Ores.Redstone.registerMacerator(new ItemStack(Items.redstone));
-		Ores.Lapis   .registerMacerator(new ItemStack(Items.dye, 1, 4));
+		Ores.Coal    .registerPulverizing(new ItemStack(Items.coal));
+		Ores.Diamond .registerPulverizing(new ItemStack(Items.diamond));
+		Ores.Emerald .registerPulverizing(new ItemStack(Items.emerald));
+		Ores.Redstone.registerPulverizing(new ItemStack(Items.redstone));
+		Ores.Lapis   .registerPulverizing(new ItemStack(Items.dye, 1, 4));
 
-		for(Ores ore : Ores.values())
+		for (Ores ore : Ores.values())
 		{
 			String oreName;
-			oreName = ore.getOreName();   // Ore
+			oreName = ore.getOreName(); // Ore
 			if (OreDictionary.getOres(oreName).size() > 0)
 				registerOreDictSmelt(ore, oreName, OreDictionary.getOres(oreName).get(0));
+			
 			oreName = ore.getDustName(); // Dust
 			if (OreDictionary.getOres(oreName).size() > 0)
 				registerOreDictDust(ore, oreName, OreDictionary.getOres(oreName).get(0));
+			
 			oreName = ore.getAltName(); // Gem
 			if (OreDictionary.getOres(oreName).size() > 0)
 				registerOreDictGem(ore, oreName, OreDictionary.getOres(oreName).get(0));
@@ -186,6 +198,18 @@ public class NetherOresCore extends BaseMod
 	{
 		processIMC(FMLInterModComms.fetchRuntimeMessages(this));
 		complete = true;
+		for (Map.Entry<String, Property> e : overrideOres.getValues().entrySet())
+		{
+			String name = e.getKey();
+			Block ore = Block.getBlockFromName(name);
+			if (isBlockInvalid(ore))
+			{
+				overrideOres.remove(name);
+				continue;
+			}
+			if (e.getValue().getBoolean(true))
+				RegistryUtils.overwriteEntry(Block.blockRegistry, name, new BlockNetherOverrideOre(ore));
+		}
 		_log.info("Load Complete.");
 	}
 
@@ -194,6 +218,11 @@ public class NetherOresCore extends BaseMod
 	{
 		if (!complete)
 			loadComplete(null);
+	}
+	
+	private boolean isBlockInvalid(Block block)
+	{
+		return (Block.getIdFromBlock(block) <= 175); // TODO:1.7.2: 175
 	}
 
 	private void processIMC(List<IMCMessage> l)
@@ -207,7 +236,12 @@ public class NetherOresCore extends BaseMod
 				{
 					String name = m.getStringValue();
 					Block ore = Block.getBlockFromName(name);
-					RegistryUtils.overwriteEntry(Block.blockRegistry, name, new BlockNetherOverrideOre(ore));
+					if (isBlockInvalid(ore))
+						throw new IllegalArgumentException("Cannot override vanilla blocks via IMC.");
+					Property a = overrideOres.get(name);
+					a.getBoolean(true);
+					if (!a.wasRead())
+						a.comment = "Override the '" + name + "' block (registered by '" + m.getSender() + "')";
 				}
 				else
 					_log.debug("Unknown IMC message (%s) from %s", k, m.getSender());
@@ -247,15 +281,15 @@ public class NetherOresCore extends BaseMod
 		enableMobsAngerPigmen.comment = "If true, any entity not a player exploding a NetherOre will anger nearby pigmen. This only accounts for exploding, entities breaking the blocks normally will still anger pigmen.";
 
 		enableStandardFurnaceRecipes = c.get("Processing.Enable", "StandardFurnaceRecipes", true);
-		enableStandardFurnaceRecipes.comment = "Set this to false to remove the standard furnace recipes (ie, nether iron ore -> normal iron ore).";
+		enableStandardFurnaceRecipes.comment = "Set this to false to remove the standard furnace recipes (i.e., nether iron ore -> normal iron ore).";
 		enableMaceratorRecipes = c.get("Processing.Enable", "MaceratorRecipes", true);
-		enableMaceratorRecipes.comment = "Set this to false to remove the IC2 Macerator recipes (ie, nether iron ore -> 4x iron dust).";
+		enableMaceratorRecipes.comment = "Set this to false to remove the IC2 Macerator recipes (i.e., nether iron ore -> 4x iron dust).";
 		enablePulverizerRecipes = c.get("Processing.Enable", "PulverizerRecipes", true);
-		enablePulverizerRecipes.comment = "Set this to false to remove the TE Pulvierzer recipes (ie, nether iron ore -> 4x iron dust).";
+		enablePulverizerRecipes.comment = "Set this to false to remove the TE Pulvierzer recipes (i.e., nether iron ore -> 4x iron dust).";
 		enableInductionSmelterRecipes = c.get("Processing.Enable", "InductionSmelterRecipes", true);
-		enableInductionSmelterRecipes.comment = "Set this to false to remove the TE Induction Smelter recipes (ie, nether iron ore -> 2x normal iron ore).";
+		enableInductionSmelterRecipes.comment = "Set this to false to remove the TE Induction Smelter recipes (i.e., nether iron ore -> 2x normal iron ore).";
 		enableGrinderRecipes = c.get("Processing.Enable", "GrinderRecipes", true);
-		enableGrinderRecipes.comment = "Set this to false to remove the AE Grind Stone recipes (ie, nether iron ore -> 4x iron dust).";
+		enableGrinderRecipes.comment = "Set this to false to remove the AE Grind Stone recipes (i.e., nether iron ore -> 4x iron dust).";
 
 		forceOreSpawn = c.get("WorldGen.Enable", "ForceOreSpawn", false);
 		forceOreSpawn.comment = "If true, will spawn nether ores regardless of if a furnace or macerator recipe was found. If false, at least one of those two must be found to spawn the ore.";
@@ -275,10 +309,14 @@ public class NetherOresCore extends BaseMod
 		hellFishMinY = c.get("WorldGen.HellFish", "MinY", 1);
 		hellFishMaxY = c.get("WorldGen.HellFish", "MaxY", 127);
 
-		for(Ores o : Ores.values())
+		for (Ores o : Ores.values())
 		{
 			o.loadConfig(c);
 		}
+		
+		overrideOres = c.getCategory("Overrides");
+		overrideOres.setComment("A set of blocks from other modes to override to act like NetherOres.\n" + 
+				"This does not include controling oregen ore recipes, only behavior when mined or destroyed.");
 
 		c.save();
 	}
@@ -308,13 +346,13 @@ public class NetherOresCore extends BaseMod
 	private void registerOreDictDust(Ores ore, String oreName, ItemStack stack)
 	{
 		if (!ore.isRegisteredMacerator() && ore.getDustName().equals(oreName))
-			ore.registerMacerator(stack);
+			ore.registerPulverizing(stack);
 	}
 
 	private void registerOreDictGem(Ores ore, String oreName, ItemStack stack)
 	{
 		if (!ore.isRegisteredMacerator() && ore.getAltName().equals(oreName))
-			ore.registerMacerator(stack);
+			ore.registerPulverizing(stack);
 	}
 
 	@Override
