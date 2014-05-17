@@ -6,7 +6,7 @@ import powercrystals.netherores.entity.EntityHellfish;
 import powercrystals.netherores.render.RenderHellfish;
 import powercrystals.netherores.render.RendererArmedOre;
 
-public class ClientProxy extends NetherOresProxy
+public class ClientProxy extends ServerProxy
 {
 	@Override
 	public void load()

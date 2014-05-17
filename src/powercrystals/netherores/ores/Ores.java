@@ -25,37 +25,37 @@ public enum Ores
 {
 	/*Name, Chunk, Group, Smelt, Pulv*/
 	Coal(       8,    16,     2,    4),
-	Diamond(    4,     3,     2,    5),
+	Diamond(    4,     3,     2,    5, true),
 	Gold(       8,     6,     2,    4),
 	Iron(       8,     8,     2,    4),
 	Lapis(      6,     6,     2,   24),
-	Redstone(   6,     8,     2,   24),
+	Redstone(   6,     8,     2,   21),
 	Copper(     8,     8,     2,    4),
 	Tin(        8,     8,     2,    4),
-	Emerald(    3,     2,     2,    5),
+	Emerald(    3,     2,     2,    5, true),
 	Silver(     6,     4,     2,    4),
 	Lead(       6,     6,     2,    4),
 	Uranium(    3,     2,     2,    4, "crushed"),
-	Nikolite(   8,     4,     2,   24),
-	Ruby(       6,     3,     2,    5),
-	Peridot(    6,     3,     2,    5),
-	Sapphire(   6,     3,     2,    5),
+	Nikolite(   8,     4,     2,   21),
+	Ruby(       6,     3,     2,    5, true),
+	Peridot(    6,     3,     2,    5, true),
+	Sapphire(   6,     3,     2,    5, true),
 
 	Platinum(   1,     3,     2,    4),
 	Nickel(     4,     6,     2,    4),
 	Steel(      3,     4,     2,    4),
 	Iridium(    1,     2,     2,    4, "drop"),
 	Osmium(     8,     7,     2,    4),
-	Sulfur(    12,    12,     2,   24),
+	Sulfur(    12,    12,     2,   24, false),
 	Titanium(   3,     2,     2,    4),
 	Mithril(    6,     6,     2,    4),
 	Adamantium( 5,     4,     2,    4),
 	Rutile(     3,     4,     2,    4),
 	Tungsten(   8,     8,     2,    4),
-	Amber(      5,     6,     2,    5),
+	Amber(      5,     6,     2,    5, true),
 	Tennantite( 8,     8,     2,    4),
 	Salt(       5,     5,     2,   12, "food"),
-	Saltpeter(  6,     4,     2,   10);
+	Saltpeter(  6,     4,     2,   10, false);
 
 	private int _blockIndex;
 	private int _metadata;
@@ -72,9 +72,14 @@ public enum Ores
 	private int _pulvCount;
 	private int _miningLevel;
 
+	private Ores(int groupsPerChunk, int blocksPerGroup, int smeltCount, int maceCount, boolean g)
+	{
+		this(groupsPerChunk, blocksPerGroup, smeltCount, maceCount, g ? "gem" : "crystal");
+	}
+
 	private Ores(int groupsPerChunk, int blocksPerGroup, int smeltCount, int maceCount)
 	{
-		this(groupsPerChunk, blocksPerGroup, smeltCount, maceCount, "gem");
+		this(groupsPerChunk, blocksPerGroup, smeltCount, maceCount, "crystalline");
 	}
 
 	private Ores(int groupsPerChunk, int blocksPerGroup,

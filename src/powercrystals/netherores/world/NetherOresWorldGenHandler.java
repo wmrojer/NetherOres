@@ -1,8 +1,9 @@
 package powercrystals.netherores.world;
 
+import static powercrystals.netherores.NetherOresCore.*;
+
 import java.util.Random;
 
-import powercrystals.netherores.NetherOresCore;
 import powercrystals.netherores.ores.Ores;
 
 import net.minecraft.world.World;
@@ -12,9 +13,10 @@ import cpw.mods.fml.common.IWorldGenerator;
 public class NetherOresWorldGenHandler implements IWorldGenerator
 {
 	@Override
-	public void generate(Random random, int chunkX, int chunkZ, World world, IChunkProvider chunkGenerator, IChunkProvider chunkProvider)
+	public void generate(Random random, int chunkX, int chunkZ,
+			World world, IChunkProvider chunkGenerator, IChunkProvider chunkProvider)
 	{
-		if(world.provider.dimensionId == -1 || NetherOresCore.worldGenAllDimensions.getBoolean(false))
+		if(world.provider.dimensionId == -1 || worldGenAllDimensions.getBoolean(false))
 		{
 			generateNether(world, random, chunkX * 16, chunkZ * 16);
 		}
@@ -22,40 +24,34 @@ public class NetherOresWorldGenHandler implements IWorldGenerator
 
 	private void generateNether(World world, Random random, int chunkX, int chunkZ)
 	{
-		if (NetherOresCore.enableWorldGen.getBoolean(true))
-		{
-			for(Ores o : Ores.values())
-			{
-				if(o.getForced() || 
-						((o.isRegisteredSmelting() ||
-								o.isRegisteredMacerator() ||
-								NetherOresCore.forceOreSpawn.getBoolean(false)) &&
-						!o.getDisabled()))
+		if (enableWorldGen.getBoolean(true))
+			for (Ores o : Ores.values()) if (o.getForced() || 
+					((o.isRegisteredSmelting() ||
+							o.isRegisteredMacerator() ||
+							forceOreSpawn.getBoolean(false)) &&
+							!o.getDisabled()))
+				for(int i = o.getGroupsPerChunk(); i --> 0; )
 				{
-					for(int i = o.getGroupsPerChunk(); i --> 0; )
-					{
-						int x = chunkX + random.nextInt(16);
-						int y = o.getMinY() + random.nextInt(o.getMaxY() - o.getMinY());
-						int z = chunkZ + random.nextInt(16);
-						new WorldGenNetherOres(NetherOresCore.getOreBlock(o.getBlockIndex()), o.getMetadata(), o.getBlocksPerGroup()).generate(world, random, x, y, z);
-					}
+					int x = chunkX + random.nextInt(16);
+					int y = o.getMinY() + random.nextInt(o.getMaxY() - o.getMinY());
+					int z = chunkZ + random.nextInt(16);
+					new WorldGenNetherOres(getOreBlock(o.getBlockIndex()),
+							o.getMetadata(), o.getBlocksPerGroup()).generate(world, random, x, y, z);
 				}
-			}
-		}
 		
-		if(NetherOresCore.enableHellfish.getBoolean(true))
+		if(enableHellfish.getBoolean(true))
 		{
-			int hellfishVein = NetherOresCore.hellFishPerGroup.getInt();
-			int minY = NetherOresCore.hellFishMinY.getInt(), maxY = NetherOresCore.hellFishMaxY.getInt();
-			if(minY >= maxY)
+			int hellfishVein = hellFishPerGroup.getInt();
+			int minY = hellFishMinY.getInt(), maxY = hellFishMaxY.getInt();
+			if (minY >= maxY)
 				minY = maxY - 1;
-			
-			for(int i = NetherOresCore.hellFishPerChunk.getInt(); i --> 0; )
+
+			for (int i = hellFishPerChunk.getInt(); i --> 0; )
 			{
 				int x = chunkX + random.nextInt(16); 
 				int y = minY + random.nextInt(maxY - minY);
 				int z = chunkZ + random.nextInt(16);
-				new WorldGenNetherOres(NetherOresCore.blockHellfish, 0, hellfishVein).generate(world, random, x, y, z);
+				new WorldGenNetherOres(blockHellfish, 0, hellfishVein).generate(world, random, x, y, z);
 			}
 		}
 	}

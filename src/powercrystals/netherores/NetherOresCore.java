@@ -44,7 +44,7 @@ import net.minecraftforge.oredict.OreDictionary.OreRegisterEvent;
 
 import powercrystals.netherores.entity.EntityArmedOre;
 import powercrystals.netherores.entity.EntityHellfish;
-import powercrystals.netherores.net.NetherOresProxy;
+import powercrystals.netherores.net.ServerProxy;
 import powercrystals.netherores.ores.BlockNetherOres;
 import powercrystals.netherores.ores.BlockNetherOverrideOre;
 import powercrystals.netherores.ores.ItemBlockNetherOre;
@@ -53,7 +53,7 @@ import powercrystals.netherores.world.BlockHellfish;
 import powercrystals.netherores.world.NetherOresWorldGenHandler;
 
 @Mod(modid = NetherOresCore.modId, name = NetherOresCore.modName, version = NetherOresCore.version,
-dependencies = "required-after:CoFHCore@["+CoFHProps.VERSION+",);before:ThermalExpansion")
+dependencies = "required-after:CoFHCore@["+CoFHProps.VERSION+",);")
 public class NetherOresCore extends BaseMod
 {
 	public static final String modId = "NetherOres";
@@ -93,15 +93,13 @@ public class NetherOresCore extends BaseMod
 	public static ConfigCategory overrideOres;
 
 	@SidedProxy(clientSide="powercrystals.netherores.net.ClientProxy",serverSide="powercrystals.netherores.net.ServerProxy")
-	public static NetherOresProxy proxy;
+	public static ServerProxy proxy;
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent evt)
 	{
 		setConfigFolderBase(evt.getModConfigurationDirectory());
-
 		loadConfig(getCommonConfig());
-
 		loadLang();
 	}
 
@@ -127,7 +125,7 @@ public class NetherOresCore extends BaseMod
 		
 		GameRegistry.registerWorldGenerator(new NetherOresWorldGenHandler(), 10);
 
-		for(Ores o : Ores.values())
+		for (Ores o : Ores.values())
 		{
 			o.load();
 		}
@@ -175,7 +173,7 @@ public class NetherOresCore extends BaseMod
 		for (Ores ore : Ores.values())
 		{
 			String oreName;
-			oreName = ore.getOreName(); // Ore
+			oreName = ore.getOreName();   // Ore
 			if (OreDictionary.getOres(oreName).size() > 0)
 				registerOreDictSmelt(ore, oreName, OreDictionary.getOres(oreName).get(0));
 			
@@ -222,7 +220,7 @@ public class NetherOresCore extends BaseMod
 	
 	private boolean isBlockInvalid(Block block)
 	{
-		return (Block.getIdFromBlock(block) <= 175); // TODO:1.7.2: 175
+		return Block.getIdFromBlock(block) <= 175; // TODO: 175 (in 1.7.2)
 	}
 
 	private void processIMC(List<IMCMessage> l)
@@ -308,6 +306,8 @@ public class NetherOresCore extends BaseMod
 		enableHellfish.comment = "If true, Hellfish will spawn in the Nether. Note that setting this false will not kill active Hellfish mobs.";
 		hellFishMinY = c.get("WorldGen.HellFish", "MinY", 1);
 		hellFishMaxY = c.get("WorldGen.HellFish", "MaxY", 127);
+		if (hellFishMinY.getInt() <= hellFishMaxY.getInt())
+			hellFishMinY.set(hellFishMaxY.getInt() - 1);
 
 		for (Ores o : Ores.values())
 		{
@@ -316,7 +316,7 @@ public class NetherOresCore extends BaseMod
 		
 		overrideOres = c.getCategory("Overrides");
 		overrideOres.setComment("A set of blocks from other modes to override to act like NetherOres.\n" + 
-				"This does not include controling oregen ore recipes, only behavior when mined or destroyed.");
+				"This does not include controling oregen, or recipes; only behavior when mined or destroyed.");
 
 		c.save();
 	}
@@ -329,7 +329,7 @@ public class NetherOresCore extends BaseMod
 
 	private void registerOreDictionaryEntry(String oreName, ItemStack stack)
 	{
-		for(Ores ore : Ores.values())
+		for (Ores ore : Ores.values())
 		{
 			registerOreDictSmelt(ore, oreName, stack);
 			registerOreDictDust(ore, oreName, stack);
