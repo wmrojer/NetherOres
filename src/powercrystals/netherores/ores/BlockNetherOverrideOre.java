@@ -65,12 +65,12 @@ public class BlockNetherOverrideOre extends Block implements INetherOre
 	/**
 	 * Overrides to proxy to the overridden block
 	 */
-	
-    @Override
+
+	@Override
 	public CreativeTabs getCreativeTabToDisplayOn()
-    {
-        return _override.getCreativeTabToDisplayOn();
-    }
+	{
+		return _override.getCreativeTabToDisplayOn();
+	}
 
 	@Override
 	public boolean canHarvestBlock(EntityPlayer player, int meta)

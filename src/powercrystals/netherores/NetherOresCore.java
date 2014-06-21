@@ -29,12 +29,14 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
@@ -57,7 +59,7 @@ dependencies = "required-after:CoFHCore@["+CoFHProps.VERSION+",);")
 public class NetherOresCore extends BaseMod
 {
 	public static final String modId = "NetherOres";
-	public static final String version = "1.7.2R2.3.0B1";
+	public static final String version = "1.7.2R2.3.0RC1";
 	public static final String modName = "Nether Ores";
 
 	public static final String mobTextureFolder = "netherores:textures/mob/";
@@ -101,29 +103,45 @@ public class NetherOresCore extends BaseMod
 		setConfigFolderBase(evt.getModConfigurationDirectory());
 		loadConfig(getCommonConfig());
 		loadLang();
-	}
 
-	@EventHandler
-	public void load(FMLInitializationEvent evt)
-	{
 		for (int i = 0, e = blockNetherOres.length; i < e; ++i)
 		{
 			Block b = blockNetherOres[i] = new BlockNetherOres(i);
 			GameRegistry.registerBlock(b, ItemBlockNetherOre.class, b.getUnlocalizedName());
 		}
-		
+
 		blockHellfish = new BlockHellfish();
 		GameRegistry.registerBlock(blockHellfish, ItemBlock.class, "netherOresBlockHellfish");
 		GameRegistry.registerCustomItemStack("netherOresBlockHellfish", new ItemStack(blockHellfish));
-		
+
 		if (enableHellQuartz.getBoolean(true))
 		{
-			BlockNetherOverrideOre quartz = new BlockNetherOverrideOre(Blocks.quartz_ore);
+			BlockNetherOverrideOre quartz = new BlockNetherOverrideOre(Blocks.quartz_ore) {
+				@Override
+				public int quantityDroppedWithBonus(int fortune, Random rand)
+				{
+					int r;
+					synchronized(Blocks.class) {
+						Blocks.quartz_ore = _override;
+						r = _override.quantityDroppedWithBonus(fortune, rand);
+						Blocks.quartz_ore = this;
+					}
+					return r;
+				}
+
+				@Override
+				public void dropBlockAsItemWithChance(World world, int x, int y, int z, int meta, float chance, int fortune)
+				{
+					synchronized(Blocks.class) {
+						Blocks.quartz_ore = _override;
+						_override.dropBlockAsItemWithChance(world, x, y, z, meta, chance, fortune);
+						Blocks.quartz_ore = this;
+					}
+				}
+			};
 			Blocks.quartz_ore = quartz;
 			RegistryUtils.overwriteEntry(Block.blockRegistry, "minecraft:quartz_ore", quartz);
 		}
-		
-		GameRegistry.registerWorldGenerator(new NetherOresWorldGenHandler(), 10);
 
 		for (Ores o : Ores.values())
 		{
@@ -132,6 +150,12 @@ public class NetherOresCore extends BaseMod
 
 		EntityRegistry.registerModEntity(EntityArmedOre.class, "netherOresArmedOre", 0, this, 80, 5, false);
 		EntityRegistry.registerModEntity(EntityHellfish.class, "netherOresHellfish", 1, this, 160, 5, true);
+	}
+
+	@EventHandler
+	public void load(FMLInitializationEvent evt)
+	{
+		GameRegistry.registerWorldGenerator(new NetherOresWorldGenHandler(), 10);
 
 		proxy.load();
 
@@ -176,11 +200,11 @@ public class NetherOresCore extends BaseMod
 			oreName = ore.getOreName();   // Ore
 			if (OreDictionary.getOres(oreName).size() > 0)
 				registerOreDictSmelt(ore, oreName, OreDictionary.getOres(oreName).get(0));
-			
+
 			oreName = ore.getDustName(); // Dust
 			if (OreDictionary.getOres(oreName).size() > 0)
 				registerOreDictDust(ore, oreName, OreDictionary.getOres(oreName).get(0));
-			
+
 			oreName = ore.getAltName(); // Gem
 			if (OreDictionary.getOres(oreName).size() > 0)
 				registerOreDictGem(ore, oreName, OreDictionary.getOres(oreName).get(0));
@@ -217,7 +241,7 @@ public class NetherOresCore extends BaseMod
 		if (!complete)
 			loadComplete(null);
 	}
-	
+
 	private boolean isBlockInvalid(Block block)
 	{
 		return Block.getIdFromBlock(block) <= 175; // TODO: 175 (in 1.7.2)
@@ -313,7 +337,7 @@ public class NetherOresCore extends BaseMod
 		{
 			o.loadConfig(c);
 		}
-		
+
 		overrideOres = c.getCategory("Overrides");
 		overrideOres.setComment("A set of blocks from other modes to override to act like NetherOres.\n" + 
 				"This does not include controling oregen, or recipes; only behavior when mined or destroyed.");

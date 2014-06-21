@@ -58,7 +58,7 @@ public class EntityArmedOre extends Entity
 	@Override
 	public void onUpdate()
 	{
-		if(_fuse-- <= 0)
+		if (_fuse-- <= 0)
 		{
 			setDead();
 
@@ -75,7 +75,7 @@ public class EntityArmedOre extends Entity
 			Block block = worldObj.getBlock(MathHelper.floor_double(posX),
 					MathHelper.floor_double(posY), MathHelper.floor_double(posZ));
 			if (Block.getIdFromBlock(block) == getAir())
-				worldObj.spawnParticle("smoke", this.posX, this.posY + 0.5D, this.posZ, 0.0D, 0.0D, 0.0D);
+				worldObj.spawnParticle("smoke", posX, posY + 0.5D, posZ, 0.0D, 0.0D, 0.0D);
 		}
 	}
 
@@ -85,7 +85,7 @@ public class EntityArmedOre extends Entity
 				MathHelper.floor_double(posY), MathHelper.floor_double(posZ));
 		if (blockId == _target)
 		{
-			worldObj.newExplosion(null, this.posX, this.posY, this.posZ,
+			worldObj.newExplosion(null, posX, posY, posZ,
 					NetherOresCore.explosionPower.getInt(), true, true);
 		}
 	}

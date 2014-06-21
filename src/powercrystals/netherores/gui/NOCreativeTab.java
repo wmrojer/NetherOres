@@ -3,10 +3,10 @@ package powercrystals.netherores.gui;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-import powercrystals.netherores.NetherOresCore;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+
+import powercrystals.netherores.NetherOresCore;
 
 public class NOCreativeTab extends CreativeTabs
 {
@@ -15,12 +15,6 @@ public class NOCreativeTab extends CreativeTabs
 	public NOCreativeTab(String label)
 	{
 		super(label);
-	}
-
-	@Override
-	public ItemStack getIconItemStack()
-	{
-		return new ItemStack(NetherOresCore.blockNetherOres[0], 1, 1);
 	}
 
 	@Override
@@ -33,7 +27,7 @@ public class NOCreativeTab extends CreativeTabs
 	@SideOnly(Side.CLIENT)
 	public Item getTabIconItem()
 	{
-		return null; // TODO: return ItemBlock here
+		return Item.getItemFromBlock(NetherOresCore.blockNetherOres[0]);
 	}
 
 	@Override

@@ -55,7 +55,8 @@ public enum Ores
 	Amber(      5,     6,     2,    5, true),
 	Tennantite( 8,     8,     2,    4),
 	Salt(       5,     5,     2,   12, "food"),
-	Saltpeter(  6,     4,     2,   10, false);
+	Saltpeter(  6,     4,     2,   10, false),
+	Magnesium(  4,     5,     2,    8, "crushed");
 
 	private int _blockIndex;
 	private int _metadata;
@@ -325,7 +326,7 @@ public enum Ores
 		_oreGenGroupsPerChunk = c.get(cat, "GroupsPerChunk", _oreGenGroupsPerChunk).getInt();
 		_oreGenBlocksPerGroup = c.get(cat, "BlocksPerGroup", _oreGenBlocksPerGroup).getInt();
 		_oreGenDisable = c.get(cat, "Disable", false, "Disables generation of " + name() +
-				" (overrides ForceOreSpawn)").getBoolean(false);
+				" (overrides global ForceOreSpawn)").getBoolean(false);
 		_oreGenForced = c.get(cat, "Force", false, "Force " + name() +
 				" to generate (overrides Disable)").getBoolean(false);
 		_miningLevel = c.get(cat, "MiningLevel", _miningLevel, "The pickaxe level required to mine " +

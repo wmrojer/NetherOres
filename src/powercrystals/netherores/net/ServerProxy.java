@@ -16,6 +16,7 @@ public class ServerProxy
 	{
 		return chunks.containsKey(world) && chunks.get(world).contains(new ChunkCoordIntPair(x >> 4, z >> 4));
 	}
+
 	public void load()
 	{
 		MinecraftForge.EVENT_BUS.register(this);

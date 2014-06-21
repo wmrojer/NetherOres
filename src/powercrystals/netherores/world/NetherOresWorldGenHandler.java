@@ -30,7 +30,7 @@ public class NetherOresWorldGenHandler implements IWorldGenerator
 							o.isRegisteredMacerator() ||
 							forceOreSpawn.getBoolean(false)) &&
 							!o.getDisabled()))
-				for(int i = o.getGroupsPerChunk(); i --> 0; )
+				for (int i = o.getGroupsPerChunk(); i --> 0; )
 				{
 					int x = chunkX + random.nextInt(16);
 					int y = o.getMinY() + random.nextInt(o.getMaxY() - o.getMinY());
@@ -39,12 +39,10 @@ public class NetherOresWorldGenHandler implements IWorldGenerator
 							o.getMetadata(), o.getBlocksPerGroup()).generate(world, random, x, y, z);
 				}
 		
-		if(enableHellfish.getBoolean(true))
+		if (enableHellfish.getBoolean(true))
 		{
 			int hellfishVein = hellFishPerGroup.getInt();
 			int minY = hellFishMinY.getInt(), maxY = hellFishMaxY.getInt();
-			if (minY >= maxY)
-				minY = maxY - 1;
 
 			for (int i = hellFishPerChunk.getInt(); i --> 0; )
 			{

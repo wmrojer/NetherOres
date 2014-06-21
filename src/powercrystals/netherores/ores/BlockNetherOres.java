@@ -1,5 +1,7 @@
 package powercrystals.netherores.ores;
 
+import static powercrystals.netherores.NetherOresCore.*;
+
 import java.util.List;
 import java.util.Random;
 
@@ -15,8 +17,6 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-
-import powercrystals.netherores.NetherOresCore;
 import powercrystals.netherores.entity.EntityArmedOre;
 import powercrystals.netherores.gui.NOCreativeTab;
 
@@ -71,13 +71,8 @@ public class BlockNetherOres extends Block implements INetherOre
 		return 1;
 	}
 
-	private ThreadLocal<Boolean> explode = new ThreadLocal<Boolean>() {
-		@Override
-		protected Boolean initialValue()
-		{
-			return true;
-		}
-	}, willAnger = new ThreadLocal<Boolean>();
+	private ThreadLocal<Boolean> explode = new ThreadLocal<Boolean>(),
+			willAnger = new ThreadLocal<Boolean>();
 
 	@Override
 	public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z)
@@ -86,7 +81,7 @@ public class BlockNetherOres extends Block implements INetherOre
 		explode.set(silky);
 		willAnger.set(true);
 		boolean r = super.removedByPlayer(world, player, x, y, z);
-		if (silky || NetherOresCore.silkyStopsPigmen.getBoolean(true))
+		if (silky || silkyStopsPigmen.getBoolean(true))
 			angerPigmen(player, world, x, y, z);
 		willAnger.set(false);
 		explode.set(true);
@@ -96,10 +91,9 @@ public class BlockNetherOres extends Block implements INetherOre
 	@Override
 	public void breakBlock(World world, int x, int y, int z, Block block, int meta)
 	{
-		if (explode.get())
+		if (explode.get() != Boolean.FALSE)
 			checkExplosionChances(this, world, x, y, z);
-		Boolean ex = willAnger.get();
-		if (ex == null || !ex)
+		if (willAnger.get() != Boolean.TRUE)
 			angerPigmen(world, x, y, z);
 		super.breakBlock(world, x, y, z, block, meta);
 	}
@@ -108,12 +102,12 @@ public class BlockNetherOres extends Block implements INetherOre
 	public void onBlockExploded(World world, int x, int y, int z, Explosion explosion)
 	{
 		explode.set(false);
-		willAnger.set(NetherOresCore.enableMobsAngerPigmen.getBoolean(true) ||
+		willAnger.set(enableMobsAngerPigmen.getBoolean(true) ||
 				explosion == null || !(explosion.getExplosivePlacedBy() instanceof EntityLiving));
 		super.onBlockExploded(world, x, y, z, explosion);
 		willAnger.set(true);
 		explode.set(true);
-		if (NetherOresCore.enableExplosionChainReactions.getBoolean(true))
+		if (enableExplosionChainReactions.getBoolean(true))
 			checkExplosionChances(this, world, x, y, z);
 	}
 
@@ -125,13 +119,13 @@ public class BlockNetherOres extends Block implements INetherOre
 
 	public static void checkExplosionChances(Block block, World world, int x, int y, int z)
 	{
-		if(!world.isRemote && NetherOresCore.enableExplosions.getBoolean(true))
+		if (!world.isRemote && enableExplosions.getBoolean(true))
 		{
-			for(int xOffset = -1; xOffset <= 1; xOffset++)
+			for (int xOffset = -1; xOffset <= 1; xOffset++)
 			{
-				for(int yOffset = -1; yOffset <= 1; yOffset++)
+				for (int yOffset = -1; yOffset <= 1; yOffset++)
 				{
-					for(int zOffset = -1; zOffset <= 1; zOffset++)
+					for (int zOffset = -1; zOffset <= 1; zOffset++)
 					{
 						if ((xOffset | yOffset | zOffset) == 0)
 							continue;
@@ -142,7 +136,7 @@ public class BlockNetherOres extends Block implements INetherOre
 
 						block = world.getBlock(tx, ty, tz);
 						if (block instanceof INetherOre &&
-								world.rand.nextInt(1000) < NetherOresCore.explosionProbability.getInt())
+								world.rand.nextInt(1000) < explosionProbability.getInt())
 						{
 							EntityArmedOre eao = new EntityArmedOre(world, tx + 0.5, ty + 0.5, tz + 0.5, block);
 							world.spawnEntityInWorld(eao);
@@ -157,10 +151,11 @@ public class BlockNetherOres extends Block implements INetherOre
 
 	public static void angerPigmen(EntityPlayer player, World world, int x, int y, int z)
 	{
-		if(NetherOresCore.enableAngryPigmen.getBoolean(true))
+		if (enableAngryPigmen.getBoolean(true))
 		{
 			List<EntityPigZombie> list = world.getEntitiesWithinAABB(EntityPigZombie.class,
-					AxisAlignedBB.getBoundingBox(x - _aggroRange, y - _aggroRange, z - _aggroRange, x + _aggroRange + 1, y + _aggroRange + 1, z + _aggroRange + 1));
+					AxisAlignedBB.getBoundingBox(x - _aggroRange, y - _aggroRange, z - _aggroRange,
+							x + _aggroRange + 1, y + _aggroRange + 1, z + _aggroRange + 1));
 			for(int j = 0; j < list.size(); j++)
 				list.get(j).becomeAngryAt(player);
 		}
