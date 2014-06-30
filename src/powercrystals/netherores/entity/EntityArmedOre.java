@@ -18,7 +18,8 @@ public class EntityArmedOre extends Entity
 	{
 		super(world);
 		_fuse = 80;
-		preventEntitySpawning = true;
+		noClip = true;
+		preventEntitySpawning = false;
 		setSize(0.0F, 0.0F);
 		yOffset = height / 2.0F;
 	}
@@ -37,7 +38,10 @@ public class EntityArmedOre extends Entity
 		prevPosY = y;
 		prevPosZ = z;
 		_target = block;
-		setAir(Block.getIdFromBlock(_target));
+		if (_target != null)
+			setAir(Block.getIdFromBlock(_target));
+		else
+			setAir(-1);
 	}
 
 	@Override
@@ -52,7 +56,7 @@ public class EntityArmedOre extends Entity
 	@Override
 	public boolean canBeCollidedWith()
 	{
-		return !this.isDead;
+		return false;
 	}
 	
 	@Override

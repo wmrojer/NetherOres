@@ -75,16 +75,22 @@ public class BlockNetherOres extends Block implements INetherOre
 			willAnger = new ThreadLocal<Boolean>();
 
 	@Override
-	public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z)
+	public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z, boolean willHarvest)
 	{
-		boolean silky = player == null || !EnchantmentHelper.getSilkTouchModifier(player); 
+		boolean silky = player == null || !EnchantmentHelper.getSilkTouchModifier(player);
 		explode.set(silky);
 		willAnger.set(true);
-		boolean r = super.removedByPlayer(world, player, x, y, z);
+		boolean r = super.removedByPlayer(world, player, x, y, z, willHarvest);
 		if (silky || silkyStopsPigmen.getBoolean(true))
 			angerPigmen(player, world, x, y, z);
 		willAnger.set(false);
 		explode.set(true);
+		if (enableFortuneExplosions.getBoolean(true))
+		{
+			int i = world.rand.nextInt(EnchantmentHelper.getFortuneModifier(player));
+			while (i --> 0)
+				checkExplosionChances(this, world, x, y, z);
+		}
 		return r;
 	}
 

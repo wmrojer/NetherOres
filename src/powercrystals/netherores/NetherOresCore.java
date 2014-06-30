@@ -1,6 +1,8 @@
 package powercrystals.netherores;
 
 import static net.minecraftforge.common.config.Configuration.CATEGORY_GENERAL;
+//this import brought to you by the department of redundancies department, the department that brought you this import
+import static powercrystals.netherores.NetherOresCore.*;
 
 import cofh.core.CoFHProps;
 import cofh.mod.BaseMod;
@@ -54,13 +56,14 @@ import powercrystals.netherores.ores.Ores;
 import powercrystals.netherores.world.BlockHellfish;
 import powercrystals.netherores.world.NetherOresWorldGenHandler;
 
-@Mod(modid = NetherOresCore.modId, name = NetherOresCore.modName, version = NetherOresCore.version,
-dependencies = "required-after:CoFHCore@["+CoFHProps.VERSION+",);")
+@Mod(modid = modId, name = modName, version = version, dependencies = dependencies)
 public class NetherOresCore extends BaseMod
 {
 	public static final String modId = "NetherOres";
-	public static final String version = "1.7.2R2.3.0RC1";
 	public static final String modName = "Nether Ores";
+	public static final String version = "1.7.10R2.3.0RC2";
+	public static final String dependencies = CoFHProps.DEPENDENCIES +
+			";required-after:CoFHCore@[" + CoFHProps.VERSION + ",)";
 
 	public static final String mobTextureFolder = "netherores:textures/mob/";
 
@@ -72,6 +75,7 @@ public class NetherOresCore extends BaseMod
 	public static Property explosionPower;
 	public static Property explosionProbability;
 	public static Property enableExplosionChainReactions;
+	public static Property enableFortuneExplosions;
 	public static Property enableAngryPigmen;
 	public static Property silkyStopsPigmen;
 	public static Property enableMobsAngerPigmen;
@@ -295,6 +299,8 @@ public class NetherOresCore extends BaseMod
 		enableExplosions.comment = "NetherOres have a chance to explode when mined if true.";
 		enableExplosionChainReactions = c.get(CATEGORY_GENERAL, "ExplosionChainReactEnable", true);
 		enableExplosionChainReactions.comment = "NetherOre explosions can trigger more explosions if true. Does nothing if ExplosionEnable is false.";
+		enableFortuneExplosions = c.get(CATEGORY_GENERAL, "FortuneExplosionEnable", true);
+		enableFortuneExplosions.comment = "NetherOres have a higher chance to explode when mined with fortune if true.";
 		enableAngryPigmen = c.get(CATEGORY_GENERAL, "AngryPigmenEnable", true);
 		enableAngryPigmen.comment = "If true, when NetherOres are mined, nearby pigmen become angry to the player.";
 		silkyStopsPigmen = c.get(CATEGORY_GENERAL, "SilkyAngryPigmenEnable", false);
