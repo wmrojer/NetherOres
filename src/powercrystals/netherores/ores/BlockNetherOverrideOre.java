@@ -1,5 +1,6 @@
 package powercrystals.netherores.ores;
 
+import static powercrystals.netherores.NetherOresCore.enableFortuneExplosions;
 import static powercrystals.netherores.ores.BlockNetherOres.*;
 
 import cpw.mods.fml.common.ObfuscationReflectionHelper;
@@ -430,6 +431,12 @@ public class BlockNetherOverrideOre extends Block implements INetherOre
 			angerPigmen(player, world, x, y, z);
 		willAnger.set(false);
 		explode.set(true);
+		if (enableFortuneExplosions.getBoolean(true))
+		{
+			int i = world.rand.nextInt(EnchantmentHelper.getFortuneModifier(player));
+			while (i --> 0)
+				checkExplosionChances(this, world, x, y, z);
+		}
 		return r;
 	}
 
