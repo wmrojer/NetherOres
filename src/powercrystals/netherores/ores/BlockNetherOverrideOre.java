@@ -1,5 +1,6 @@
 package powercrystals.netherores.ores;
 
+import static powercrystals.netherores.NetherOresCore.*;
 import static powercrystals.netherores.NetherOresCore.enableFortuneExplosions;
 import static powercrystals.netherores.ores.BlockNetherOres.*;
 
@@ -31,6 +32,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import powercrystals.netherores.NetherOresCore;
+import powercrystals.netherores.world.BlockHellfish;
 
 public class BlockNetherOverrideOre extends Block implements INetherOre
 {
@@ -412,13 +414,8 @@ public class BlockNetherOverrideOre extends Block implements INetherOre
 	 * NetherOre behavior
 	 */
 
-	private ThreadLocal<Boolean> explode = new ThreadLocal<Boolean>() {
-		@Override
-		protected Boolean initialValue()
-		{
-			return true;
-		}
-	}, willAnger = new ThreadLocal<Boolean>();
+	private ThreadLocal<Boolean> explode = new ThreadLocal<Boolean>(),
+			willAnger = new ThreadLocal<Boolean>();
 
 	@Override
 	public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z, boolean willHarvest)
@@ -433,7 +430,8 @@ public class BlockNetherOverrideOre extends Block implements INetherOre
 		explode.set(true);
 		if (enableFortuneExplosions.getBoolean(true))
 		{
-			int i = world.rand.nextInt(EnchantmentHelper.getFortuneModifier(player));
+			int i = EnchantmentHelper.getFortuneModifier(player);
+			i = i > 0 ? world.rand.nextInt(i) : 0;
 			while (i --> 0)
 				checkExplosionChances(this, world, x, y, z);
 		}
@@ -443,11 +441,13 @@ public class BlockNetherOverrideOre extends Block implements INetherOre
 	@Override
 	public void breakBlock(World world, int x, int y, int z, Block block, int meta)
 	{
-		if (explode.get())
+		if (explode.get() != Boolean.FALSE)
 			checkExplosionChances(this, world, x, y, z);
-		Boolean ex = willAnger.get();
-		if (ex == null || !ex)
+		if (willAnger.get() != Boolean.TRUE)
 			angerPigmen(world, x, y, z);
+		if (hellFishFromOre.getBoolean(false))
+			if (world.rand.nextInt(10000) < hellFishFromOreChance.getInt())
+				BlockHellfish.spawnHellfish(world, x, y, z);
 		_override.breakBlock(world, x, y, z, block, meta);
 	}
 

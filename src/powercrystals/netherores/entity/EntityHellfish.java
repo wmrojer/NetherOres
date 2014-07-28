@@ -1,5 +1,7 @@
 package powercrystals.netherores.entity;
 
+import static powercrystals.netherores.NetherOresCore.*;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -9,7 +11,6 @@ import net.minecraft.util.Facing;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
-import powercrystals.netherores.NetherOresCore;
 import powercrystals.netherores.world.BlockHellfish;
 
 public class EntityHellfish extends EntitySilverfish
@@ -28,7 +29,7 @@ public class EntityHellfish extends EntitySilverfish
 	{
 		super.applyEntityAttributes();
 		getEntityAttribute(SharedMonsterAttributes.maxHealth).
-		setBaseValue(12.5D);
+		setBaseValue(hellFishMaxHealth.getDouble(12.5D));
 
 		getEntityAttribute(SharedMonsterAttributes.movementSpeed).
 		setBaseValue(0.925D + (rand.nextDouble() * .1));
@@ -69,7 +70,7 @@ public class EntityHellfish extends EntitySilverfish
 							{
 								Block block = worldObj.getBlock(X + x, Y + y, Z + z);
 
-								if (block == NetherOresCore.blockHellfish)
+								if (block == blockHellfish)
 								{
 									if (!worldObj.getGameRules().getGameRuleBooleanValue("mobGriefing"))
 										worldObj.setBlock(X + x, Y + y, Z + z, Blocks.netherrack, 0, 3);
@@ -97,7 +98,7 @@ public class EntityHellfish extends EntitySilverfish
 				{
 					worldObj.setBlock(X + Facing.offsetsXForSide[direction],
 							Y + Facing.offsetsYForSide[direction],
-							Z + Facing.offsetsZForSide[direction], NetherOresCore.blockHellfish, 0, 0);
+							Z + Facing.offsetsZForSide[direction], blockHellfish, 0, 0);
 					spawnExplosionParticle();
 					setDead();
 				}

@@ -19,6 +19,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import powercrystals.netherores.entity.EntityArmedOre;
 import powercrystals.netherores.gui.NOCreativeTab;
+import powercrystals.netherores.world.BlockHellfish;
 
 public class BlockNetherOres extends Block implements INetherOre
 {
@@ -87,7 +88,8 @@ public class BlockNetherOres extends Block implements INetherOre
 		explode.set(true);
 		if (enableFortuneExplosions.getBoolean(true))
 		{
-			int i = world.rand.nextInt(EnchantmentHelper.getFortuneModifier(player));
+			int i = EnchantmentHelper.getFortuneModifier(player);
+			i = i > 0 ? world.rand.nextInt(i) : 0;
 			while (i --> 0)
 				checkExplosionChances(this, world, x, y, z);
 		}
@@ -101,6 +103,9 @@ public class BlockNetherOres extends Block implements INetherOre
 			checkExplosionChances(this, world, x, y, z);
 		if (willAnger.get() != Boolean.TRUE)
 			angerPigmen(world, x, y, z);
+		if (hellFishFromOre.getBoolean(false))
+			if (world.rand.nextInt(10000) < hellFishFromOreChance.getInt())
+				BlockHellfish.spawnHellfish(world, x, y, z);
 		super.breakBlock(world, x, y, z, block, meta);
 	}
 

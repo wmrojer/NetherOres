@@ -8,10 +8,6 @@ import cofh.core.CoFHProps;
 import cofh.mod.BaseMod;
 import cofh.updater.UpdateManager;
 import cofh.util.RegistryUtils;
-import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.FMLModContainer;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.SidedProxy;
@@ -22,13 +18,11 @@ import cpw.mods.fml.common.event.FMLInterModComms.IMCMessage;
 import cpw.mods.fml.common.event.FMLLoadCompleteEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.event.FMLServerAboutToStartEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -91,10 +85,13 @@ public class NetherOresCore extends BaseMod
 	public static Property worldGenAllDimensions;
 	public static Property enableHellQuartz;
 
+	public static Property hellFishFromOre;
+	public static Property hellFishFromOreChance;
 	public static Property hellFishPerChunk;
 	public static Property hellFishPerGroup;
 	public static Property hellFishMinY;
 	public static Property hellFishMaxY;
+	public static Property hellFishMaxHealth;
 
 	public static ConfigCategory overrideOres;
 
@@ -164,15 +161,6 @@ public class NetherOresCore extends BaseMod
 		proxy.load();
 
 		UpdateManager.registerUpdater(new UpdateManager(this));
-
-		try {
-			Field eBus = FMLModContainer.class.getDeclaredField("eventBus");
-			eBus.setAccessible(true);
-			EventBus FMLbus = (EventBus) eBus.get(FMLCommonHandler.instance().findContainerFor(this));
-			FMLbus.register(this);
-		} catch (Throwable t) {
-			_log.debug("Error hooking LoadComplete", t);
-		}
 	}
 
 	@EventHandler
@@ -217,13 +205,10 @@ public class NetherOresCore extends BaseMod
 		MinecraftForge.EVENT_BUS.register(this);
 	}
 
-	private boolean complete = false;
-
-	@Subscribe
+	@EventHandler
 	public void loadComplete(FMLLoadCompleteEvent evt)
 	{
 		processIMC(FMLInterModComms.fetchRuntimeMessages(this));
-		complete = true;
 		for (Map.Entry<String, Property> e : overrideOres.getValues().entrySet())
 		{
 			String name = e.getKey();
@@ -233,17 +218,10 @@ public class NetherOresCore extends BaseMod
 				overrideOres.remove(name);
 				continue;
 			}
-			if (e.getValue().getBoolean(true))
+			if (e.getValue().setRequiresMcRestart(true).getBoolean(true))
 				RegistryUtils.overwriteEntry(Block.blockRegistry, name, new BlockNetherOverrideOre(ore));
 		}
 		_log.info("Load Complete.");
-	}
-
-	@EventHandler
-	public void serverStarting(FMLServerAboutToStartEvent evt)
-	{
-		if (!complete)
-			loadComplete(null);
 	}
 
 	private boolean isBlockInvalid(Block block)
@@ -307,6 +285,8 @@ public class NetherOresCore extends BaseMod
 		silkyStopsPigmen.comment = "If true, when NetherOres are mined with Silk Touch, nearby pigmen become angry to the player.";
 		enableMobsAngerPigmen = c.get(CATEGORY_GENERAL, "MobsAngerPigmen", true);
 		enableMobsAngerPigmen.comment = "If true, any entity not a player exploding a NetherOre will anger nearby pigmen. This only accounts for exploding, entities breaking the blocks normally will still anger pigmen.";
+		hellFishMaxHealth = c.get(CATEGORY_GENERAL, "HellFish.MaxHealth", 12.5, null, 8.0, Double.MAX_VALUE);
+		hellFishMaxHealth.comment = "The maximum health a HellFish will have when spawned.";
 
 		enableStandardFurnaceRecipes = c.get("Processing.Enable", "StandardFurnaceRecipes", true);
 		enableStandardFurnaceRecipes.comment = "Set this to false to remove the standard furnace recipes (i.e., nether iron ore -> normal iron ore).";
@@ -325,9 +305,13 @@ public class NetherOresCore extends BaseMod
 		worldGenAllDimensions.comment = "If true, Nether Ores worldgen will run in all dimensions instead of just the Nether. It will still require netherrack to place ores.";
 		enableWorldGen = c.get("WorldGen.Enable", "OreGen", true);
 		enableWorldGen.comment = "If true, Nether Ores oregen will run and places ores in the world where appropriate. Only disable this if you intend to use the ores with a custom ore generator. (overrides per-ore forcing; hellfish still generate if enabled)";
-		enableHellQuartz = c.get("WorldGen.Enable", "OverrideNetherQuartz", true);
+		enableHellQuartz = c.get("WorldGen.Enable", "OverrideNetherQuartz", true).setRequiresMcRestart(true);
 		enableHellQuartz.comment = "If true, Nether Quartz ore will be a NetherOre and will follow the same rules as all other NetherOres.";
-
+		
+		hellFishFromOre = c.get("WorldGen.HellFish", "EnableSpawningFromOre", false);
+		hellFishFromOre.comment = "If true, Hellfish will spawn from broken NetherOres.";
+		hellFishFromOreChance = c.get("WorldGen.HellFish", "SpawningFromOreChance", 1000);
+		hellFishFromOreChance.comment = "The chance out of 10000 that a broken ore will spawn a hellfish.";
 		hellFishPerChunk = c.get("WorldGen.HellFish", "GroupsPerChunk", 9);
 		hellFishPerChunk.comment = "The maximum number of hellfish veins per chunk.";
 		hellFishPerGroup = c.get("WorldGen.HellFish", "BlocksPerGroup", 12);

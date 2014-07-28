@@ -315,27 +315,28 @@ public enum Ores
 	public void loadConfig(Configuration c)
 	{
 		String cat = "WorldGen.Ores." + name();
-		_oreGenMaxY = c.get(cat, "MaxY", _oreGenMaxY).getInt();
-		_oreGenMinY = c.get(cat, "MinY", _oreGenMinY).getInt();
+		_oreGenMaxY = c.get(cat, "MaxY", _oreGenMaxY).setRequiresMcRestart(true).getInt();
+		_oreGenMinY = c.get(cat, "MinY", _oreGenMinY).setRequiresMcRestart(true).getInt();
 		if (_oreGenMinY >= _oreGenMaxY)
 		{
 			_oreGenMinY = _oreGenMaxY - 1;
 			c.get(cat, "MinY", _oreGenMinY).set(_oreGenMinY);
 		}
 		
-		_oreGenGroupsPerChunk = c.get(cat, "GroupsPerChunk", _oreGenGroupsPerChunk).getInt();
-		_oreGenBlocksPerGroup = c.get(cat, "BlocksPerGroup", _oreGenBlocksPerGroup).getInt();
+		_oreGenGroupsPerChunk = c.get(cat, "GroupsPerChunk", _oreGenGroupsPerChunk).setRequiresMcRestart(true).getInt();
+		_oreGenBlocksPerGroup = c.get(cat, "BlocksPerGroup", _oreGenBlocksPerGroup).setRequiresMcRestart(true).getInt();
 		_oreGenDisable = c.get(cat, "Disable", false, "Disables generation of " + name() +
-				" (overrides global ForceOreSpawn)").getBoolean(false);
+				" (overrides global ForceOreSpawn)").setRequiresMcRestart(true).getBoolean(false);
 		_oreGenForced = c.get(cat, "Force", false, "Force " + name() +
-				" to generate (overrides Disable)").getBoolean(false);
+				" to generate (overrides Disable)").setRequiresMcRestart(true).getBoolean(false);
 		_miningLevel = c.get(cat, "MiningLevel", _miningLevel, "The pickaxe level required to mine " +
-				name()).getInt();
+				name()).setRequiresMcRestart(true).getInt();
 		
 		cat = "Processing.Ores." + name();
-		_smeltCount = c.get(cat, "SmeltedCount", _smeltCount, "Output from smelting " + name()).getInt();
-		_pulvCount = c.get(cat, "PulverizedCount", _pulvCount, "Output from grinding " + name()).getInt();
+		_smeltCount = c.get(cat, "SmeltedCount", _smeltCount, "Output from smelting " + name()).setRequiresMcRestart(true).getInt();
+		_pulvCount = c.get(cat, "PulverizedCount", _pulvCount, "Output from grinding " + name()).setRequiresMcRestart(true).getInt();
 		_secondary = c.get(cat, "AlternateOrePrefix", _secondary, "Output from grinding " +
-				 name() + " if dust" + name() + " is not found (i.e., " + _secondary + name() + ")").getString();
+				 name() + " if dust" + name() + " is not found (i.e., " + _secondary + name() +
+				 ")").setRequiresMcRestart(true).getString();
 	}
 }

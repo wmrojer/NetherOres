@@ -6,7 +6,7 @@
         "logoFile": "",
         "updateUrl": "",
         "credits": "",
-        "version": "2.3.0RC1",
+        "version": "2.3.0RC2",
         "modid": "NetherOres",
         "authorList": [
             "PowerCrystals",
@@ -14,7 +14,7 @@
             "AtomicStryker",
             "skyboy026"
         ],
-        "mcversion": "1.7.2",
+        "mcversion": "1.7.10",
         "screenshots": [],
         "dependencies": [],
         "description": "Introduces mineable yet dangerous ores to the Nether"
