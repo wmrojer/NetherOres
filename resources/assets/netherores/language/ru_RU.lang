@@ -1,6 +1,6 @@
 entity.NetherOres.netherOresHellfish.name = Адская рыбка
 
-tile.netherores.hellfish.name = Камень Нижнего мира
+tile.netherores.hellfish.name = tile.hellrock
 tile.netherores.ore.coal.name = Угольная руда Нижнего мира
 tile.netherores.ore.diamond.name = Алмазная руда Нижнего мира
 tile.netherores.ore.gold.name = Золотая руда Нижнего мира
@@ -32,3 +32,4 @@ tile.netherores.ore.amber.name = Янтарная руда Нижнего мир
 tile.netherores.ore.tennantite.name = Теннантитовая руда Нижнего мира
 tile.netherores.ore.salt.name = Руда соли Нижнего мира
 tile.netherores.ore.saltpeter.name = Селитровая руда Нижнего мира
+tile.netherores.ore.magnesium.name = Магниевая руда Нижнего мира
