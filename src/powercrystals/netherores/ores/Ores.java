@@ -4,9 +4,9 @@ import appeng.api.AEApi;
 import appeng.api.features.IGrinderEntry;
 import appeng.api.features.IGrinderRegistry;
 
+import cofh.api.modhelpers.ThermalExpansionHelper;
+import cofh.asm.relauncher.Strippable;
 import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.Optional;
-import cpw.mods.fml.common.event.FMLInterModComms;
 import cpw.mods.fml.common.registry.GameRegistry;
 
 import ic2.api.recipe.RecipeInputItemStack;
@@ -15,7 +15,6 @@ import ic2.api.recipe.Recipes;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.oredict.OreDictionary;
 
@@ -210,33 +209,12 @@ public enum Ores
 			ItemStack smeltToReg = smeltStack.copy();
 			smeltToReg.stackSize = _smeltCount;
 			ItemStack smeltToRich = smeltStack.copy();
-			smeltToRich.stackSize = _smeltCount + (int)Math.ceil(_smeltCount / 3f);
+			int richSmeltCt = _smeltCount + (int)Math.ceil(_smeltCount / 3f);
+			smeltToRich.stackSize = richSmeltCt;
 
-			NBTTagCompound toSend = new NBTTagCompound();
-			toSend.setInteger("energy", 3200);
-			toSend.setTag("primaryInput", new NBTTagCompound());
-			toSend.setTag("secondaryInput", new NBTTagCompound());
-			toSend.setTag("primaryOutput", new NBTTagCompound());
-			toSend.setTag("secondaryOutput", new NBTTagCompound());
-			input.writeToNBT(toSend.getCompoundTag("primaryInput"));
-			regSec.writeToNBT(toSend.getCompoundTag("secondaryInput"));
-			smeltToReg.writeToNBT(toSend.getCompoundTag("primaryOutput"));
-			slagRich.writeToNBT(toSend.getCompoundTag("secondaryOutput"));
-			toSend.setInteger("secondaryChance", 10);
-			FMLInterModComms.sendMessage("ThermalExpansion", "SmelterRecipe", toSend);
-
-			toSend = new NBTTagCompound();
-			toSend.setInteger("energy", 4000);
-			toSend.setTag("primaryInput", new NBTTagCompound());
-			toSend.setTag("secondaryInput", new NBTTagCompound());
-			toSend.setTag("primaryOutput", new NBTTagCompound());
-			toSend.setTag("secondaryOutput", new NBTTagCompound());
-			input.writeToNBT(toSend.getCompoundTag("primaryInput"));
-			slagRich.writeToNBT(toSend.getCompoundTag("secondaryInput"));
-			smeltToRich.writeToNBT(toSend.getCompoundTag("primaryOutput"));
-			slag.writeToNBT(toSend.getCompoundTag("secondaryOutput"));
-			toSend.setInteger("secondaryChance", 100);
-			FMLInterModComms.sendMessage("ThermalExpansion", "SmelterRecipe", toSend);
+			//energy, primaryInput, secondaryInput, primaryOutput, secondaryOutput, secondaryChance
+			ThermalExpansionHelper.addSmelterRecipe(800 * 2 * _smeltCount, input, regSec, smeltToReg, slagRich, 10);
+			ThermalExpansionHelper.addSmelterRecipe(800 * 3 * richSmeltCt, input, slagRich, smeltToRich, slag, 100);
 		}
 	}
 
@@ -262,16 +240,8 @@ public enum Ores
 			pulvPriTo.stackSize = _pulvCount;
 			pulvSecTo.stackSize = 1;
 
-			NBTTagCompound toSend = new NBTTagCompound();
-			toSend.setInteger("energy", 3200);
-			toSend.setTag("input", new NBTTagCompound());
-			toSend.setTag("primaryOutput", new NBTTagCompound());
-			toSend.setTag("secondaryOutput", new NBTTagCompound());
-			input.writeToNBT(toSend.getCompoundTag("input"));
-			pulvPriTo.writeToNBT(toSend.getCompoundTag("primaryOutput"));
-			pulvSecTo.writeToNBT(toSend.getCompoundTag("secondaryOutput"));
-			toSend.setInteger("secondaryChance", 15);
-			FMLInterModComms.sendMessage("ThermalExpansion", "PulverizerRecipe", toSend);
+			//energy, input, primaryOutput, secondaryOutput, secondaryChance
+			ThermalExpansionHelper.addPulverizerRecipe(3200, input, pulvPriTo, pulvSecTo, 15);
 		}
 
 		if (NetherOresCore.enableGrinderRecipes.getBoolean(true) && 
@@ -281,7 +251,7 @@ public enum Ores
 		}
 	}
 	
-	@Optional.Method(modid="IC2")
+	@Strippable("mod:IC2")
 	private void registerMacerator(ItemStack maceStack)
 	{
 		ItemStack input = getItemStack(1);
@@ -290,7 +260,7 @@ public enum Ores
 		Recipes.macerator.addRecipe(new RecipeInputItemStack(input), null, maceTo.copy());
 	}
 	
-	@Optional.Method(modid="appliedenergistics2")
+	@Strippable("mod:appliedenergistics2")
 	private void registerAEGrinder(ItemStack maceStack)
 	{
 		ItemStack maceTo = maceStack.copy();

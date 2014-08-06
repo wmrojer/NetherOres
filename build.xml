@@ -413,5 +413,11 @@
 		<antcall target="install"/>
 	</target>
 
+	<target name="refresh-deps">
+		<delete dir="${lib.dir}"/>
+		<delete dir="${download.dir}"/>
+		<antcall target="install"/>
+	</target>
+
 	<target name="jar" depends="install"/>
 </project>

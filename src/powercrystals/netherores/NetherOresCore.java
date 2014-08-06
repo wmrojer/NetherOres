@@ -1,13 +1,12 @@
 package powercrystals.netherores;
 
 import static net.minecraftforge.common.config.Configuration.CATEGORY_GENERAL;
-//this import brought to you by the department of redundancies department, the department that brought you this import
 import static powercrystals.netherores.NetherOresCore.*;
 
 import cofh.core.CoFHProps;
+import cofh.lib.util.RegistryUtils;
 import cofh.mod.BaseMod;
-import cofh.updater.UpdateManager;
-import cofh.util.RegistryUtils;
+import cofh.mod.updater.UpdateManager;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.SidedProxy;
@@ -49,6 +48,7 @@ import powercrystals.netherores.ores.ItemBlockNetherOre;
 import powercrystals.netherores.ores.Ores;
 import powercrystals.netherores.world.BlockHellfish;
 import powercrystals.netherores.world.NetherOresWorldGenHandler;
+//this import brought to you by the department of redundancies department, the department that brought you this import
 
 @Mod(modid = modId, name = modName, version = version, dependencies = dependencies)
 public class NetherOresCore extends BaseMod
