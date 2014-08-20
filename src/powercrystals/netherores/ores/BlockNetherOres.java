@@ -18,7 +18,7 @@ import powercrystals.netherores.NetherOresCore;
 import powercrystals.netherores.entity.EntityArmedOre;
 import powercrystals.netherores.gui.NOCreativeTab;
 
-public class BlockNetherOres extends Block
+public class BlockNetherOres extends Block implements INetherOre
 {	
 	private static int _aggroRange = 32;
 	private int _blockIndex = 0;
