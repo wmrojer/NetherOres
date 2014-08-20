@@ -4,6 +4,7 @@ import static net.minecraftforge.common.config.Configuration.CATEGORY_GENERAL;
 import static powercrystals.netherores.NetherOresCore.*;
 
 import cofh.core.CoFHProps;
+import cofh.core.world.WorldHandler;
 import cofh.lib.util.RegistryUtils;
 import cofh.mod.BaseMod;
 import cofh.mod.updater.UpdateManager;
@@ -91,6 +92,7 @@ public class NetherOresCore extends BaseMod
 	public static Property hellFishPerGroup;
 	public static Property hellFishMinY;
 	public static Property hellFishMaxY;
+	public static Property hellFishRetrogen;
 	public static Property hellFishMaxHealth;
 
 	public static ConfigCategory overrideOres;
@@ -149,14 +151,14 @@ public class NetherOresCore extends BaseMod
 			o.load();
 		}
 
-		EntityRegistry.registerModEntity(EntityArmedOre.class, "netherOresArmedOre", 0, this, 80, 5, false);
+		EntityRegistry.registerModEntity(EntityArmedOre.class, "ArmedOre", 0, this, 80, 5, false);
 		EntityRegistry.registerModEntity(EntityHellfish.class, "netherOresHellfish", 1, this, 160, 5, true);
 	}
 
 	@EventHandler
 	public void load(FMLInitializationEvent evt)
 	{
-		GameRegistry.registerWorldGenerator(new NetherOresWorldGenHandler(), 10);
+		WorldHandler.instance.registerFeature(new NetherOresWorldGenHandler());
 
 		proxy.load();
 
@@ -322,6 +324,7 @@ public class NetherOresCore extends BaseMod
 		hellFishMaxY = c.get("WorldGen.HellFish", "MaxY", 127);
 		if (hellFishMinY.getInt() <= hellFishMaxY.getInt())
 			hellFishMinY.set(hellFishMaxY.getInt() - 1);
+		hellFishRetrogen = c.get("WorldGen.HellFish", "Retrogen", true, "Retroactively generate HellFish");
 
 		for (Ores o : Ores.values())
 		{

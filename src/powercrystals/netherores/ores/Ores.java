@@ -60,14 +60,21 @@ public enum Ores
 	private int _blockIndex;
 	private int _metadata;
 	private String _secondary;
+
 	private boolean _registeredSmelting;
 	private boolean _registeredMacerator;
-	private int _oreGenMinY = 1;
-	private int _oreGenMaxY = 127;
-	private int _oreGenGroupsPerChunk = 6;
-	private int _oreGenBlocksPerGroup = 14;
+
 	private boolean _oreGenDisable = false;
 	private boolean _oreGenForced = false;
+
+	private boolean _retroGenEnabled = true;
+
+	private int _oreGenMinY = 1;
+	private int _oreGenMaxY = 127;
+
+	private int _oreGenGroupsPerChunk = 6;
+	private int _oreGenBlocksPerGroup = 14;
+
 	private int _smeltCount;
 	private int _pulvCount;
 	private int _miningLevel;
@@ -139,6 +146,11 @@ public enum Ores
 	public int getMinY()
 	{
 		return _oreGenMinY;
+	}
+
+	public boolean getRetroGen()
+	{
+		return _retroGenEnabled;
 	}
 
 	public int getGroupsPerChunk()
@@ -301,6 +313,9 @@ public enum Ores
 				" to generate (overrides Disable)").setRequiresMcRestart(true).getBoolean(false);
 		_miningLevel = c.get(cat, "MiningLevel", _miningLevel, "The pickaxe level required to mine " +
 				name()).setRequiresMcRestart(true).getInt();
+		
+		_retroGenEnabled = c.get(cat, "Retrogen", true, "Retroactively generate " + name()).
+				setRequiresMcRestart(true).getBoolean(true);
 		
 		cat = "Processing.Ores." + name();
 		_smeltCount = c.get(cat, "SmeltedCount", _smeltCount, "Output from smelting " + name()).setRequiresMcRestart(true).getInt();

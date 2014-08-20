@@ -2,34 +2,43 @@ package powercrystals.netherores.world;
 
 import static powercrystals.netherores.NetherOresCore.*;
 
+import cofh.api.world.IFeatureGenerator;
+
 import java.util.Random;
+
+import net.minecraft.world.World;
 
 import powercrystals.netherores.ores.Ores;
 
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.IChunkProvider;
-import cpw.mods.fml.common.IWorldGenerator;
-
-public class NetherOresWorldGenHandler implements IWorldGenerator
+public class NetherOresWorldGenHandler implements IFeatureGenerator
 {
+	private final String name = "NetherOres:WorldGen";
+
 	@Override
-	public void generate(Random random, int chunkX, int chunkZ,
-			World world, IChunkProvider chunkGenerator, IChunkProvider chunkProvider)
+	public String getFeatureName()
 	{
-		if(world.provider.dimensionId == -1 || worldGenAllDimensions.getBoolean(false))
-		{
-			generateNether(world, random, chunkX * 16, chunkZ * 16);
-		}
+		return name;
 	}
 
-	private void generateNether(World world, Random random, int chunkX, int chunkZ)
+	@Override
+	public boolean generateFeature(Random random, int chunkX, int chunkZ, World world, boolean newGen)
+	{
+		if (world.provider.dimensionId == -1 || worldGenAllDimensions.getBoolean(false))
+		{
+			generateNether(world, random, chunkX * 16, chunkZ * 16, newGen);
+			return true;
+		}
+		return false;
+	}
+
+	private void generateNether(World world, Random random, int chunkX, int chunkZ, boolean newGen)
 	{
 		if (enableWorldGen.getBoolean(true))
 			for (Ores o : Ores.values()) if (o.getForced() || 
 					((o.isRegisteredSmelting() ||
 							o.isRegisteredMacerator() ||
 							forceOreSpawn.getBoolean(false)) &&
-							!o.getDisabled()))
+							!o.getDisabled())) if (newGen || o.getRetroGen())
 				for (int i = o.getGroupsPerChunk(); i --> 0; )
 				{
 					int x = chunkX + random.nextInt(16);
@@ -38,8 +47,8 @@ public class NetherOresWorldGenHandler implements IWorldGenerator
 					new WorldGenNetherOres(getOreBlock(o.getBlockIndex()),
 							o.getMetadata(), o.getBlocksPerGroup()).generate(world, random, x, y, z);
 				}
-		
-		if (enableHellfish.getBoolean(true))
+
+		if (enableHellfish.getBoolean(true) && (newGen || (!newGen && hellFishRetrogen.getBoolean())))
 		{
 			int hellfishVein = hellFishPerGroup.getInt();
 			int minY = hellFishMinY.getInt(), maxY = hellFishMaxY.getInt();
