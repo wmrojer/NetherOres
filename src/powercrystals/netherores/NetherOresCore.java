@@ -58,7 +58,7 @@ public class NetherOresCore extends BaseMod
 	public static final String modName = "Nether Ores";
 	public static final String version = "1.7.10R2.3.0RC3";
 	public static final String dependencies = CoFHProps.DEPENDENCIES +
-			";required-after:CoFHCore@[" + CoFHProps.VERSION + ",)";
+			"required-after:CoFHCore@[" + CoFHProps.VERSION + ",)";
 
 	public static final String mobTextureFolder = "netherores:textures/mob/";
 
@@ -162,7 +162,7 @@ public class NetherOresCore extends BaseMod
 
 		proxy.load();
 
-		UpdateManager.registerUpdater(new UpdateManager(this));
+		UpdateManager.registerUpdater(new UpdateManager(this, null, CoFHProps.DOWNLOAD_URL));
 	}
 
 	@EventHandler

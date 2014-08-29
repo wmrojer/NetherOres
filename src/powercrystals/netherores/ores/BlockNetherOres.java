@@ -152,7 +152,7 @@ public class BlockNetherOres extends Block implements INetherOre
 							EntityArmedOre eao = new EntityArmedOre(world, tx + 0.5, ty + 0.5, tz + 0.5, block);
 							world.spawnEntityInWorld(eao);
 
-							world.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "random.fuse", 1.0F, 1.0F);
+							world.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "game.tnt.primed", 1.0F, 1.0F);
 						}
 					}
 				}
@@ -167,7 +167,7 @@ public class BlockNetherOres extends Block implements INetherOre
 			List<EntityPigZombie> list = world.getEntitiesWithinAABB(EntityPigZombie.class,
 					AxisAlignedBB.getBoundingBox(x - _aggroRange, y - _aggroRange, z - _aggroRange,
 							x + _aggroRange + 1, y + _aggroRange + 1, z + _aggroRange + 1));
-			for(int j = 0; j < list.size(); j++)
+			for (int j = 0; j < list.size(); j++)
 				list.get(j).becomeAngryAt(player);
 		}
 	}
