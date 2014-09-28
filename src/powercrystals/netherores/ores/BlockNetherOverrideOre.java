@@ -1,7 +1,6 @@
 package powercrystals.netherores.ores;
 
 import static powercrystals.netherores.NetherOresCore.*;
-import static powercrystals.netherores.NetherOresCore.enableFortuneExplosions;
 import static powercrystals.netherores.ores.BlockNetherOres.*;
 
 import cpw.mods.fml.common.ObfuscationReflectionHelper;
@@ -239,6 +238,12 @@ public class BlockNetherOverrideOre extends Block implements INetherOre
 	}
 
 	@Override
+    public float getBlockHardness(World p_149712_1_, int p_149712_2_, int p_149712_3_, int p_149712_4_)
+    {
+        return _override.getBlockHardness(p_149712_1_, p_149712_2_, p_149712_3_, p_149712_4_);
+    }
+
+	@Override
 	public float getExplosionResistance(Entity p_149638_1_)
 	{
 		return _override.getExplosionResistance(p_149638_1_);
@@ -420,7 +425,7 @@ public class BlockNetherOverrideOre extends Block implements INetherOre
 	@Override
 	public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z, boolean willHarvest)
 	{
-		boolean silky = player == null || !EnchantmentHelper.getSilkTouchModifier(player); 
+		boolean silky = player == null || !EnchantmentHelper.getSilkTouchModifier(player);
 		explode.set(silky);
 		willAnger.set(true);
 		boolean r = _override.removedByPlayer(world, player, x, y, z, willHarvest);
