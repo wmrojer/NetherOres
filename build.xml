@@ -118,7 +118,6 @@
 			classpathref="mcp.classpath" debug="true" debuglevel="lines,source" includeAntRuntime="false">
 			<include name="**/*.java"/>
 		      <classpath>
-				<fileset file="${download.dir}/codechickenlib.jar"/>
 				<fileset file="${download.dir}/CoFHLib.jar"/>
 		      </classpath>
 		</javac>
