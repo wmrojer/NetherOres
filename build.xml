@@ -94,9 +94,6 @@
 	</target>
 
 	<target name="get-dependencies" depends="get-version" unless="have.libs">
-		<echo message="Downloading CCL..."/>
-		<get src="http://files.minecraftforge.net/maven/codechicken/CodeChickenLib/1.7.2-1.1.0.73/CodeChickenLib-1.7.2-1.1.0.73-dev.jar" dest="${download.dir}/codechickenlib.jar"/>
-
 		<echo message="Downloading CoFHLib... "/>
 		<get src="https://github.com/CoFH/CoFHLib/archive/master.zip" dest="${download.dir}/CoFHLib.zip"/>
 		<!-- Begin hack -->
@@ -107,9 +104,6 @@
 			target="1.6" source="1.6"
 			classpathref="mcp.classpath" debug="true" debuglevel="lines,source" includeAntRuntime="false">
 			<include name="**/*.java"/>
-		      <classpath>
-				<fileset file="${download.dir}/codechickenlib.jar"/>
-		      </classpath>
 		</javac>
 		<jar destfile="${download.dir}/CoFHLib.jar" compress="true" level="9" basedir="${compile.dir}"/>
 		<delete dir="${compile.dir}" failonerror="false"/>
