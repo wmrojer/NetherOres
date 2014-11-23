@@ -76,6 +76,7 @@ public class NetherOresCore extends BaseMod
 	public static Property enableMobsAngerPigmen;
 	public static Property enableHellfish;
 
+	public static Property enableSmeltToOres;
 	public static Property enableStandardFurnaceRecipes;
 	public static Property enableMaceratorRecipes;
 	public static Property enablePulverizerRecipes;
@@ -174,26 +175,21 @@ public class NetherOresCore extends BaseMod
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent e)
 	{
-		Ores.Coal    .registerSmelting(new ItemStack(Blocks.coal_ore));
-		Ores.Gold    .registerSmelting(new ItemStack(Blocks.gold_ore));
-		Ores.Iron    .registerSmelting(new ItemStack(Blocks.iron_ore));
-		Ores.Lapis   .registerSmelting(new ItemStack(Blocks.lapis_ore));
-		Ores.Diamond .registerSmelting(new ItemStack(Blocks.diamond_ore));
-		Ores.Emerald .registerSmelting(new ItemStack(Blocks.emerald_ore));
-		Ores.Redstone.registerSmelting(new ItemStack(Blocks.redstone_ore));
-
-		Ores.Coal    .registerPulverizing(new ItemStack(Items.coal));
-		Ores.Diamond .registerPulverizing(new ItemStack(Items.diamond));
-		Ores.Emerald .registerPulverizing(new ItemStack(Items.emerald));
-		Ores.Redstone.registerPulverizing(new ItemStack(Items.redstone));
-		Ores.Lapis   .registerPulverizing(new ItemStack(Items.dye, 1, 4));
+		if (!enableSmeltToOres.getBoolean(true))
+			Ores.Coal.registerSmelting(new ItemStack(Items.coal));
+		Ores.Coal.registerPulverizing (new ItemStack(Items.coal));
 
 		for (Ores ore : Ores.values())
 		{
 			String oreName;
 			oreName = ore.getOreName();   // Ore
-			if (OreDictionary.getOres(oreName).size() > 0)
-				registerOreDictSmelt(ore, oreName, OreDictionary.getOres(oreName).get(0));
+			if (enableSmeltToOres.getBoolean(true) && OreDictionary.getOres(oreName).size() > 0)
+				registerOreDictOre(ore, oreName, OreDictionary.getOres(oreName).get(0));
+			else {
+				oreName = ore.getSmeltName(); // Ingot
+				if (OreDictionary.getOres(oreName).size() > 0)
+					registerOreDictSmelt(ore, oreName, OreDictionary.getOres(oreName).get(0));
+			}
 
 			oreName = ore.getDustName(); // Dust
 			if (OreDictionary.getOres(oreName).size() > 0)
@@ -290,6 +286,8 @@ public class NetherOresCore extends BaseMod
 		hellFishMaxHealth = c.get(CATEGORY_GENERAL, "HellFish.MaxHealth", 12.5, null, 8.0, Double.MAX_VALUE);
 		hellFishMaxHealth.comment = "The maximum health a HellFish will have when spawned.";
 
+		enableSmeltToOres = c.get("Processing.Enable", "SmeltToOre", true);
+		enableSmeltToOres.comment = "Set this to false to remove smelting NetherOres to ores (i.e., netheriron ore -> 2x normal iron ore).\nInstead, ores will smelt to ingots or some other appropriate item.";
 		enableStandardFurnaceRecipes = c.get("Processing.Enable", "StandardFurnaceRecipes", true);
 		enableStandardFurnaceRecipes.comment = "Set this to false to remove the standard furnace recipes (i.e., nether iron ore -> normal iron ore).";
 		enableMaceratorRecipes = c.get("Processing.Enable", "MaceratorRecipes", true);
@@ -309,7 +307,7 @@ public class NetherOresCore extends BaseMod
 		enableWorldGen.comment = "If true, Nether Ores oregen will run and places ores in the world where appropriate. Only disable this if you intend to use the ores with a custom ore generator. (overrides per-ore forcing; hellfish still generate if enabled)";
 		enableHellQuartz = c.get("WorldGen.Enable", "OverrideNetherQuartz", true).setRequiresMcRestart(true);
 		enableHellQuartz.comment = "If true, Nether Quartz ore will be a NetherOre and will follow the same rules as all other NetherOres.";
-		
+
 		hellFishFromOre = c.get("WorldGen.HellFish", "EnableSpawningFromOre", false);
 		hellFishFromOre.comment = "If true, Hellfish will spawn from broken NetherOres.";
 		hellFishFromOreChance = c.get("WorldGen.HellFish", "SpawningFromOreChance", 1000);
@@ -332,7 +330,7 @@ public class NetherOresCore extends BaseMod
 		}
 
 		overrideOres = c.getCategory("Overrides");
-		overrideOres.setComment("A set of blocks from other modes to override to act like NetherOres.\n" + 
+		overrideOres.setComment("A set of blocks from other modes to override to act like NetherOres.\n" +
 				"This does not include controling oregen, or recipes; only behavior when mined or destroyed.");
 
 		c.save();
@@ -348,15 +346,24 @@ public class NetherOresCore extends BaseMod
 	{
 		for (Ores ore : Ores.values())
 		{
+			if (enableSmeltToOres.getBoolean(true)) {
+				registerOreDictOre(ore, oreName, stack);
+			}
 			registerOreDictSmelt(ore, oreName, stack);
 			registerOreDictDust(ore, oreName, stack);
 			registerOreDictGem(ore, oreName, stack);
 		}
 	}
 
-	private void registerOreDictSmelt(Ores ore, String oreName, ItemStack stack)
+	private void registerOreDictOre(Ores ore, String oreName, ItemStack stack)
 	{
 		if (!ore.isRegisteredSmelting() && ore.getOreName().equals(oreName))
+			ore.registerSmelting(stack);
+	}
+
+	private void registerOreDictSmelt(Ores ore, String oreName, ItemStack stack)
+	{
+		if (!ore.isRegisteredSmelting() && ore.getSmeltName().equals(oreName))
 			ore.registerSmelting(stack);
 	}
 

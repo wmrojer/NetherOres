@@ -94,6 +94,9 @@
 	</target>
 
 	<target name="get-dependencies" depends="get-version" unless="have.libs">
+		<delete dir="${lib.dir}/"/>
+		<mkdir dir="${lib.dir}/"/>
+
 		<echo message="Downloading CoFHLib... "/>
 		<get src="https://github.com/CoFH/CoFHLib/archive/master.zip" dest="${download.dir}/CoFHLib.zip"/>
 		<!-- Begin hack -->
@@ -129,13 +132,10 @@
 		<get src="http://ic2api.player.to:8080/job/IC2_experimental/477/artifact/build/libs/industrialcraft-2-2.1.477-experimental-api.jar" dest="${download.dir}/industrialcraft-2-api.jar"/>
 		
 		<echo message="Downloading AppEng API..." />
-		<get src="http://ae2.ae-mod.info/builds/appliedenergistics2-deobf-rv0-beta-4.jar" dest="${download.dir}/AppEng.jar"/>
+		<get src="http://ae-mod.info/builds/appliedenergistics2-rv1-stable-1-dev.jar" dest="${download.dir}/AppEng.jar"/>
 	</target>
 
 	<target name="extract-dependencies" depends="setup-forge,get-dependencies" unless="have.libs">
-		<delete dir="${lib.dir}/"/>
-		<mkdir dir="${lib.dir}/"/>
-
 		<echo message="Extracting CoFHLib..."/>
 		<copy file="${download.dir}/CoFHLib.jar" todir="${lib.dir}"/>
 		
@@ -338,12 +338,10 @@
 		<!-- Split mod&mc version, update mcmod -->
 		<script language="javascript" classpathref="gson"><![CDATA[
 			
-			versionlist = project.getProperty("grep.out").split('R');
+			versionlist = project.getProperty("grep.out");
 
-			mcversion = versionlist[0];
-			mfrversion = versionlist[1];
-			if (versionlist.length > 2)
-				mfrversion = versionlist[1]+"R"+versionlist[2];
+			mcversion = versionlist.substring(0, versionlist.indexOf('R'));
+			mfrversion = versionlist.substring(versionlist.indexOf('R') + 1);
 			
 			project.setProperty("mfrv", mfrversion);
 			project.setProperty("mcv", mcversion);

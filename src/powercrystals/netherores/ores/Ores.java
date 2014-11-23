@@ -23,19 +23,19 @@ import powercrystals.netherores.NetherOresCore;
 public enum Ores
 {
 	/*Name, Chunk, Group, Smelt, Pulv*/
-	Coal(       8,    16,     2,    4),
+	Coal(       8,    16,     2,    5),
 	Diamond(    4,     3,     2,    5, true),
 	Gold(       8,     6,     2,    4),
 	Iron(       8,     8,     2,    4),
-	Lapis(      6,     6,     2,   24),
-	Redstone(   6,     8,     2,   21),
+	Lapis(      6,     6,     2,   24, true),
+	Redstone(   6,     8,     2,   21, "dust", true),
 	Copper(     8,     8,     2,    4),
 	Tin(        8,     8,     2,    4),
 	Emerald(    3,     2,     2,    5, true),
 	Silver(     6,     4,     2,    4),
 	Lead(       6,     6,     2,    4),
 	Uranium(    3,     2,     2,    4, "crushed"),
-	Nikolite(   8,     4,     2,   21),
+	Nikolite(   8,     4,     2,   21, "dust", true),
 	Ruby(       6,     3,     2,    5, true),
 	Peridot(    6,     3,     2,    5, true),
 	Sapphire(   6,     3,     2,    5, true),
@@ -53,12 +53,13 @@ public enum Ores
 	Tungsten(   8,     8,     2,    4),
 	Amber(      5,     6,     2,    5, true),
 	Tennantite( 8,     8,     2,    4),
-	Salt(       5,     5,     2,   12, "food"),
+	Salt(       5,     5,     2,   12, "food", true),
 	Saltpeter(  6,     4,     2,   10, false),
 	Magnesium(  4,     5,     2,    8, "crushed");
 
 	private int _blockIndex;
 	private int _metadata;
+	private String _primary;
 	private String _secondary;
 
 	private boolean _registeredSmelting;
@@ -81,16 +82,27 @@ public enum Ores
 
 	private Ores(int groupsPerChunk, int blocksPerGroup, int smeltCount, int maceCount, boolean g)
 	{
-		this(groupsPerChunk, blocksPerGroup, smeltCount, maceCount, g ? "gem" : "crystal");
+		this(groupsPerChunk, blocksPerGroup, smeltCount, maceCount, g ? "gem" : "crystal", g);
+	}
+
+	private Ores(int groupsPerChunk, int blocksPerGroup, int smeltCount, int maceCount, String v, boolean g)
+	{ // constructor exists because java is stupid about enforcing constructor location
+		this(groupsPerChunk, blocksPerGroup, smeltCount, maceCount, v, v);
 	}
 
 	private Ores(int groupsPerChunk, int blocksPerGroup, int smeltCount, int maceCount)
 	{
-		this(groupsPerChunk, blocksPerGroup, smeltCount, maceCount, "crystalline");
+		this(groupsPerChunk, blocksPerGroup, smeltCount, maceCount, null, null);
 	}
 
 	private Ores(int groupsPerChunk, int blocksPerGroup,
 			int smeltCount, int maceCount, String secondaryType)
+	{
+		this(groupsPerChunk, blocksPerGroup, smeltCount, maceCount, null, secondaryType);
+	}
+
+	private Ores(int groupsPerChunk, int blocksPerGroup,
+			int smeltCount, int maceCount, String primaryType, String secondaryType)
 	{
 		int meta = ordinal();
 		_blockIndex = meta / 16;
@@ -100,7 +112,8 @@ public enum Ores
 		_smeltCount = smeltCount;
 		_pulvCount = maceCount;
 		_miningLevel = 2;
-		_secondary = secondaryType;
+		_primary = primaryType != null ? primaryType : "ingot";
+		_secondary = secondaryType != null ? secondaryType : "crystalline";
 	}
 
 	public int getBlockIndex()
@@ -116,6 +129,11 @@ public enum Ores
 	public String getOreName()
 	{
 		return "ore" + name();
+	}
+
+	public String getSmeltName()
+	{
+		return _primary + name();
 	}
 
 	public String getDustName()
@@ -182,7 +200,7 @@ public enum Ores
 	{
 		return _pulvCount;
 	}
-	
+
 	public ItemStack getItemStack(int amt)
 	{
 		return new ItemStack(NetherOresCore.getOreBlock(_blockIndex), amt, _metadata);
@@ -204,14 +222,14 @@ public enum Ores
 		if (_registeredSmelting)
 			return;
 		_registeredSmelting = true;
-		if(NetherOresCore.enableStandardFurnaceRecipes.getBoolean(true))
+		if (NetherOresCore.enableStandardFurnaceRecipes.getBoolean(true))
 		{
 			ItemStack smeltTo = smeltStack.copy();
 			smeltTo.stackSize = _smeltCount;
 			FurnaceRecipes.smelting().func_151394_a(getItemStack(1), smeltTo, 1F);
 		}
 
-		if(NetherOresCore.enableInductionSmelterRecipes.getBoolean(true) &&
+		if (NetherOresCore.enableInductionSmelterRecipes.getBoolean(true) &&
 				Loader.isModLoaded("ThermalExpansion"))
 		{
 			ItemStack input = getItemStack(1);
@@ -219,6 +237,9 @@ public enum Ores
 			ItemStack slagRich = GameRegistry.findItemStack("ThermalExpansion", "slagRich", 1);
 			ItemStack slag = GameRegistry.findItemStack("ThermalExpansion", "slag", 1);
 			ItemStack smeltToReg = smeltStack.copy();
+			int _smeltCount = this._smeltCount;
+			if (!NetherOresCore.enableSmeltToOres.getBoolean(true))
+				_smeltCount *= 2;
 			smeltToReg.stackSize = _smeltCount;
 			ItemStack smeltToRich = smeltStack.copy();
 			int richSmeltCt = _smeltCount + (int)Math.ceil(_smeltCount / 3f);
@@ -235,7 +256,7 @@ public enum Ores
 		if (_registeredMacerator)
 			return;
 		_registeredMacerator = true;
-		
+
 		if (NetherOresCore.enableMaceratorRecipes.getBoolean(true) &&
 				Loader.isModLoaded("IC2"))
 		{
@@ -256,13 +277,13 @@ public enum Ores
 			ThermalExpansionHelper.addPulverizerRecipe(3200, input, pulvPriTo, pulvSecTo, 15);
 		}
 
-		if (NetherOresCore.enableGrinderRecipes.getBoolean(true) && 
+		if (NetherOresCore.enableGrinderRecipes.getBoolean(true) &&
 				Loader.isModLoaded("appliedenergistics2"))
 		{
 			registerAEGrinder(maceStack.copy());
 		}
 	}
-	
+
 	@Strippable("mod:IC2")
 	private void registerMacerator(ItemStack maceStack)
 	{
@@ -271,7 +292,7 @@ public enum Ores
 		maceTo.stackSize = _pulvCount;
 		Recipes.macerator.addRecipe(new RecipeInputItemStack(input), null, maceTo.copy());
 	}
-	
+
 	@Strippable("mod:appliedenergistics2")
 	private void registerAEGrinder(ItemStack maceStack)
 	{
@@ -304,7 +325,7 @@ public enum Ores
 			_oreGenMinY = _oreGenMaxY - 1;
 			c.get(cat, "MinY", _oreGenMinY).set(_oreGenMinY);
 		}
-		
+
 		_oreGenGroupsPerChunk = c.get(cat, "GroupsPerChunk", _oreGenGroupsPerChunk).setRequiresMcRestart(true).getInt();
 		_oreGenBlocksPerGroup = c.get(cat, "BlocksPerGroup", _oreGenBlocksPerGroup).setRequiresMcRestart(true).getInt();
 		_oreGenDisable = c.get(cat, "Disable", false, "Disables generation of " + name() +
@@ -313,12 +334,15 @@ public enum Ores
 				" to generate (overrides Disable)").setRequiresMcRestart(true).getBoolean(false);
 		_miningLevel = c.get(cat, "MiningLevel", _miningLevel, "The pickaxe level required to mine " +
 				name()).setRequiresMcRestart(true).getInt();
-		
-		_retroGenEnabled = c.get(cat, "Retrogen", true, "Retroactively generate " + name()).
+
+		_retroGenEnabled = c.get(cat, "Retrogen", true, "Retroactively generate " + name() + " if enabled in CoFHCore").
 				setRequiresMcRestart(true).getBoolean(true);
-		
+
 		cat = "Processing.Ores." + name();
 		_smeltCount = c.get(cat, "SmeltedCount", _smeltCount, "Output from smelting " + name()).setRequiresMcRestart(true).getInt();
+		_primary = c.get(cat, "PrimaryOrePrefix", _primary, "Output from smelting " +
+				 name() + " if ore" + name() + " is not found or SmeltToOre is false (i.e., " + _primary + name() +
+				 ")").setRequiresMcRestart(true).getString();
 		_pulvCount = c.get(cat, "PulverizedCount", _pulvCount, "Output from grinding " + name()).setRequiresMcRestart(true).getInt();
 		_secondary = c.get(cat, "AlternateOrePrefix", _secondary, "Output from grinding " +
 				 name() + " if dust" + name() + " is not found (i.e., " + _secondary + name() +
