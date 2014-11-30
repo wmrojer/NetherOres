@@ -9,6 +9,7 @@ import cofh.lib.util.RegistryUtils;
 import cofh.mod.BaseMod;
 import cofh.mod.updater.UpdateManager;
 import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.Mod.CustomProperty;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
@@ -51,7 +52,8 @@ import powercrystals.netherores.world.BlockHellfish;
 import powercrystals.netherores.world.NetherOresWorldGenHandler;
 //this import brought to you by the department of redundancies department, the department that brought you this import
 
-@Mod(modid = modId, name = modName, version = version, dependencies = dependencies)
+@Mod(modid = modId, name = modName, version = version, dependencies = dependencies,
+customProperties = @CustomProperty(k = "cofhversion", v = "true"))
 public class NetherOresCore extends BaseMod
 {
 	public static final String modId = "NetherOres";
