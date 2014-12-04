@@ -213,7 +213,9 @@ public enum Ores
 		{
 			ItemStack oreStack = getItemStack(1);
 			OreDictionary.registerOre("oreNether" + name(), oreStack);
+			// @deprecated
 			GameRegistry.registerCustomItemStack("netherOresBlock" + name(), oreStack);
+			GameRegistry.registerCustomItemStack(name(), oreStack);
 		}
 	}
 
@@ -347,5 +349,13 @@ public enum Ores
 		_secondary = c.get(cat, "AlternateOrePrefix", _secondary, "Output from grinding " +
 				 name() + " if dust" + name() + " is not found (i.e., " + _secondary + name() +
 				 ")").setRequiresMcRestart(true).getString();
+	}
+
+	public void postConfig(Configuration c)
+	{
+		String cat = "WorldGen.Ores." + name();
+		_oreGenDisable = c.get(cat, "Disable", _oreGenDisable | !(_registeredSmelting | _registeredMacerator),
+				"Disables generation of " + name() + " (overrides global ForceOreSpawn)").
+				setRequiresMcRestart(true).getBoolean(false);
 	}
 }

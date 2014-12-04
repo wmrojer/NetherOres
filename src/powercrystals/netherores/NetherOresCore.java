@@ -99,6 +99,7 @@ public class NetherOresCore extends BaseMod
 	public static Property hellFishMaxHealth;
 
 	public static ConfigCategory overrideOres;
+	private static Configuration config;
 
 	@SidedProxy(clientSide="powercrystals.netherores.net.ClientProxy",serverSide="powercrystals.netherores.net.ServerProxy")
 	public static ServerProxy proxy;
@@ -221,6 +222,11 @@ public class NetherOresCore extends BaseMod
 			if (e.getValue().setRequiresMcRestart(true).getBoolean(true))
 				RegistryUtils.overwriteEntry(Block.blockRegistry, name, new BlockNetherOverrideOre(ore));
 		}
+
+		for (Ores o : Ores.values())
+		{
+			o.postConfig(config);
+		}
 		_log.info("Load Complete.");
 	}
 
@@ -267,6 +273,7 @@ public class NetherOresCore extends BaseMod
 	private void loadConfig(File f)
 	{
 		Configuration c = new Configuration(f);
+		config = c;
 		c.load();
 
 		explosionPower = c.get(CATEGORY_GENERAL, "ExplosionPower", 2);
