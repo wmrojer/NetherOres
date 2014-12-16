@@ -180,12 +180,10 @@ public class NetherOresCore extends BaseMod
 	{
 		if (!enableSmeltToOres.getBoolean(true))
 			Ores.Coal.registerSmelting(new ItemStack(Items.coal));
-		Ores.Coal.registerPulverizing (new ItemStack(Items.coal));
 
-		for (Ores ore : Ores.values())
-		{
+		for (Ores ore : Ores.values()) {
 			String oreName;
-			oreName = ore.getOreName();   // Ore
+			oreName = ore.getOreName(); // Ore
 			if (enableSmeltToOres.getBoolean(true) && OreDictionary.getOres(oreName).size() > 0)
 				registerOreDictOre(ore, oreName, OreDictionary.getOres(oreName).get(0));
 			else {
@@ -202,6 +200,8 @@ public class NetherOresCore extends BaseMod
 			if (OreDictionary.getOres(oreName).size() > 0)
 				registerOreDictGem(ore, oreName, OreDictionary.getOres(oreName).get(0));
 		}
+
+		Ores.Coal.registerPulverizing(new ItemStack(Items.coal));
 
 		MinecraftForge.EVENT_BUS.register(this);
 	}
