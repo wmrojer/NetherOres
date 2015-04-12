@@ -1,5 +1,7 @@
 package powercrystals.netherores.net;
 
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -22,6 +24,7 @@ public class ServerProxy
 		MinecraftForge.EVENT_BUS.register(this);
 	}
 
+	@SubscribeEvent
 	public void evt(PopulateChunkEvent.Pre evt)
 	{
 		if (!chunks.containsKey(evt.world))
@@ -29,6 +32,7 @@ public class ServerProxy
 		chunks.get(evt.world).add(new ChunkCoordIntPair(evt.chunkX, evt.chunkZ));
 	}
 
+	@SubscribeEvent
 	public void evt(PopulateChunkEvent.Post evt)
 	{
 		if (!chunks.containsKey(evt.world))
