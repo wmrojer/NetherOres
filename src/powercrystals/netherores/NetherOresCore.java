@@ -228,6 +228,7 @@ public class NetherOresCore extends BaseMod
 			o.postConfig(config);
 		}
 		_log.info("Load Complete.");
+		config.save();
 	}
 
 	private boolean isBlockInvalid(Block block)
@@ -329,7 +330,7 @@ public class NetherOresCore extends BaseMod
 		enableHellfish.comment = "If true, Hellfish will spawn in the Nether. Note that setting this false will not kill active Hellfish mobs.";
 		hellFishMinY = c.get("WorldGen.HellFish", "MinY", 1);
 		hellFishMaxY = c.get("WorldGen.HellFish", "MaxY", 127);
-		if (hellFishMinY.getInt() <= hellFishMaxY.getInt())
+		if (hellFishMinY.getInt() >= hellFishMaxY.getInt())
 			hellFishMinY.set(hellFishMaxY.getInt() - 1);
 		hellFishRetrogen = c.get("WorldGen.HellFish", "Retrogen", true, "Retroactively generate HellFish");
 
@@ -339,7 +340,7 @@ public class NetherOresCore extends BaseMod
 		}
 
 		overrideOres = c.getCategory("Overrides");
-		overrideOres.setComment("A set of blocks from other modes to override to act like NetherOres.\n" +
+		overrideOres.setComment("A set of blocks from other mods to override to act like NetherOres.\n" +
 				"This does not include controling oregen, or recipes; only behavior when mined or destroyed.");
 
 		c.save();
