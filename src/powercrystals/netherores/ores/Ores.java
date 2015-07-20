@@ -355,8 +355,10 @@ public enum Ores
 	{
 		String cat = "WorldGen.Ores." + name();
 		_oreGenDisable |= !(_registeredSmelting | _registeredMacerator);
-		if (!c.get(cat, "Disable", _oreGenDisable).wasRead()) {
-			c.get(cat, "Disable", _oreGenDisable).set(_oreGenDisable);
+		if (!c.get(cat, "Disable", _oreGenDisable, "Disables generation of " + name() +
+			" (overrides global ForceOreSpawn)").wasRead()) {
+			c.get(cat, "Disable", _oreGenDisable, "Disables generation of " + name() +
+				" (overrides global ForceOreSpawn)").set(_oreGenDisable);
 		}
 	}
 }
