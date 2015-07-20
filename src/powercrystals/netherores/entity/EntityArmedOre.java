@@ -2,18 +2,20 @@ package powercrystals.netherores.entity;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import powercrystals.netherores.NetherOresCore;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
+import powercrystals.netherores.NetherOresCore;
+
 public class EntityArmedOre extends Entity
 {
 	private int _fuse;
 	private Block _target;
-	
+
 	public EntityArmedOre(World world)
 	{
 		super(world);
@@ -25,7 +27,7 @@ public class EntityArmedOre extends Entity
 	}
 
 	public EntityArmedOre(World world, double x, double y, double z) { this(world, x, y, z, null); }
-	
+
 	public EntityArmedOre(World world, double x, double y, double z, Block block)
 	{
 		this(world);
@@ -48,7 +50,7 @@ public class EntityArmedOre extends Entity
 	protected void entityInit() {}
 
 	@Override
-	protected boolean canTriggerWalking()
+	public boolean canTriggerWalking()
 	{
 		return false;
 	}
@@ -58,7 +60,7 @@ public class EntityArmedOre extends Entity
 	{
 		return false;
 	}
-	
+
 	@Override
 	public void onUpdate()
 	{
