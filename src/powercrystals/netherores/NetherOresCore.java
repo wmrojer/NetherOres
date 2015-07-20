@@ -297,7 +297,7 @@ public class NetherOresCore extends BaseMod
 		hellFishMaxHealth.comment = "The maximum health a HellFish will have when spawned.";
 
 		enableSmeltToOres = c.get("Processing.Enable", "SmeltToOre", true);
-		enableSmeltToOres.comment = "Set this to false to remove smelting NetherOres to ores (i.e., netheriron ore -> 2x normal iron ore).\nInstead, ores will smelt to ingots or some other appropriate item.";
+		enableSmeltToOres.comment = "Set this to false to remove smelting NetherOres to ores (i.e., nether iron ore -> 2x normal iron ore).\nInstead, ores will smelt to ingots or some other appropriate item.";
 		enableStandardFurnaceRecipes = c.get("Processing.Enable", "StandardFurnaceRecipes", true);
 		enableStandardFurnaceRecipes.comment = "Set this to false to remove the standard furnace recipes (i.e., nether iron ore -> normal iron ore).";
 		enableMaceratorRecipes = c.get("Processing.Enable", "MaceratorRecipes", true);
@@ -341,7 +341,7 @@ public class NetherOresCore extends BaseMod
 
 		overrideOres = c.getCategory("Overrides");
 		overrideOres.setComment("A set of blocks from other mods to override to act like NetherOres.\n" +
-				"This does not include controling oregen, or recipes; only behavior when mined or destroyed.");
+				"This does not include controlling oregen, or recipes; only behavior when mined or destroyed.");
 
 		c.save();
 	}
