@@ -58,7 +58,7 @@ public class NetherOresCore extends BaseMod
 {
 	public static final String modId = "NetherOres";
 	public static final String modName = "Nether Ores";
-	public static final String version = "1.7.10R2.3.1B1";
+	public static final String version = "1.7.10R2.3.1RC1";
 	public static final String dependencies = CoFHProps.DEPENDENCIES +
 			"required-after:CoFHCore@[" + CoFHProps.VERSION + ",)";
 
