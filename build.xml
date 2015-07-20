@@ -112,6 +112,9 @@
 		<delete dir="${compile.dir}" failonerror="false"/>
 		<delete dir="${download.dir}/CoFHLib-master"/>
 		<!-- End hack -->
+
+		<echo message="Downloading NEI API... "/>
+		<get src="http://chickenbones.net/maven/codechicken/NotEnoughItems/1.7.10-1.0.2.15/NotEnoughItems-1.7.10-1.0.2.15-dev.jar" dest="${download.dir}/NEI.jar"/>
 		<echo message="Compiling CoFHCore... "/>
 		<!-- Begin hack -->
 		<delete dir="${compile.dir}" failonerror="false"/>
@@ -121,6 +124,7 @@
 			classpathref="mcp.classpath" debug="true" debuglevel="lines,source" includeAntRuntime="false">
 			<include name="**/*.java"/>
 		      <classpath>
+				<fileset file="${download.dir}/NEI.jar"/>
 				<fileset file="${download.dir}/CoFHLib.jar"/>
 		      </classpath>
 		</javac>
