@@ -354,8 +354,9 @@ public enum Ores
 	public void postConfig(Configuration c)
 	{
 		String cat = "WorldGen.Ores." + name();
-		_oreGenDisable = c.get(cat, "Disable", _oreGenDisable | !(_registeredSmelting | _registeredMacerator),
-				"Disables generation of " + name() + " (overrides global ForceOreSpawn)").
-				setRequiresMcRestart(true).getBoolean(false);
+		_oreGenDisable |= !(_registeredSmelting | _registeredMacerator);
+		if (!c.get(cat, "Disable", _oreGenDisable).wasRead()) {
+			c.get(cat, "Disable", _oreGenDisable).set(_oreGenDisable);
+		}
 	}
 }
