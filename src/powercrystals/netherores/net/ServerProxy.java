@@ -1,5 +1,6 @@
 package powercrystals.netherores.net;
 
+import cofh.asmhooks.event.ModPopulateChunkEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 import java.util.HashMap;
@@ -34,6 +35,22 @@ public class ServerProxy
 
 	@SubscribeEvent
 	public void evt(PopulateChunkEvent.Post evt)
+	{
+		if (!chunks.containsKey(evt.world))
+			return;
+		chunks.get(evt.world).remove(new ChunkCoordIntPair(evt.chunkX, evt.chunkZ));
+	}
+
+	@SubscribeEvent
+	public void evt(ModPopulateChunkEvent.Pre evt)
+	{
+		if (!chunks.containsKey(evt.world))
+			chunks.put(evt.world, new HashSet<ChunkCoordIntPair>());
+		chunks.get(evt.world).add(new ChunkCoordIntPair(evt.chunkX, evt.chunkZ));
+	}
+
+	@SubscribeEvent
+	public void evt(ModPopulateChunkEvent.Post evt)
 	{
 		if (!chunks.containsKey(evt.world))
 			return;
