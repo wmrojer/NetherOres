@@ -1,6 +1,7 @@
 package powercrystals.netherores.ores;
 
 import java.util.List;
+import java.util.Locale;
 
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
@@ -32,7 +33,7 @@ public class ItemBlockNetherOre extends ItemBlock
 		int index = _block.getBlockIndex();
 		Ores[] ores = Ores.values();
 		int md = Math.min(index * 16 + stack.getItemDamage(), ores.length - 1);
-		return "tile.netherores.ore." + ores[md].name().toLowerCase();
+		return "tile.netherores.ore." + ores[md].name().toLowerCase(Locale.US);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
