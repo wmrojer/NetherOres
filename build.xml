@@ -133,7 +133,7 @@
 		<!-- End hack -->
 		
 		<echo message="Downloading IC2 API... "/>
-		<get src="http://ic2api.player.to:8080/job/IC2_experimental/477/artifact/build/libs/industrialcraft-2-2.1.477-experimental-api.jar" dest="${download.dir}/industrialcraft-2-api.jar"/>
+		<get src="http://jenkins.ic2.player.to/job/IC2_experimental/477/artifact/build/libs/industrialcraft-2-2.1.477-experimental-dev.jar" dest="${download.dir}/industrialcraft-2-api.jar"/>
 		
 		<echo message="Downloading AppEng API..." />
 		<get src="http://ae-mod.info/builds/appliedenergistics2-rv1-stable-1-dev.jar" dest="${download.dir}/AppEng.jar"/>
