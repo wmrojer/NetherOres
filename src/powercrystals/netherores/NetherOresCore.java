@@ -27,14 +27,12 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
@@ -74,6 +72,7 @@ public class NetherOresCore extends BaseMod
 	public static Property enableExplosionChainReactions;
 	public static Property enableFortuneExplosions;
 	public static Property enableAngryPigmen;
+	public static Property pigmenAggroRange;
 	public static Property silkyStopsPigmen;
 	public static Property enableMobsAngerPigmen;
 	public static Property enableHellfish;
@@ -84,6 +83,7 @@ public class NetherOresCore extends BaseMod
 	public static Property enablePulverizerRecipes;
 	public static Property enableInductionSmelterRecipes;
 	public static Property enableGrinderRecipes;
+	public static Property requireSilkTouch;
 
 	public static Property forceOreSpawn;
 	public static Property worldGenAllDimensions;
@@ -125,25 +125,15 @@ public class NetherOresCore extends BaseMod
 		{
 			BlockNetherOverrideOre quartz = new BlockNetherOverrideOre(Blocks.quartz_ore) {
 				@Override
-				public int quantityDroppedWithBonus(int fortune, Random rand)
+				public void setOverride() 
 				{
-					int r;
-					synchronized(Blocks.class) {
-						Blocks.quartz_ore = _override;
-						r = _override.quantityDroppedWithBonus(fortune, rand);
-						Blocks.quartz_ore = this;
-					}
-					return r;
+					Blocks.quartz_ore = this;
 				}
 
 				@Override
-				public void dropBlockAsItemWithChance(World world, int x, int y, int z, int meta, float chance, int fortune)
+				public void resetOverride()
 				{
-					synchronized(Blocks.class) {
-						Blocks.quartz_ore = _override;
-						_override.dropBlockAsItemWithChance(world, x, y, z, meta, chance, fortune);
-						Blocks.quartz_ore = this;
-					}
+					Blocks.quartz_ore = _override;
 				}
 			};
 			Blocks.quartz_ore = quartz;
@@ -179,7 +169,9 @@ public class NetherOresCore extends BaseMod
 	public void postInit(FMLPostInitializationEvent e)
 	{
 		if (!enableSmeltToOres.getBoolean(true))
-			Ores.Coal.registerSmelting(new ItemStack(Items.coal));
+			Ores.Coal.registerSmelting(new ItemStack(Items.coal));  // If not smelting to ore, smelt coal ore to coal. Without this it would be dustCoal if that exists.
+
+		Ores.Coal.registerPulverizing(new ItemStack(Items.coal)); // Register pulverizing of coal ore to coal to avoid it getting registered as dustCoal if that exists.
 
 		for (Ores ore : Ores.values()) {
 			String oreName;
@@ -200,8 +192,6 @@ public class NetherOresCore extends BaseMod
 			if (OreDictionary.getOres(oreName).size() > 0)
 				registerOreDictGem(ore, oreName, OreDictionary.getOres(oreName).get(0));
 		}
-
-		Ores.Coal.registerPulverizing(new ItemStack(Items.coal));
 
 		MinecraftForge.EVENT_BUS.register(this);
 	}
@@ -257,9 +247,9 @@ public class NetherOresCore extends BaseMod
 				else
 					_log.debug("Unknown IMC message (%s) from %s", k, m.getSender());
 			}
-			catch (Throwable _)
+			catch (Throwable e)
 			{
-				_log.error("Bad IMC message (%s) from %s", m.key, m.getSender(), _);
+				_log.error("Bad IMC message (%s) from %s", m.key, m.getSender(), e);
 			}
 		}
 	}
@@ -289,12 +279,16 @@ public class NetherOresCore extends BaseMod
 		enableFortuneExplosions.comment = "NetherOres have a higher chance to explode when mined with fortune if true.";
 		enableAngryPigmen = c.get(CATEGORY_GENERAL, "AngryPigmenEnable", true);
 		enableAngryPigmen.comment = "If true, when NetherOres are mined, nearby pigmen become angry to the player.";
+		pigmenAggroRange = c.get(CATEGORY_GENERAL, "PigmenAggroRange", 32);
+		pigmenAggroRange.comment = "How far away Pigmen gets angry";
 		silkyStopsPigmen = c.get(CATEGORY_GENERAL, "SilkyAngryPigmenEnable", false);
 		silkyStopsPigmen.comment = "If true, when NetherOres are mined with Silk Touch, nearby pigmen become angry to the player.";
 		enableMobsAngerPigmen = c.get(CATEGORY_GENERAL, "MobsAngerPigmen", true);
 		enableMobsAngerPigmen.comment = "If true, any entity not a player exploding a NetherOre will anger nearby pigmen. This only accounts for exploding, entities breaking the blocks normally will still anger pigmen.";
 		hellFishMaxHealth = c.get(CATEGORY_GENERAL, "HellFish.MaxHealth", 12.5, null, 8.0, Double.MAX_VALUE);
 		hellFishMaxHealth.comment = "The maximum health a HellFish will have when spawned.";
+		requireSilkTouch = c.get(CATEGORY_GENERAL, "RequireSilkTouch", true);
+		requireSilkTouch.comment = "If ores like Coal, Diamond, Emerald requires Silk Touch to drop as ore (If this is false it overrides the per ore setting)";
 
 		enableSmeltToOres = c.get("Processing.Enable", "SmeltToOre", true);
 		enableSmeltToOres.comment = "Set this to false to remove smelting NetherOres to ores (i.e., nether iron ore -> 2x normal iron ore).\nInstead, ores will smelt to ingots or some other appropriate item.";

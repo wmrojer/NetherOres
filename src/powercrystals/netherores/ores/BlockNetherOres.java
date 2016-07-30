@@ -12,18 +12,21 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.monster.EntityPigZombie;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
+import net.minecraft.util.MathHelper;
 import net.minecraft.world.Explosion;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
+import powercrystals.netherores.NetherOresCore;
 import powercrystals.netherores.entity.EntityArmedOre;
 import powercrystals.netherores.gui.NOCreativeTab;
 import powercrystals.netherores.world.BlockHellfish;
 
 public class BlockNetherOres extends Block implements INetherOre
 {
-	private static int _aggroRange = 32;
 	private int _blockIndex = 0;
 	private IIcon[] _netherOresIcons = new IIcon[16];
 
@@ -61,15 +64,63 @@ public class BlockNetherOres extends Block implements INetherOre
 	}
 
 	@Override
+	public Item getItemDropped(int meta, Random rand, int fortune) {
+		int index = getBlockIndex() * 16 + meta; 
+		Ores[] ores = Ores.values();
+		if (ores[index].isRequireSilkTouch() && ores[index].getItemDropped()!=null) {
+			return ores[index].getItemDropped();
+		}
+		return super.getItemDropped(meta, rand, fortune);
+	}
+
+	@Override
 	public int damageDropped(int meta)
 	{
+		int index = getBlockIndex() * 16 + meta; 
+		Ores[] ores = Ores.values();
+		if (ores[index].isRequireSilkTouch() && ores[index].getItemDropped()!=null) {
+			return ores[index].getMetaDropped();
+		}
 		return meta;
 	}
+
+	@Override
+	public int quantityDropped(int meta, int fortune, Random random) {
+		int index = getBlockIndex() * 16 + meta; 
+		Ores[] ores = Ores.values();
+		if (ores[index].isRequireSilkTouch()) {
+			int i = ores[index].getDropCount();
+			if (i > 1) {
+				int j = Math.max(random.nextInt(fortune + 2) - 1, 0) + 1;  // -1 means 0 has one more weight then the rest
+				return Math.min(i + random.nextInt(i * j), 64);
+			}
+		} 
+		return 1;
+	}
+
+	@Override
+    public boolean canSilkHarvest(World world, EntityPlayer player, int x, int y, int z, int metadata)
+    {
+        return true;
+    }
 
 	@Override
 	public int quantityDropped(Random random)
 	{
 		return 1;
+	}
+
+    private Random rand = new Random();
+	@Override
+	public int getExpDrop(IBlockAccess world, int meta, int fortune) {
+		int exp = 0;
+		if (this.getItemDropped(meta, rand, fortune) != Item.getItemFromBlock(this)) {
+			int index = getBlockIndex() * 16 + meta; 
+			Ores[] ores = Ores.values();
+			exp = ores[index].getExp();
+			exp = MathHelper.getRandomIntegerInRange(rand, exp, exp*2+1);
+		}
+		return exp;
 	}
 
 	private ThreadLocal<Boolean> explode = new ThreadLocal<Boolean>(),
@@ -162,8 +213,10 @@ public class BlockNetherOres extends Block implements INetherOre
 
 	public static void angerPigmen(EntityPlayer player, World world, int x, int y, int z)
 	{
+		final int _aggroRange = NetherOresCore.pigmenAggroRange.getInt();
 		if (enableAngryPigmen.getBoolean(true))
 		{
+			@SuppressWarnings("unchecked")
 			List<EntityPigZombie> list = world.getEntitiesWithinAABB(EntityPigZombie.class,
 					AxisAlignedBB.getBoundingBox(x - _aggroRange, y - _aggroRange, z - _aggroRange,
 							x + _aggroRange + 1, y + _aggroRange + 1, z + _aggroRange + 1));

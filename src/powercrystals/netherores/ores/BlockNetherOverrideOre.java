@@ -46,6 +46,18 @@ public class BlockNetherOverrideOre extends Block implements INetherOre
 				(ItemBlock)Item.getItemFromBlock(_override), this, "field_150939_a");
 	}
 
+	public void setOverride()
+	{
+		// override this.
+		// Ex. Blocks.quartz_ore = this;
+	}
+	
+	public void resetOverride()
+	{
+		// override this.
+		// Ex. Blocks.quartz_ore = _override;
+	}
+	
 	@Override
 	public boolean isAssociatedBlock(Block block)
 	{
@@ -107,7 +119,10 @@ public class BlockNetherOverrideOre extends Block implements INetherOre
 	@Override
 	public int getExpDrop(IBlockAccess world, int a, int b)
 	{
-		return _override.getExpDrop(world, a, b);
+		resetOverride();
+		int exp = _override.getExpDrop(world, a, b);
+		setOverride();
+		return exp;
 	}
 
 	@Override
@@ -400,7 +415,9 @@ public class BlockNetherOverrideOre extends Block implements INetherOre
 		if (calling.get() == Boolean.TRUE)
 			return;
 		calling.set(Boolean.TRUE);
+		resetOverride();
 		_override.harvestBlock(world, player, p_149636_3_, p_149636_4_, p_149636_5_, p_149636_6_);
+		setOverride();
 		calling.set(null);
 	}
 
@@ -462,7 +479,9 @@ public class BlockNetherOverrideOre extends Block implements INetherOre
 		explode.set(false);
 		willAnger.set(NetherOresCore.enableMobsAngerPigmen.getBoolean(true) ||
 				explosion == null || !(explosion.getExplosivePlacedBy() instanceof EntityLiving));
+		resetOverride();
 		_override.onBlockExploded(world, x, y, z, explosion);
+		setOverride();
 		willAnger.set(true);
 		explode.set(true);
 		if (NetherOresCore.enableExplosionChainReactions.getBoolean(true))
